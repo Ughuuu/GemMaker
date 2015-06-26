@@ -1,0 +1,16 @@
+<editor name="ngeen">
+	<gui_camera x="400.0" y="300.0" w="800.0" h="600.0"/>
+	<def_camera x="0.0" y="0.0" w="800.0" h="600.0"/>
+	<bg_color red="0.6" green="0.2" blue="0.1" alpha="1.0"/>
+	<object name="button.pack">
+		<button states="4"/>
+		<phys x="244.0" y="166.0" type="Polygon" width="50.0" height="50.0"/>
+		<animation_tex name="button.pack" x="219.0" y="141.0" w="50.0" h="50.0"/>
+		<position x="244.0" y="166.0" z="2.0"/>
+	</object>
+	<object name="swordcraft.png">
+		<phys x="200.0" y="200.0" type="Polygon" width="100.0" height="100.0"/>
+		<single_tex name="swordcraft.png" x="150.0" y="150.0" w="100.0" h="100.0"/>
+		<position x="200.0" y="200.0" z="3.0"/>
+	</object>
+</editor>
