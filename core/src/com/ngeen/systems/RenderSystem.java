@@ -7,39 +7,44 @@ import com.artemis.annotations.Wire;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.ngeen.components.TextComponent;
 import com.ngeen.components.TextureComponent;
 import com.ngeen.components.TransformComponent;
 import com.ngeen.holder.Constant;
+import com.ngeen.ui.Interface;
 
 @Wire
 public class RenderSystem extends EntityProcessingSystem {
 	private SpriteBatch batch;
 
 	@SuppressWarnings("unchecked")
-	public RenderSystem(SpriteBatch batch) {
+	public RenderSystem() {
 		super(Aspect.all(TransformComponent.class)
 				.one(TextureComponent.class, TextComponent.class));
-		this.batch = batch;
+		this.batch = new SpriteBatch();
+		Constant.BATCH = this.batch;
+	}
+	
+	private void changeCamera(){
+		batch.setProjectionMatrix(Constant.CAMERA.combined);
 	}
 
 	@Override
 	protected void begin() {
-		Gdx.gl.glClearColor(Constant.BACKGROUND_COLOR.r, Constant.BACKGROUND_COLOR.g, Constant.BACKGROUND_COLOR.b, Constant.BACKGROUND_COLOR.a);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		changeCamera();
 		batch.begin();
 	}
 	
 	@Override
-	protected void process(Entity e) {
-		// TODO Auto-generated method stub
-		
+	protected void process(Entity e) {	
 	}
 	
 	@Override
 	protected void end(){
-		
+		batch.end();
 	}
 	
 }

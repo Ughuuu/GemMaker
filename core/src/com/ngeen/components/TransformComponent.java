@@ -1,13 +1,18 @@
 package com.ngeen.components;
 
 import com.artemis.Component;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
-public class TransformComponent extends Component{
-	Vector2 position;
-	float angle;
-	Vector2 scale;
-	int z;
+public class TransformComponent extends Component {
+	public Vector2 position;
+	public float angle;
+	public Vector2 scale;
+	public int z;
+
+	public TransformComponent() {
+		position = new Vector2(0, 0);
+		angle = 0;
+		scale = new Vector2(0, 0);
+		z = 0;
+	}
 }

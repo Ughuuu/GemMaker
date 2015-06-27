@@ -4,6 +4,7 @@ import com.artemis.Aspect;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
 import com.artemis.systems.IntervalEntityProcessingSystem;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ngeen.components.PhysicsComponent;
@@ -22,11 +23,14 @@ public class PhysicsSystem extends IntervalEntityProcessingSystem {
 		if(!Constant.RELEASE)
 		debugRenderer = new Box2DDebugRenderer();
 	}
-
+	
 	@Override
 	protected void begin() {
-		if (Constant.DEBUG)
-			debugRenderer.render(world, Constant.CAMERA.combined);
+		if (Constant.DEBUG){
+			Matrix4 mat = new Matrix4(Constant.CAMERA.combined);
+			mat.scl(Constant.INV_PIXEL_TO_METER);
+			debugRenderer.render(world, mat);
+		}
 		world.step(Constant.MS, 6, 2);
 	}
 

@@ -14,25 +14,36 @@ import com.ngeen.components.TransformComponent;
 import com.ngeen.holder.Constant;
 
 @Wire
-public class TransformSystem extends EntityProcessingSystem {
+public class OverlaySystem extends EntityProcessingSystem {
+	private ShapeRenderer shapeRenderer;
 	ComponentMapper<TransformComponent> transformMapper;
 	ComponentMapper<TagComponent> tagComponent;
 
 	@SuppressWarnings("unchecked")
-	public TransformSystem() {
+	public OverlaySystem() {
 		super(Aspect.all(TransformComponent.class));
+		shapeRenderer = new ShapeRenderer();
+	}
+
+	private void changeCamera() {
+		shapeRenderer.setProjectionMatrix(Constant.CAMERA.combined);
 	}
 
 	@Override
 	public void begin() {
+		shapeRenderer.begin(ShapeType.Line);
+		changeCamera();
 	}
 
 	@Override
 	protected void process(Entity e) {
 		TransformComponent transform = transformMapper.get(e);
+		shapeRenderer.rect(transform.position.x - 5, transform.position.y - 5,
+				transform.position.x + 5, transform.position.y + 5);
 	}
 
 	@Override
 	public void end() {
+		shapeRenderer.end();
 	}
 }

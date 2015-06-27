@@ -2,8 +2,12 @@ package com.ngeen.holder;
 
 import java.util.List;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -19,6 +23,9 @@ public class Constant {
 
 	public static Vector2 GRAVITY = new Vector2(0, -1f);
 	public static Camera CAMERA;
+	public static SpriteBatch BATCH;
+	public static BitmapFont DEBUG_FONT;
+	public static AssetManager MANAGER;
 	
 	public static float GAME_SPEED = 1;
 	public static float ZOOM = 1;

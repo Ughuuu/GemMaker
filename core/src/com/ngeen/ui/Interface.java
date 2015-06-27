@@ -47,8 +47,14 @@ public class Interface extends Stage {
 		buttons = new TextureAtlas("atlas/def_but.atlas");
 
 		top = createTopMenu();
+		top.setBackground("square");
 		this.addActor(top);
-		this.setDebugAll(true);
+		//this.setDebugAll(true);
+	}
+	
+	Table createBottom(){
+		return top;
+		
 	}
 
 	Table createTopMenu() {
@@ -110,6 +116,7 @@ public class Interface extends Stage {
 		but[0].addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				ng.entityHelper.createPositional("n", "default");
 			};
 		});
 		// zoom in
@@ -180,6 +187,7 @@ public class Interface extends Stage {
 		but[6].addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				Gdx.app.exit();
 			};
 		});
 		table.setSize(w, 80);

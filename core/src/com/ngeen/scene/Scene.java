@@ -1,23 +1,14 @@
 package com.ngeen.scene;
 
+import com.artemis.World;
 import com.badlogic.gdx.math.Vector2;
 import com.ngeen.holder.Constant;
 import com.ngeen.holder.Ngeen;
 import com.ngeen.ui.Interface;
 
 public class Scene {
-	private final Ngeen ng;
-
-	/**
-	 * Scene receives a copy of Ngeen so it can call different methods of it
-	 * directly.
-	 * 
-	 * @param ng
-	 */
-	public Scene(final Ngeen ng) {
-		this.ng = ng;
-	}
-
+	public static Ngeen ng;
+	
 	/**
 	 * Called before onEnter so you can assist the loading part of objects.
 	 */
