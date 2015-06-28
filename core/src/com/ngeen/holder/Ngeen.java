@@ -9,15 +9,19 @@ import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
 import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.input.GestureDetector.GestureListener;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.ngeen.components.CameraComponent;
 import com.ngeen.factories.CollidableFactory;
 import com.ngeen.helper.EntityHelper;
 import com.ngeen.helper.InputHelper;
 import com.ngeen.helper.SaveHelper;
 import com.ngeen.load.Loader;
+import com.ngeen.manager.EntityLogger;
 import com.ngeen.scene.LoadScene;
 import com.ngeen.scene.Scene;
 import com.ngeen.systems.AnimateSystem;
@@ -66,6 +70,24 @@ public class Ngeen {
 		Constant.CAMERA = camera.camera;
 	}
 
+	public void zoom() {
+		if (Constant.ZOOM < 0.1f)
+			Constant.ZOOM = 0.1f;
+		if (Constant.ZOOM > 2)
+			Constant.ZOOM = 2;
+		Constant.CAMERA.viewportHeight = Constant.H * Constant.ZOOM;
+		Constant.CAMERA.viewportWidth = Constant.W * Constant.ZOOM;
+		Constant.CAMERA.update();
+	}
+
+	public GestureListener getGestureListener() {
+		return (GestureListener) sceneSystem;
+	}
+
+	public InputProcessor getInputProcessor() {
+		return (InputProcessor) sceneSystem;
+	}
+
 	public void init() {
 		Scene.ng = this;
 		Constant.DEBUG_FONT = new BitmapFont(
@@ -77,6 +99,9 @@ public class Ngeen {
 		engine = new World();
 		engine.setManager(new TagManager());
 		engine.setManager(new GroupManager());
+		if (Constant.DEBUG) {
+			engine.setManager(new EntityLogger());
+		}
 
 		animateSystem = new AnimateSystem();
 		buttonSystem = new ButtonSystem();

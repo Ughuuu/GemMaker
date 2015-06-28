@@ -15,7 +15,8 @@ public class Constant {
 	public static int DEBUG_LEVEL = 0;
 	public static int W = 1024;
 	public static int H = 576;
-	
+
+	public static boolean OUTPUT_OUT = false;
 	public static boolean GAME_STATE = false;
 	public static boolean VOLUME = true;
 	public static boolean DEBUG = true;
@@ -26,15 +27,14 @@ public class Constant {
 	public static SpriteBatch BATCH;
 	public static BitmapFont DEBUG_FONT;
 	public static AssetManager MANAGER;
-	
+
 	public static float GAME_SPEED = 1;
 	public static float ZOOM = 1;
 	public static float FPS = 60;
 	public static float MS = 1.f / FPS;
 	public static float PIXEL_TO_METER = 100;
-	public static float INV_PIXEL_TO_METER = 1.f/PIXEL_TO_METER;
-	
+	public static float INV_PIXEL_TO_METER = 1.f / PIXEL_TO_METER;
+
 	public static Color BACKGROUND_COLOR = new Color(.6f, .2f, .1f, 1);
 
 }
-

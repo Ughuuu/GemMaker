@@ -18,6 +18,7 @@ public class OverlaySystem extends EntityProcessingSystem {
 	private ShapeRenderer shapeRenderer;
 	ComponentMapper<TransformComponent> transformMapper;
 	ComponentMapper<TagComponent> tagComponent;
+	public int x1, y1, x2, y2;
 
 	@SuppressWarnings("unchecked")
 	public OverlaySystem() {
@@ -29,10 +30,15 @@ public class OverlaySystem extends EntityProcessingSystem {
 		shapeRenderer.setProjectionMatrix(Constant.CAMERA.combined);
 	}
 
+	private void drawSelection(){
+		shapeRenderer.rect(x1, y1, x2-x1, y2-y1);
+	}
+	
 	@Override
 	public void begin() {
-		shapeRenderer.begin(ShapeType.Line);
 		changeCamera();
+		shapeRenderer.begin(ShapeType.Line);
+		drawSelection();
 	}
 
 	@Override

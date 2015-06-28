@@ -29,7 +29,7 @@ public class Loader {
 	 * 1 - texture 2 - texture atlas 3 - fonts 4 - sound 5 - music 6 - particles
 	 */
 	private final String[][] types = { { "png", "jpg", "jpeg", "gif" },
-			{ "pack" }, { "fnt" }, { "wav", "ogg", "mp3" },
+			{ "pack", "atlas" }, { "fnt" }, { "wav", "ogg", "mp3" },
 			{ "wav", "ogg", "mp3" }, { "p" } };
 	private ArrayList<String> folderName = new ArrayList<String>();
 	private final EntityHelper entityHelper;

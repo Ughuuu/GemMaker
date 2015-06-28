@@ -1,5 +1,11 @@
 package com.ngeen.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import sun.font.CreatedFontTracker;
+
+import com.artemis.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,52 +15,371 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox.CheckBoxStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton.ImageTextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ngeen.components.AnimationComponent;
+import com.ngeen.components.ButtonComponent;
+import com.ngeen.components.CameraComponent;
+import com.ngeen.components.GroupComponent;
+import com.ngeen.components.MusicComponent;
+import com.ngeen.components.ParticleComponent;
+import com.ngeen.components.PhysicsComponent;
+import com.ngeen.components.ResourceComponent;
+import com.ngeen.components.ScriptComponent;
+import com.ngeen.components.SoundComponent;
+import com.ngeen.components.TagComponent;
+import com.ngeen.components.TextComponent;
+import com.ngeen.components.TextureComponent;
+import com.ngeen.components.TransformComponent;
 import com.ngeen.holder.Constant;
 import com.ngeen.holder.Ngeen;
+import com.ngeen.ui.creators.Creator;
+import com.ngeen.ui.creators.CreatorAnimation;
+import com.ngeen.ui.creators.CreatorButton;
+import com.ngeen.ui.creators.CreatorCamera;
+import com.ngeen.ui.creators.CreatorGroup;
+import com.ngeen.ui.creators.CreatorMusic;
+import com.ngeen.ui.creators.CreatorParticle;
+import com.ngeen.ui.creators.CreatorPhysics;
+import com.ngeen.ui.creators.CreatorResource;
+import com.ngeen.ui.creators.CreatorScript;
+import com.ngeen.ui.creators.CreatorSound;
+import com.ngeen.ui.creators.CreatorTag;
+import com.ngeen.ui.creators.CreatorText;
+import com.ngeen.ui.creators.CreatorTexture;
+import com.ngeen.ui.creators.CreatorTransform;
 
 public class Interface extends Stage {
-	private Skin skin;
-	private TextureAtlas buttons;
-	private Table top;
-	private int w, h;
+	public static Skin skin;
+	public static TextureAtlas buttons;
+	public int w, h, uniqueId = 0;
+	public static TextArea debug;
+	public static ScrollPane debugPane;
+	public static ScrollPane lookPane;
+	public static ImageTextButtonStyle entityStyle = new ImageTextButtonStyle();
+	public static Map<Integer, ImageTextButton> entityMap = new HashMap<Integer, ImageTextButton>();
+	public static int selected = -1;
 
-	final Ngeen ng;
-	
-	public static void print(String line){	
-		System.out.print(line);	
+	public static Table entities, right, top, bottom, left, components;
+
+	public static Ngeen ng;
+
+	public static void select(Entity e) {
+		selected = e.id;
+		AnimationComponent anim = e.getComponent(AnimationComponent.class);
+		if (anim != null) {
+			CreatorAnimation.addAnimation();
+			CreatorAnimation.animationIndex.setText(anim.index + "");
+			CreatorAnimation.animationPage.setText(anim.page);
+			CreatorAnimation.animationResource
+					.setText(ng.getById(anim.resource_index).getComponent(
+							ResourceComponent.class).name);
+		} else {
+			CreatorAnimation.removeAnimation();
+		}
+		ButtonComponent butc = e.getComponent(ButtonComponent.class);
+		if (butc != null) {
+			CreatorButton.addButton();
+			CreatorButton.buttonState.setText(butc.state + "");
+			CreatorButton.buttonStates.setText(butc.states + "");
+		} else {
+			CreatorButton.removeButton();
+		}
+		CameraComponent camc = e.getComponent(CameraComponent.class);
+		if (camc != null) {
+			CreatorCamera.addCamera();
+			CreatorCamera.cameraHeight.setText(camc.camera.viewportHeight + "");
+			CreatorCamera.cameraWidth.setText(camc.camera.viewportWidth + "");
+		} else {
+			CreatorCamera.removeCamera();
+		}
+		GroupComponent groupc = e.getComponent(GroupComponent.class);
+		if (groupc != null) {
+			CreatorGroup.addGroup();
+			CreatorGroup.groupName.setText(groupc.name);
+		} else {
+			CreatorGroup.removeGroup();
+		}
+		MusicComponent musicc = e.getComponent(MusicComponent.class);
+		if (musicc != null) {
+			CreatorMusic.addMusic();
+			CreatorMusic.musicResource.setText(ng
+					.getById(musicc.resource_index).getComponent(
+							ResourceComponent.class).name);
+		} else {
+			CreatorMusic.removeMusic();
+		}
+		ParticleComponent partc = e.getComponent(ParticleComponent.class);
+		if (partc != null) {
+			CreatorParticle.addParticle();
+			CreatorParticle.partDraw.setChecked(partc.draw);
+			CreatorParticle.partResource
+					.setText(ng.getById(partc.resource_index).getComponent(
+							ResourceComponent.class).name);
+		} else {
+			CreatorParticle.removeParticle();
+		}
+		PhysicsComponent physc = e.getComponent(PhysicsComponent.class);
+		if (physc != null) {
+			CreatorPhysics.addPhysics();
+		} else {
+			CreatorPhysics.removePhysics();
+		}
+		ResourceComponent resc = e.getComponent(ResourceComponent.class);
+		if (resc != null) {
+			CreatorResource.addResource();
+			CreatorResource.resourceName.setText(resc.name);
+			CreatorResource.resourceType.setText(resc.resource.getClass()
+					.getSimpleName());
+		} else {
+			CreatorResource.removeResource();
+		}
+		ScriptComponent scriptc = e.getComponent(ScriptComponent.class);
+		if (scriptc != null) {
+			CreatorScript.addScript();
+			CreatorScript.scriptScript.setText(scriptc.script.getClass()
+					.getSimpleName());
+			CreatorScript.scriptEnable.setChecked(scriptc.script.active);
+		} else {
+			CreatorScript.removeScript();
+		}
+		SoundComponent soundc = e.getComponent(SoundComponent.class);
+		if (soundc != null) {
+			CreatorSound.addSound();
+			CreatorSound.soundResource.setText(ng
+					.getById(soundc.resource_index).getComponent(
+							ResourceComponent.class).name);
+		} else {
+			CreatorSound.removeSound();
+		}
+		TagComponent tagc = e.getComponent(TagComponent.class);
+		if (tagc != null) {
+			CreatorTag.addTag();
+			CreatorTag.tagName.setText(tagc.name);
+		} else {
+			CreatorTag.removeTag();
+		}
+		TextComponent textc = e.getComponent(TextComponent.class);
+		if (textc != null) {
+			CreatorText.addText();
+			CreatorText.textDraw.setChecked(textc.draw);
+			CreatorText.textResource.setText(ng.getById(textc.resource_index)
+					.getComponent(ResourceComponent.class).name);
+			CreatorText.textText.setText(textc.text);
+		} else {
+			CreatorText.removeText();
+		}
+		TextureComponent texturec = e.getComponent(TextureComponent.class);
+		if (texturec != null) {
+			CreatorTexture.addTexture();
+			CreatorTexture.textureResource.setText(ng.getById(
+					texturec.resource_index).getComponent(
+					ResourceComponent.class).name);
+			CreatorTexture.textureDraw.setChecked(texturec.draw);
+		} else {
+			CreatorTexture.removeTexture();
+		}
+		TransformComponent transformc = e
+				.getComponent(TransformComponent.class);
+		if (transformc != null) {
+			CreatorTransform.addTransform();
+			CreatorTransform.transformAngle.setText(transformc.angle + "");
+			CreatorTransform.transformDepth.setText(transformc.z + "");
+			CreatorTransform.transformPositionX.setText(transformc.position.x
+					+ "");
+			CreatorTransform.transformPositionY.setText(transformc.position.y
+					+ "");
+			CreatorTransform.transformScaleX.setText(transformc.scale.x + "");
+			CreatorTransform.transformScaleY.setText(transformc.scale.y + "");
+		} else {
+			CreatorTransform.removeTransform();
+		}
 	}
-	
-	public static void println(String line){
-		System.out.println(line);
+
+	public static void deselect() {
+		// tag2.setText("NULL");
 	}
-	
+
+	public static void addEntity(Entity e) {
+		if (entityMap.get(e.id) == null) {
+			select(e);
+			println("Entity: " + e.getComponent(TagComponent.class).name
+					+ " added.");
+			final ImageTextButton ent = new ImageTextButton(
+					e.getComponent(TagComponent.class).name, entityStyle);
+			ent.setName("" + e.id);
+			ent.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					select(ng.getById(Integer
+							.parseInt(ent.getName().toString())));
+				};
+			});
+			entityMap.put(e.id, ent);
+			entities.add(ent).row();
+		} else {
+			changeEntity(e);
+		}
+	}
+
+	public static void changeEntity(Entity e) {
+		if (entityMap.get(e.id) != null) {
+			println("Entity: " + e.getComponent(TagComponent.class).name
+					+ " changed.");
+			select(e);
+			entityMap.get(e.id)
+					.setText(e.getComponent(TagComponent.class).name);
+		}
+	}
+
+	public static void deleteEntity(Entity e) {
+		if (entityMap.get(e.id) != null) {
+			if (e.id == selected) {
+				deselect();
+			}
+			println("Entity: " + e.getComponent(TagComponent.class).name
+					+ " deleted.");
+			ImageTextButton but = entityMap.remove(e.id);
+			but.remove();
+		}
+	}
+
+	public static void notifyDebug() {
+		debug.setPrefRows(50);
+		// debug.setPrefRows(debug.getText().split("\n").length);
+		debugPane.layout();
+	}
+
+	public static void print(String line) {
+		debug.appendText(line);
+		if (Constant.OUTPUT_OUT == true)
+			System.out.println(line);
+		notifyDebug();
+	}
+
+	public static void println(String line) {
+		debug.appendText(line + "\n");
+		if (Constant.OUTPUT_OUT == true)
+			System.out.println(line);
+		notifyDebug();
+	}
+
 	public Interface(Ngeen ng) {
 		super(new ScreenViewport());
 		this.ng = ng;
-		w = Gdx.graphics.getWidth();
-		h = Gdx.graphics.getHeight();
 		init();
 	}
 
 	void init() {
+		w = Gdx.graphics.getWidth();
+		h = Gdx.graphics.getHeight();
 		skin = new Skin(Gdx.files.internal("atlas/darkui.json"));
+		skin.getFont("default-font").getData().setScale(0.1f);
 		buttons = new TextureAtlas("atlas/def_but.atlas");
 
+		Creator.buttons = buttons;
+		Creator.skin = skin;
+		Creator.w = w;
+		Creator.h = h;
+
+		entityStyle.up = new TextureRegionDrawable(buttons.findRegion("but", 0));
+		entityStyle.checked = new TextureRegionDrawable(buttons.findRegion(
+				"but", 1));
+		entityStyle.font = skin.getFont("default-font");
+
 		top = createTopMenu();
-		top.setBackground("square");
+		bottom = createBottomMenu();
+		left = createLeftMenu();
+		right = createRightMenu();
+
+		this.addActor(left);
 		this.addActor(top);
-		//this.setDebugAll(true);
+		this.addActor(right);
+		this.addActor(bottom);
+		this.setDebugAll(true);
 	}
-	
-	Table createBottom(){
-		return top;
-		
+
+	public void changeDebug() {
+
+	}
+
+	Table createBottomMenu() {
+		Table table = new Table(skin);
+
+		final ImageButton but = new ImageButton(new TextureRegionDrawable(
+				buttons.findRegion("expand", 0)), new TextureRegionDrawable(
+				buttons.findRegion("expand", 1)));
+
+		debug = new TextArea("This is ngeen(all lowercase) version 1.1.\n",
+				skin);
+
+		debugPane = new ScrollPane(debug, skin);
+		debugPane.setScrollbarsOnTop(false);
+		debugPane.setFadeScrollBars(false);
+		debugPane.setCancelTouchFocus(false);
+
+		table.add(debugPane).expand().fill();
+		table.add(but);
+
+		table.setSize(w, 64);
+		table.setPosition(0, 0);
+
+		// expand
+		but.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (bottom.getHeight() == 250) {
+					bottom.setSize(w, 64);
+				} else
+					bottom.setSize(w, 250);
+			};
+		});
+
+		table.setBackground("square");
+		return table;
+	}
+
+	Table createLeftMenu() {
+		Table table = new Table(skin);
+
+		final ImageButton but = new ImageButton(new TextureRegionDrawable(
+				buttons.findRegion("expand", 0)), new TextureRegionDrawable(
+				buttons.findRegion("expand", 1)));
+
+		entities = new Table(skin);
+		ScrollPane pane = new ScrollPane(entities, skin);
+		pane.setCancelTouchFocus(false);
+
+		table.add(pane).expand().fill();
+		table.add(but);
+
+		table.setSize(64, h - 64 * 2);
+		table.setPosition(0, 64);
+
+		// expand
+		but.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (left.getWidth() == 64) {
+					left.setSize(250, h - 64 * 2);
+				} else
+					left.setSize(64, h - 64 * 2);
+			};
+		});
+
+		table.setBackground("square");
+		return table;
 	}
 
 	Table createTopMenu() {
@@ -116,21 +441,24 @@ public class Interface extends Stage {
 		but[0].addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				ng.entityHelper.createPositional("n", "default");
+				ng.entityHelper.createPositional("n" + uniqueId, "default");
+				uniqueId++;
 			};
 		});
 		// zoom in
 		but[1].addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				Constant.ZOOM += 0.5f * Constant.ZOOM;
+				Constant.ZOOM -= 0.2f;
+				ng.zoom();
 			};
 		});
 		// zoom out
 		but[2].addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				Constant.ZOOM -= 0.5f * Constant.ZOOM;
+				Constant.ZOOM += 0.2f;
+				ng.zoom();
 			};
 		});
 		// slow down
@@ -190,13 +518,91 @@ public class Interface extends Stage {
 				Gdx.app.exit();
 			};
 		});
-		table.setSize(w, 80);
-		table.setPosition(0, h - 80);
+		table.setSize(w, 64);
+		table.setPosition(0, h - 64);
+		table.setBackground("square");
 		return table;
 	}
 
-	public void dispose() {
-		skin.dispose();
-		buttons.dispose();
+	Table createRightMenu() {
+		Table table = new Table(skin);
+
+		final ImageButton but = new ImageButton(new TextureRegionDrawable(
+				buttons.findRegion("expand", 0)), new TextureRegionDrawable(
+				buttons.findRegion("expand", 1)));
+
+		components = new Table(skin);
+
+		CreatorAnimation.createAnimation();
+		CreatorButton.createButton();
+		CreatorCamera.createCamera();
+		CreatorGroup.createGroup();
+		CreatorMusic.createMusic();
+		CreatorParticle.createParticle();
+		CreatorPhysics.createPhysics();
+		CreatorResource.createResource();
+		CreatorScript.createScript();
+		CreatorSound.createSound();
+		CreatorTag.createTag();
+		CreatorText.createText();
+		CreatorTexture.createTexture();
+		CreatorTransform.createTransform();
+
+		components.add(Creator.tag).fillX().expandX();
+		components.row();
+		components.add(Creator.group).fillX().expandX();
+		components.row();
+		components.add(Creator.transform).fillX().expandX();
+		components.row();
+		components.add(Creator.texture).fillX().expandX();
+		components.row();
+		components.add(Creator.physics).fillX().expandX();
+		components.row();
+		components.add(Creator.particle).fillX().expandX();
+		components.row();
+		components.add(Creator.animation).fillX().expandX();
+		components.row();
+		components.add(Creator.button).fillX().expandX();
+		components.row();
+		components.add(Creator.text).fillX().expandX();
+		components.row();
+		components.add(Creator.sound).fillX().expandX();
+		components.row();
+		components.add(Creator.music).fillX().expandX();
+		components.row();
+		components.add(Creator.script).fillX().expandX();
+		components.row();
+		components.add(Creator.camera).fillX().expandX();
+		components.row();
+		components.add(Creator.resource).fillX().expandX();
+		components.row();
+
+		ScrollPane lookPane = new ScrollPane(components, skin);
+		lookPane.setCancelTouchFocus(false);
+
+		table.add(but);
+		table.add(lookPane).expand().fill();
+
+		table.setSize(64, h - 64 * 2);
+		table.setPosition(w - 64, 64);
+
+		// expand
+		but.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (right.getWidth() == 64) {
+					right.setPosition(w - 350, 64);
+					right.setSize(350, h - 64 * 2);
+				} else {
+					right.setPosition(w - 64, 64);
+					right.setSize(64, h - 64 * 2);
+				}
+			};
+		});
+
+		deselect();
+		table.setBackground("square");
+		return table;
 	}
+
 }

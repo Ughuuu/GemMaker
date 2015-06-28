@@ -27,7 +27,7 @@ public class LogSystem extends EntityProcessingSystem {
 	@Override
 	public void begin() {
 		Constant.BATCH.begin();
-		Constant.DEBUG_FONT.getData().setScale(0.2f);
+		Constant.DEBUG_FONT.getData().setScale(0.15f);
 	}
 
 	@Override

@@ -3,201 +3,198 @@ darkui.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-but
-  rotate: false
-  xy: 1, 397
-  size: 64, 64
-  split: 3, 3, 3, 3
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
 check
   rotate: false
-  xy: 1, 331
+  xy: 1, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 down
   rotate: false
-  xy: 67, 397
+  xy: 1, 85
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 knob
   rotate: false
-  xy: 1, 265
+  xy: 67, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 left
   rotate: false
-  xy: 67, 331
+  xy: 1, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 minus
   rotate: false
-  xy: 133, 397
+  xy: 67, 85
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 next
   rotate: false
-  xy: 1, 199
+  xy: 133, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 plus
   rotate: false
-  xy: 67, 265
+  xy: 67, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 prev
   rotate: false
-  xy: 133, 331
+  xy: 133, 85
   size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-p_but
-  rotate: false
-  xy: 199, 397
-  size: 64, 64
-  split: 3, 3, 3, 3
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_check
   rotate: false
-  xy: 1, 133
+  xy: 199, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_down
   rotate: false
-  xy: 67, 199
+  xy: 133, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_knob
   rotate: false
-  xy: 133, 265
+  xy: 199, 85
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_left
   rotate: false
-  xy: 199, 331
+  xy: 265, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_minus
   rotate: false
-  xy: 265, 397
+  xy: 199, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_next
   rotate: false
-  xy: 1, 67
+  xy: 265, 85
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_plus
   rotate: false
-  xy: 67, 133
+  xy: 331, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_prev
   rotate: false
-  xy: 133, 199
+  xy: 265, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_right
   rotate: false
-  xy: 199, 265
+  xy: 331, 85
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_scrolldown
   rotate: false
-  xy: 265, 331
+  xy: 397, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_scrollup
   rotate: false
-  xy: 331, 397
+  xy: 331, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 p_up
   rotate: false
-  xy: 1, 1
+  xy: 397, 85
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 right
   rotate: false
-  xy: 67, 67
+  xy: 463, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 scrolldown
   rotate: false
-  xy: 133, 133
+  xy: 397, 19
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 scrollup
   rotate: false
-  xy: 199, 199
+  xy: 463, 85
   size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-square
-  rotate: false
-  xy: 265, 265
-  size: 64, 64
-  split: 3, 3, 3, 3
   orig: 64, 64
   offset: 0, 0
   index: -1
 up
   rotate: false
-  xy: 331, 331
+  xy: 529, 151
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+but
+  rotate: false
+  xy: 1, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+p_but
+  rotate: false
+  xy: 463, 67
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+square
+  rotate: false
+  xy: 529, 133
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 white
   rotate: false
-  xy: 397, 458
+  xy: 595, 212
   size: 3, 3
   orig: 3, 3
   offset: 0, 0

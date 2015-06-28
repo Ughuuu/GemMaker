@@ -37,7 +37,7 @@ but
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: -1
+  index: 0
 config
   rotate: false
   xy: 158, 447
@@ -150,13 +150,13 @@ new
   orig: 64, 64
   offset: 0, 0
   index: 1
-p_but
+but
   rotate: false
   xy: 1, 51
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: -1
+  index: 1
 save
   rotate: false
   xy: 1, 1
