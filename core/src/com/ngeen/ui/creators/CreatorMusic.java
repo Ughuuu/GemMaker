@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.CameraComponent;
+import com.ngeen.components.MusicComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorMusic {
@@ -39,6 +41,7 @@ public class CreatorMusic {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				addMusic();
+				Interface.ng.entityHelper.addComponent(MusicComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 
@@ -47,6 +50,7 @@ public class CreatorMusic {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				removeMusic();
+				Interface.ng.entityHelper.removeComponent(MusicComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 

@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.ButtonComponent;
+import com.ngeen.components.CameraComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorCamera {
@@ -55,6 +57,7 @@ public class CreatorCamera {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				addCamera();
+				Interface.ng.entityHelper.addComponent(CameraComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 
@@ -63,6 +66,7 @@ public class CreatorCamera {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				removeCamera();
+				Interface.ng.entityHelper.removeComponent(CameraComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 	}

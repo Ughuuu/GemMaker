@@ -1,5 +1,5 @@
 {
-com.badlogic.gdx.graphics.g2d.BitmapFont: { default-font: { file: ../font/ubuntu.fnt } },
+com.badlogic.gdx.graphics.g2d.BitmapFont: { default-font: { file: ../data/font/ubuntu.fnt } },
 com.badlogic.gdx.graphics.Color: {
 	green: { a: 1, b: 0.5, g: 0.23, r: 0.21 },
 	white: { a: 1, b: 1, g: 1, r: 1 },

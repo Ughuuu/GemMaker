@@ -33,10 +33,12 @@ public class Loader {
 			{ "wav", "ogg", "mp3" }, { "p" } };
 	private ArrayList<String> folderName = new ArrayList<String>();
 	private final EntityHelper entityHelper;
+	private final Ngeen ng;
 	private boolean loading = false;
 
-	public Loader(EntityHelper entityHelper) {
+	public Loader(EntityHelper entityHelper, Ngeen ng) {
 		this.entityHelper = entityHelper;
+		this.ng = ng;
 	}
 
 	private boolean checkExt(String name, int i) {
@@ -125,6 +127,8 @@ public class Loader {
 			LoadAll("data/sound/" + folder + "/", 3);
 			LoadAll("data/music/" + folder + "/", 4);
 			LoadAll("data/particle/" + folder + "/", 5);
+
+			ng.afterLoad(folder);
 
 			if (folderName.isEmpty()) {
 				return true;

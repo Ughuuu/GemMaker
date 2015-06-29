@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.PhysicsComponent;
+import com.ngeen.components.ScriptComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorScript {
@@ -42,6 +44,7 @@ public class CreatorScript {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				addScript();
+				Interface.ng.entityHelper.addComponent(ScriptComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 
@@ -50,6 +53,7 @@ public class CreatorScript {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				removeScript();
+				Interface.ng.entityHelper.removeComponent(ScriptComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 

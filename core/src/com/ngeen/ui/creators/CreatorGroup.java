@@ -37,6 +37,7 @@ public class CreatorGroup {
 	}
 
 	public static void removeGroup() {
+		groupName.setText("");
 	}
 
 	public static void addGroup() {

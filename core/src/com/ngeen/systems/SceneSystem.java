@@ -15,7 +15,6 @@ public class SceneSystem extends VoidEntitySystem implements GestureListener,
 	private Scene scene;
 
 	public SceneSystem() {
-		this.scene = new LoadScene();
 	}
 
 	public Scene getScene() {
@@ -24,71 +23,83 @@ public class SceneSystem extends VoidEntitySystem implements GestureListener,
 
 	public void setScene(Scene scene) {
 		this.scene = scene;
+		scene.onInit();
 	}
 
 	@Override
 	protected void processSystem() {
-		scene.onUpdate(Gdx.graphics.getDeltaTime());
+		if (scene != null)
+			scene.onUpdate(Gdx.graphics.getDeltaTime());
 	}
 
 	@Override
 	public boolean touchDown(float x, float y, int pointer, int button) {
-		scene.onTouchDown(x, y, pointer);
+		if (scene != null)
+			scene.onTouchDown(x, y, pointer);
 		return false;
 	}
 
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
-		scene.onTap(x, y, count);
+		if (scene != null)
+			scene.onTap(x, y, count);
 		return false;
 	}
 
 	@Override
 	public boolean longPress(float x, float y) {
-		scene.onLongPress(x, y);
+		if (scene != null)
+			scene.onLongPress(x, y);
 		return false;
 	}
 
 	@Override
 	public boolean fling(float velocityX, float velocityY, int button) {
-		scene.onFling(velocityX, velocityY);
+		if (scene != null)
+			scene.onFling(velocityX, velocityY);
 		return false;
 	}
 
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		scene.onPan(x, y, deltaX, deltaY);
+		if (scene != null)
+			scene.onPan(x, y, deltaX, deltaY);
 		return false;
 	}
 
 	@Override
 	public boolean panStop(float x, float y, int pointer, int button) {
-		scene.onPanStop(x, y);
+		if (scene != null)
+			scene.onPanStop(x, y);
 		return false;
 	}
 
 	@Override
 	public boolean zoom(float initialDistance, float distance) {
-		scene.onZoom(initialDistance, distance);
+		if (scene != null)
+			scene.onZoom(initialDistance, distance);
 		return false;
 	}
 
 	@Override
 	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2,
 			Vector2 pointer1, Vector2 pointer2) {
-		scene.onPinch(initialPointer1, initialPointer2, pointer1, pointer2);
+		if (scene != null)
+			scene.onPinch(initialPointer1, initialPointer2, pointer1, pointer2);
 		return false;
 	}
 
 	@Override
 	public boolean keyDown(int keycode) {
-		scene.onKeyDown(keycode);
+		if (scene != null)
+			scene.onKeyDown(keycode);
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		scene.onKeyUp(keycode);
+		if (scene != null)
+			scene.onKeyUp(keycode);
 		return false;
 	}
 
@@ -106,13 +117,15 @@ public class SceneSystem extends VoidEntitySystem implements GestureListener,
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		scene.onTouchUp(screenX, screenY, pointer);
+		if (scene != null)
+			scene.onTouchUp(screenX, screenY, pointer);
 		return false;
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		scene.onTouchDrag(screenX, screenY, pointer);
+		if (scene != null)
+			scene.onTouchDrag(screenX, screenY, pointer);
 		return false;
 	}
 

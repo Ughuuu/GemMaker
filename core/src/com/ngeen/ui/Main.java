@@ -10,6 +10,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ngeen.holder.Constant;
 import com.ngeen.holder.Ngeen;
+import com.ngeen.scene.LoadScene;
 import com.ngeen.tester.Test;
 
 public class Main extends ApplicationAdapter {
@@ -32,6 +33,7 @@ public class Main extends ApplicationAdapter {
 		ng = new Ngeen();
 		initDisplay();
 		test = new Test(ng);
+		ng.setScene(new LoadScene());
 	}
 
 	@Override

@@ -10,10 +10,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.TextComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorTag {
 
+	public static ImageButton tagDel;
 	public static Label tagTitle, tagNameLabel;
 	public static TextField tagName;
 
@@ -25,17 +27,33 @@ public class CreatorTag {
 		Table tag = Creator.tag;
 		tag.setBackground("square");
 
+		tagDel = new ImageButton(new TextureRegionDrawable(buttons.findRegion(
+				"exit", 0)), new TextureRegionDrawable(buttons.findRegion(
+				"exit", 1)));
+
 		tagTitle = new Label("Tag: ", skin);
 		tagNameLabel = new Label("Name: ", skin);
 		tagName = new TextField("", skin);
-		tag.add(tagTitle).colspan(2).expandX().fillX();
+		tag.add(tagTitle).expandX().fillX();
+		tag.add(tagDel);
 		tag.row();
 		tag.add(tagNameLabel);
 		tag.add(tagName);
 		tag.row();
+
+		// remove
+		tagDel.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				Interface.ng.removeEntity(Interface.selected);
+				Interface.deselect();
+			};
+		});
 	}
 
 	public static void removeTag() {
+		tagName.setText("");
+		tagDel.remove();
 	}
 
 	public static void addTag() {

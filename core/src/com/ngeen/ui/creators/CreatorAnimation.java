@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.AnimationComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorAnimation {
@@ -59,6 +60,7 @@ public class CreatorAnimation {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				addAnimation();
+				Interface.ng.entityHelper.addComponent(AnimationComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 
@@ -67,6 +69,7 @@ public class CreatorAnimation {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				removeAnimation();
+				Interface.ng.entityHelper.removeComponent(AnimationComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 		animation.setBackground("square");

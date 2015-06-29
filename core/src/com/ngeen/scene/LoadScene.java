@@ -1,8 +1,14 @@
 package com.ngeen.scene;
 
-public class LoadScene extends Scene{
+public class LoadScene extends Scene {
+
 	@Override
-	public void onUpdate(float delta){
-		
+	public void onInit() {
+		ng.load("");
+	};
+
+	@Override
+	public void onUpdate(float delta) {
+
 	}
 }

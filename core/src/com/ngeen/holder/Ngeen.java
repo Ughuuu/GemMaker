@@ -10,6 +10,7 @@ import com.artemis.managers.TagManager;
 import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -32,6 +33,7 @@ import com.ngeen.systems.PhysicsSystem;
 import com.ngeen.systems.RenderSystem;
 import com.ngeen.systems.SceneSystem;
 import com.ngeen.systems.TransformSystem;
+import com.ngeen.ui.Interface;
 
 public class Ngeen {
 	private World engine;
@@ -56,6 +58,10 @@ public class Ngeen {
 
 	public ImmutableBag<Entity> getByGroup(String group) {
 		return engine.getManager(GroupManager.class).getEntities(group);
+	}
+
+	public void removeEntity(int id) {
+		engine.deleteEntity(id);
 	}
 
 	public void clear() {
@@ -88,10 +94,16 @@ public class Ngeen {
 		return (InputProcessor) sceneSystem;
 	}
 
+	public void load(String name) {
+		load.preLoadAll(name);
+	}
+
 	public void init() {
 		Scene.ng = this;
 		Constant.DEBUG_FONT = new BitmapFont(
-				Gdx.files.internal("font/AmaticSC-Regular.fnt"));
+				Gdx.files.internal("data/font/AmaticSC-Regular.fnt"));
+
+		Constant.MANAGER = new AssetManager();
 
 		inputHelper = new InputHelper();
 		saveHelper = new SaveHelper();
@@ -125,15 +137,25 @@ public class Ngeen {
 		}
 
 		engine.initialize();
+
 		entityHelper = new EntityHelper(engine);
-		load = new Loader(entityHelper);
+		load = new Loader(entityHelper, this);
 
 		addDummyEntities();
+	}
+
+	public void setScene(Scene sc) {
+		((SceneSystem) sceneSystem).setScene(sc);
+	}
+
+	public void afterLoad(String name) {
+		Interface.println("Started loading: \"" + name + "\" folder");
 	}
 
 	public void update(float delta) {
 		engine.setDelta(delta);
 		engine.process();
+		load.done();
 	}
 
 	public Ngeen() {

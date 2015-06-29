@@ -78,76 +78,74 @@ public class Interface extends Stage {
 	public static void select(Entity e) {
 		selected = e.id;
 		AnimationComponent anim = e.getComponent(AnimationComponent.class);
+		CreatorAnimation.addAnimation();
 		if (anim != null) {
-			CreatorAnimation.addAnimation();
 			CreatorAnimation.animationIndex.setText(anim.index + "");
 			CreatorAnimation.animationPage.setText(anim.page);
-			CreatorAnimation.animationResource
-					.setText(ng.getById(anim.resource_index).getComponent(
-							ResourceComponent.class).name);
+			CreatorAnimation.animationResource.setText(ng.getById(
+					anim.resource_index).getComponent(TagComponent.class).name);
 		} else {
 			CreatorAnimation.removeAnimation();
 		}
 		ButtonComponent butc = e.getComponent(ButtonComponent.class);
+		CreatorButton.addButton();
 		if (butc != null) {
-			CreatorButton.addButton();
 			CreatorButton.buttonState.setText(butc.state + "");
 			CreatorButton.buttonStates.setText(butc.states + "");
 		} else {
 			CreatorButton.removeButton();
 		}
 		CameraComponent camc = e.getComponent(CameraComponent.class);
+		CreatorCamera.addCamera();
 		if (camc != null) {
-			CreatorCamera.addCamera();
 			CreatorCamera.cameraHeight.setText(camc.camera.viewportHeight + "");
 			CreatorCamera.cameraWidth.setText(camc.camera.viewportWidth + "");
 		} else {
 			CreatorCamera.removeCamera();
 		}
 		GroupComponent groupc = e.getComponent(GroupComponent.class);
+		CreatorGroup.addGroup();
 		if (groupc != null) {
-			CreatorGroup.addGroup();
 			CreatorGroup.groupName.setText(groupc.name);
 		} else {
 			CreatorGroup.removeGroup();
 		}
 		MusicComponent musicc = e.getComponent(MusicComponent.class);
+		CreatorMusic.addMusic();
 		if (musicc != null) {
-			CreatorMusic.addMusic();
 			CreatorMusic.musicResource.setText(ng
 					.getById(musicc.resource_index).getComponent(
-							ResourceComponent.class).name);
+							TagComponent.class).name);
 		} else {
 			CreatorMusic.removeMusic();
 		}
 		ParticleComponent partc = e.getComponent(ParticleComponent.class);
+		CreatorParticle.addParticle();
 		if (partc != null) {
-			CreatorParticle.addParticle();
 			CreatorParticle.partDraw.setChecked(partc.draw);
 			CreatorParticle.partResource
 					.setText(ng.getById(partc.resource_index).getComponent(
-							ResourceComponent.class).name);
+							TagComponent.class).name);
 		} else {
 			CreatorParticle.removeParticle();
 		}
 		PhysicsComponent physc = e.getComponent(PhysicsComponent.class);
+		CreatorPhysics.addPhysics();
 		if (physc != null) {
-			CreatorPhysics.addPhysics();
 		} else {
 			CreatorPhysics.removePhysics();
 		}
 		ResourceComponent resc = e.getComponent(ResourceComponent.class);
+		CreatorResource.addResource();
 		if (resc != null) {
-			CreatorResource.addResource();
-			CreatorResource.resourceName.setText(resc.name);
 			CreatorResource.resourceType.setText(resc.resource.getClass()
 					.getSimpleName());
 		} else {
 			CreatorResource.removeResource();
 		}
 		ScriptComponent scriptc = e.getComponent(ScriptComponent.class);
+		CreatorScript.addScript();
 		if (scriptc != null) {
-			CreatorScript.addScript();
 			CreatorScript.scriptScript.setText(scriptc.script.getClass()
 					.getSimpleName());
 			CreatorScript.scriptEnable.setChecked(scriptc.script.active);
@@ -155,45 +153,45 @@ public class Interface extends Stage {
 			CreatorScript.removeScript();
 		}
 		SoundComponent soundc = e.getComponent(SoundComponent.class);
+		CreatorSound.addSound();
 		if (soundc != null) {
-			CreatorSound.addSound();
 			CreatorSound.soundResource.setText(ng
 					.getById(soundc.resource_index).getComponent(
-							ResourceComponent.class).name);
+							TagComponent.class).name);
 		} else {
 			CreatorSound.removeSound();
 		}
 		TagComponent tagc = e.getComponent(TagComponent.class);
+		CreatorTag.addTag();
 		if (tagc != null) {
-			CreatorTag.addTag();
 			CreatorTag.tagName.setText(tagc.name);
 		} else {
 			CreatorTag.removeTag();
 		}
 		TextComponent textc = e.getComponent(TextComponent.class);
+		CreatorText.addText();
 		if (textc != null) {
-			CreatorText.addText();
 			CreatorText.textDraw.setChecked(textc.draw);
 			CreatorText.textResource.setText(ng.getById(textc.resource_index)
-					.getComponent(ResourceComponent.class).name);
+					.getComponent(TagComponent.class).name);
 			CreatorText.textText.setText(textc.text);
 		} else {
 			CreatorText.removeText();
 		}
 		TextureComponent texturec = e.getComponent(TextureComponent.class);
+		CreatorTexture.addTexture();
 		if (texturec != null) {
-			CreatorTexture.addTexture();
-			CreatorTexture.textureResource.setText(ng.getById(
-					texturec.resource_index).getComponent(
-					ResourceComponent.class).name);
+			CreatorTexture.textureResource
+					.setText(ng.getById(texturec.resource_index).getComponent(
+							TagComponent.class).name);
 			CreatorTexture.textureDraw.setChecked(texturec.draw);
 		} else {
 			CreatorTexture.removeTexture();
 		}
 		TransformComponent transformc = e
 				.getComponent(TransformComponent.class);
+		CreatorTransform.addTransform();
 		if (transformc != null) {
-			CreatorTransform.addTransform();
 			CreatorTransform.transformAngle.setText(transformc.angle + "");
 			CreatorTransform.transformDepth.setText(transformc.z + "");
 			CreatorTransform.transformPositionX.setText(transformc.position.x
@@ -208,7 +206,33 @@ public class Interface extends Stage {
 	}
 
 	public static void deselect() {
-		// tag2.setText("NULL");
+		selected = -1;
+		CreatorAnimation.removeAnimation();
+		CreatorButton.removeButton();
+		CreatorCamera.removeCamera();
+		CreatorGroup.removeGroup();
+		CreatorMusic.removeMusic();
+		CreatorParticle.removeParticle();
+		CreatorPhysics.removePhysics();
+		CreatorResource.removeResource();
+		CreatorScript.removeScript();
+		CreatorSound.removeSound();
+		CreatorTag.removeTag();
+		CreatorText.removeText();
+		CreatorTexture.removeTexture();
+		CreatorTransform.removeTransform();
+
+		CreatorAnimation.animationNew.remove();
+		CreatorButton.buttonNew.remove();
+		CreatorCamera.cameraNew.remove();
+		CreatorMusic.musicNew.remove();
+		CreatorParticle.particleNew.remove();
+		CreatorPhysics.physicsNew.remove();
+		CreatorScript.scriptNew.remove();
+		CreatorSound.soundNew.remove();
+		CreatorText.textNew.remove();
+		CreatorTexture.textureNew.remove();
+		CreatorTransform.transformNew.remove();
 	}
 
 	public static void addEntity(Entity e) {
@@ -284,9 +308,9 @@ public class Interface extends Stage {
 	void init() {
 		w = Gdx.graphics.getWidth();
 		h = Gdx.graphics.getHeight();
-		skin = new Skin(Gdx.files.internal("atlas/darkui.json"));
+		skin = new Skin(Gdx.files.internal("debug/darkui.json"));
 		skin.getFont("default-font").getData().setScale(0.1f);
-		buttons = new TextureAtlas("atlas/def_but.atlas");
+		buttons = new TextureAtlas("debug/def_but.atlas");
 
 		Creator.buttons = buttons;
 		Creator.skin = skin;

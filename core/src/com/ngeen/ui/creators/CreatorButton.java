@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.AnimationComponent;
+import com.ngeen.components.ButtonComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorButton {
@@ -55,6 +57,7 @@ public class CreatorButton {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				addButton();
+				Interface.ng.entityHelper.addComponent(ButtonComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 
@@ -63,6 +66,7 @@ public class CreatorButton {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				removeButton();
+				Interface.ng.entityHelper.removeComponent(ButtonComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 	}

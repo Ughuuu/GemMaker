@@ -2,20 +2,29 @@ package com.ngeen.helper;
 
 import com.artemis.Archetype;
 import com.artemis.ArchetypeBuilder;
+import com.artemis.Component;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.ngeen.components.AnimationComponent;
+import com.ngeen.components.ButtonComponent;
+import com.ngeen.components.CameraComponent;
 import com.ngeen.components.GroupComponent;
+import com.ngeen.components.MusicComponent;
+import com.ngeen.components.ParticleComponent;
+import com.ngeen.components.PhysicsComponent;
 import com.ngeen.components.ResourceComponent;
+import com.ngeen.components.ScriptComponent;
+import com.ngeen.components.SoundComponent;
 import com.ngeen.components.TagComponent;
+import com.ngeen.components.TextComponent;
 import com.ngeen.components.TextureComponent;
 import com.ngeen.components.TransformComponent;
 import com.ngeen.factories.CollidableFactory;
 
-public class EntityHelper<T> {
+public class EntityHelper {
 	CollidableFactory collidableFactory;
 	Archetype transform, empty, resource;
 	World engine;
@@ -23,12 +32,11 @@ public class EntityHelper<T> {
 	@SuppressWarnings("unchecked")
 	public EntityHelper(World engine) {
 		this.engine = engine;
-		final ArchetypeBuilder archetypeBuilder = new ArchetypeBuilder();
-		transform = archetypeBuilder.add(TransformComponent.class,
+		transform = new ArchetypeBuilder().add(TransformComponent.class,
 				TagComponent.class, GroupComponent.class).build(engine);
-		empty = archetypeBuilder.add(TagComponent.class, GroupComponent.class)
-				.build(engine);
-		resource = archetypeBuilder.add(ResourceComponent.class,
+		empty = new ArchetypeBuilder().add(TagComponent.class,
+				GroupComponent.class).build(engine);
+		resource = new ArchetypeBuilder().add(ResourceComponent.class,
 				TagComponent.class, GroupComponent.class).build(engine);
 	}
 
@@ -54,7 +62,8 @@ public class EntityHelper<T> {
 		return ent;
 	}
 
-	public Entity createResource(T resource_object, String tag, String group) {
+	public Entity createResource(Object resource_object, String tag,
+			String group) {
 		if (engine.getManager(TagManager.class).isRegistered(tag))
 			return null;
 		Entity ent = engine.createEntity(resource);
@@ -69,5 +78,49 @@ public class EntityHelper<T> {
 	public AnimationComponent addAnimation(Entity e) {
 		AnimationComponent anim = e.edit().create(AnimationComponent.class);
 		return anim;
+	}
+
+	public void removeComponent(Class<? extends Component> component, Entity e) {
+		e.edit().remove(component);
+	}
+
+	public void addComponent(Class<? extends Component> component, Entity e) {
+		e.edit().create(component);
+		if (component.equals(AnimationComponent.class)) {
+
+		}
+		if (component.equals(ButtonComponent.class)) {
+
+		}
+		if (component.equals(CameraComponent.class)) {
+
+		}
+		if (component.equals(MusicComponent.class)) {
+
+		}
+		if (component.equals(ParticleComponent.class)) {
+
+		}
+		if (component.equals(PhysicsComponent.class)) {
+
+		}
+		if (component.equals(ResourceComponent.class)) {
+
+		}
+		if (component.equals(ScriptComponent.class)) {
+
+		}
+		if (component.equals(SoundComponent.class)) {
+
+		}
+		if (component.equals(TextComponent.class)) {
+
+		}
+		if (component.equals(TextureComponent.class)) {
+
+		}
+		if (component.equals(TransformComponent.class)) {
+
+		}
 	}
 }

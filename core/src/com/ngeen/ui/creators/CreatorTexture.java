@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.TextComponent;
+import com.ngeen.components.TextureComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorTexture {
@@ -61,6 +63,7 @@ public class CreatorTexture {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				addTexture();
+				Interface.ng.entityHelper.addComponent(TextureComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 
@@ -69,6 +72,7 @@ public class CreatorTexture {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				removeTexture();
+				Interface.ng.entityHelper.removeComponent(TextureComponent.class, Interface.ng.getById(Interface.selected));
 			};
 		});
 		
