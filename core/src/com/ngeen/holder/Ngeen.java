@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
+import com.ngeen.command.CommandCenter;
 import com.ngeen.components.CameraComponent;
 import com.ngeen.factories.CollidableFactory;
 import com.ngeen.helper.EntityHelper;
@@ -43,6 +44,7 @@ public class Ngeen {
 	public EntityHelper entityHelper;
 	public InputHelper inputHelper;
 	public SaveHelper saveHelper;
+	public CommandCenter undoRedo;
 
 	private Loader load;
 
@@ -94,6 +96,10 @@ public class Ngeen {
 		return (InputProcessor) sceneSystem;
 	}
 
+	public InputProcessor getInputProcessorDebug() {
+		return (InputProcessor) inputHelper;
+	}
+
 	public void load(String name) {
 		load.preLoadAll(name);
 	}
@@ -105,14 +111,17 @@ public class Ngeen {
 
 		Constant.MANAGER = new AssetManager();
 
-		inputHelper = new InputHelper();
+		inputHelper = new InputHelper(this);
 		saveHelper = new SaveHelper();
+		if (Constant.DEBUG) {
+			undoRedo = new CommandCenter(this);
+		}
 
 		engine = new World();
 		engine.setManager(new TagManager());
 		engine.setManager(new GroupManager());
 		if (Constant.DEBUG) {
-			engine.setManager(new EntityLogger());
+			engine.setManager(new EntityLogger(this));
 		}
 
 		animateSystem = new AnimateSystem();
@@ -169,23 +178,4 @@ public class Ngeen {
 		Constant.BATCH.dispose();
 		Constant.DEBUG_FONT.dispose();
 	}
-
-	/*
-	 * public void checkClick(int x, int y, final String s) { Vector3 testPoint
-	 * = new Vector3(x, y, 0); inUse.unproject(testPoint);
-	 * 
-	 * move.world.QueryAABB(new QueryCallback() {
-	 * 
-	 * @Override public boolean reportFixture(Fixture fixture) { ClickState
-	 * state = (ClickState) fixture.getBody().getUserData(); if
-	 * (s.compareTo("ClickDown") == 0) { state.down = true; state.up = false; }
-	 * if (s.compareTo("ClickUp") == 0) { state.up = true; state.down = false; }
-	 * return true; } }, testPoint.x - 0.1f, testPoint.y - 0.1f, testPoint.x +
-	 * 0.1f, testPoint.y + 0.1f); }
-	 * 
-	 * @Override public boolean keyDown(int keycode) { if (keycode ==
-	 * Keys.ENTER) { DEBUG = !DEBUG; } if (keycode == Keys.SPACE) { try {
-	 * save(); } catch (IOException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } } return false; }
-	 */
 }

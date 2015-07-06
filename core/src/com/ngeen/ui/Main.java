@@ -24,6 +24,8 @@ public class Main extends ApplicationAdapter {
 		final InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(ng.getInputProcessor());
+		if (Constant.DEBUG)
+			multiplexer.addProcessor(ng.getInputProcessorDebug());
 		multiplexer.addProcessor(new GestureDetector(ng.getGestureListener()));
 		Gdx.input.setInputProcessor(multiplexer);
 	}
@@ -32,7 +34,7 @@ public class Main extends ApplicationAdapter {
 	public void create() {
 		ng = new Ngeen();
 		initDisplay();
-		test = new Test(ng);
+		// test = new Test(ng);
 		ng.setScene(new LoadScene());
 	}
 
@@ -49,6 +51,5 @@ public class Main extends ApplicationAdapter {
 
 	@Override
 	public void resize(int w, int h) {
-		initDisplay();
 	}
 }

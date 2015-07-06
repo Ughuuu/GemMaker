@@ -238,7 +238,7 @@ public class Interface extends Stage {
 	public static void addEntity(Entity e) {
 		if (entityMap.get(e.id) == null) {
 			select(e);
-			println("Entity: " + e.getComponent(TagComponent.class).name
+			println("Entity " + e.getId() +": " + e.getComponent(TagComponent.class).name
 					+ " added.");
 			final ImageTextButton ent = new ImageTextButton(
 					e.getComponent(TagComponent.class).name, entityStyle);
@@ -259,7 +259,7 @@ public class Interface extends Stage {
 
 	public static void changeEntity(Entity e) {
 		if (entityMap.get(e.id) != null) {
-			println("Entity: " + e.getComponent(TagComponent.class).name
+			println("Entity " + e.getId() +": " +  e.getComponent(TagComponent.class).name
 					+ " changed.");
 			select(e);
 			entityMap.get(e.id)
@@ -272,7 +272,7 @@ public class Interface extends Stage {
 			if (e.id == selected) {
 				deselect();
 			}
-			println("Entity: " + e.getComponent(TagComponent.class).name
+			println("Entity " + e.getId() +": " +  e.getComponent(TagComponent.class).name
 					+ " deleted.");
 			ImageTextButton but = entityMap.remove(e.id);
 			but.remove();

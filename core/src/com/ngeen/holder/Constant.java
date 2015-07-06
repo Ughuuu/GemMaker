@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Constant {
-	public static int DEBUG_LEVEL = 0;
+	public static int DEBUG_LEVEL = 1;
 	public static int W = 1024;
 	public static int H = 576;
 
