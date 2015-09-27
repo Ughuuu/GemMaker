@@ -39,17 +39,10 @@ public class InputHelper implements GestureListener, InputProcessor {
 			break;
 		case Keys.Z:
 			if (control) {// ctrl + z(undo)
-				ng.undoRedo.decreaseTime();
-				ng.undoRedo.undoNext();
 			}
 			break;
 		case Keys.Y:
 			if (control) {// ctrl + y(redo)
-				if (!ng.undoRedo.increaseTime()) {
-					ng.undoRedo.redoNext();
-				} else {
-					ng.undoRedo.decreaseTime();
-				}
 			}
 			break;
 		}

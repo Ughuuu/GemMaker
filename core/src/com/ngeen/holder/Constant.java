@@ -2,6 +2,7 @@ package com.ngeen.holder;
 
 import java.util.List;
 
+import com.artemis.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -19,11 +20,11 @@ public class Constant {
 	public static boolean OUTPUT_OUT = false;
 	public static boolean GAME_STATE = false;
 	public static boolean VOLUME = true;
-	public static boolean DEBUG = true;
-	public static boolean RELEASE = false;
+	public static final boolean DEBUG = true;
+	public static final boolean RELEASE = false;
 
 	public static Vector2 GRAVITY = new Vector2(0, -1f);
-	public static Camera CAMERA;
+	public static Entity CAMERA;
 	public static SpriteBatch BATCH;
 	public static BitmapFont DEBUG_FONT;
 	public static AssetManager MANAGER;

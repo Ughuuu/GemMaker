@@ -7,8 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.GroupComponent;
+import com.ngeen.components.TagComponent;
 import com.ngeen.ui.Interface;
 
 public class CreatorGroup {
@@ -33,6 +36,16 @@ public class CreatorGroup {
 		group.add(groupNameLabel);
 		group.add(groupName);
 		group.row();
+		
+
+		
+		groupName.setTextFieldListener(new TextFieldListener() {			
+			@Override
+			public void keyTyped(TextField textField, char c) {
+				Interface.ng.getById(Interface.selected).getComponent(GroupComponent.class).name = groupName.getText();
+				Interface.reselect();
+			};
+		});
 
 	}
 

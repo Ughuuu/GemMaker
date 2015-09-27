@@ -4,12 +4,7 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
-import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.physics.box2d.World;
 import com.ngeen.components.TagComponent;
 import com.ngeen.components.TransformComponent;
 import com.ngeen.holder.Constant;
@@ -27,7 +22,7 @@ public class LogSystem extends EntityProcessingSystem {
 	@Override
 	public void begin() {
 		Constant.BATCH.begin();
-		Constant.DEBUG_FONT.getData().setScale(0.15f);
+		Constant.DEBUG_FONT.getData().setScale(0.1f);
 	}
 
 	@Override

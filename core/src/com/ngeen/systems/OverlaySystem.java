@@ -8,9 +8,12 @@ import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.World;
+import com.ngeen.components.CameraComponent;
 import com.ngeen.components.TagComponent;
 import com.ngeen.components.TransformComponent;
+import com.ngeen.helper.ComputeHelper;
 import com.ngeen.holder.Constant;
 
 @Wire
@@ -27,13 +30,16 @@ public class OverlaySystem extends EntityProcessingSystem {
 	}
 
 	private void changeCamera() {
-		shapeRenderer.setProjectionMatrix(Constant.CAMERA.combined);
+		Matrix4 comb = Constant.CAMERA.getComponent(CameraComponent.class).camera.combined;
+		Matrix4 pos = ComputeHelper.getCombined(Constant.CAMERA.getComponent(TransformComponent.class));
+		Matrix4 cpy = comb.cpy();
+		shapeRenderer.setProjectionMatrix(cpy.mul(pos));
 	}
 
-	private void drawSelection(){
-		shapeRenderer.rect(x1, y1, x2-x1, y2-y1);
+	private void drawSelection() {
+		shapeRenderer.rect(x1, y1, x2 - x1, y2 - y1);
 	}
-	
+
 	@Override
 	public void begin() {
 		changeCamera();
@@ -44,8 +50,7 @@ public class OverlaySystem extends EntityProcessingSystem {
 	@Override
 	protected void process(Entity e) {
 		TransformComponent transform = transformMapper.get(e);
-		shapeRenderer.rect(transform.position.x - 5, transform.position.y - 5,
-				transform.position.x + 5, transform.position.y + 5);
+		shapeRenderer.rect(transform.position.x - 5, transform.position.y - 5, 5, 5);
 	}
 
 	@Override

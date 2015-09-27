@@ -1,5 +1,8 @@
 package com.ngeen.ui.creators;
 
+import com.artemis.Entity;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
@@ -8,8 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ngeen.components.ResourceComponent;
+import com.ngeen.components.TagComponent;
 import com.ngeen.components.TextComponent;
 import com.ngeen.components.TextureComponent;
 import com.ngeen.ui.Interface;
@@ -85,5 +91,26 @@ public class CreatorTexture {
 		texture.add(textureResourceLabel);
 		texture.add(textureResource);
 		texture.row();
+		
+		textureDraw.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				Interface.ng.getById(Interface.selected).getComponent(TextureComponent.class).draw = textureDraw.isChecked();
+				Interface.reselect();
+			};
+		});
+		
+		textureResource.setTextFieldListener(new TextFieldListener() {			
+			@Override
+			public void keyTyped(TextField textField, char c) {
+				Entity e = Interface.ng.getByTag(textureResource.getText());
+				if(e == null)
+					return;
+				Interface.ng.getById(Interface.selected).getComponent(TextureComponent.class).resource_index = e.id;
+				Interface.ng.getById(Interface.selected).getComponent(TextureComponent.class).tex = 
+						new Sprite((Texture)e.getComponent(ResourceComponent.class).resource);
+				Interface.reselect();
+			};
+		});
 	}
 }

@@ -7,6 +7,7 @@ import sun.font.CreatedFontTracker;
 
 import com.artemis.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -69,21 +70,38 @@ public class Interface extends Stage {
 	public static ScrollPane lookPane;
 	public static ImageTextButtonStyle entityStyle = new ImageTextButtonStyle();
 	public static Map<Integer, ImageTextButton> entityMap = new HashMap<Integer, ImageTextButton>();
+	public static float size = 4.5f, icons = 64f;
 	public static int selected = -1;
+	public static Map<String, Entity> sel = new HashMap<String, Entity>();
+	public static boolean assetSel = false;
 
-	public static Table entities, right, top, bottom, left, components;
+	public static Table entities, right, top, bottom, left, components, assets;
 
 	public static Ngeen ng;
 
+	public static void reselect(){
+		int id = selected;
+		changeEntity(ng.getById(id));
+		//select(ng.getById(id));
+	}
+	
 	public static void select(Entity e) {
+		if(!Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)){
+			for(Entity ent : sel.values()){
+				entityMap.get(ent.id).setChecked(false);
+				//deselect(ent);
+			}
+			sel.clear();
+		}
+		sel.put(e.getComponent(TagComponent.class).name, e);
 		selected = e.id;
 		AnimationComponent anim = e.getComponent(AnimationComponent.class);
 		CreatorAnimation.addAnimation();
 		if (anim != null) {
 			CreatorAnimation.animationIndex.setText(anim.index + "");
 			CreatorAnimation.animationPage.setText(anim.page);
-			CreatorAnimation.animationResource.setText(ng.getById(
-					anim.resource_index).getComponent(TagComponent.class).name);
+			CreatorAnimation.animationResource
+					.setText(ng.getById(anim.resource_index).getComponent(TagComponent.class).name);
 		} else {
 			CreatorAnimation.removeAnimation();
 		}
@@ -113,9 +131,7 @@ public class Interface extends Stage {
 		MusicComponent musicc = e.getComponent(MusicComponent.class);
 		CreatorMusic.addMusic();
 		if (musicc != null) {
-			CreatorMusic.musicResource.setText(ng
-					.getById(musicc.resource_index).getComponent(
-							TagComponent.class).name);
+			CreatorMusic.musicResource.setText(ng.getById(musicc.resource_index).getComponent(TagComponent.class).name);
 		} else {
 			CreatorMusic.removeMusic();
 		}
@@ -124,8 +140,7 @@ public class Interface extends Stage {
 		if (partc != null) {
 			CreatorParticle.partDraw.setChecked(partc.draw);
 			CreatorParticle.partResource
-					.setText(ng.getById(partc.resource_index).getComponent(
-							TagComponent.class).name);
+					.setText(ng.getById(partc.resource_index).getComponent(TagComponent.class).name);
 		} else {
 			CreatorParticle.removeParticle();
 		}
@@ -138,16 +153,14 @@ public class Interface extends Stage {
 		ResourceComponent resc = e.getComponent(ResourceComponent.class);
 		CreatorResource.addResource();
 		if (resc != null) {
-			CreatorResource.resourceType.setText(resc.resource.getClass()
-					.getSimpleName());
+			CreatorResource.resourceType.setText(resc.resource.getClass().getSimpleName());
 		} else {
 			CreatorResource.removeResource();
 		}
 		ScriptComponent scriptc = e.getComponent(ScriptComponent.class);
 		CreatorScript.addScript();
 		if (scriptc != null) {
-			CreatorScript.scriptScript.setText(scriptc.script.getClass()
-					.getSimpleName());
+			CreatorScript.scriptScript.setText(scriptc.script.getClass().getSimpleName());
 			CreatorScript.scriptEnable.setChecked(scriptc.script.active);
 		} else {
 			CreatorScript.removeScript();
@@ -155,9 +168,7 @@ public class Interface extends Stage {
 		SoundComponent soundc = e.getComponent(SoundComponent.class);
 		CreatorSound.addSound();
 		if (soundc != null) {
-			CreatorSound.soundResource.setText(ng
-					.getById(soundc.resource_index).getComponent(
-							TagComponent.class).name);
+			CreatorSound.soundResource.setText(ng.getById(soundc.resource_index).getComponent(TagComponent.class).name);
 		} else {
 			CreatorSound.removeSound();
 		}
@@ -172,8 +183,7 @@ public class Interface extends Stage {
 		CreatorText.addText();
 		if (textc != null) {
 			CreatorText.textDraw.setChecked(textc.draw);
-			CreatorText.textResource.setText(ng.getById(textc.resource_index)
-					.getComponent(TagComponent.class).name);
+			CreatorText.textResource.setText(ng.getById(textc.resource_index).getComponent(TagComponent.class).name);
 			CreatorText.textText.setText(textc.text);
 		} else {
 			CreatorText.removeText();
@@ -182,22 +192,18 @@ public class Interface extends Stage {
 		CreatorTexture.addTexture();
 		if (texturec != null) {
 			CreatorTexture.textureResource
-					.setText(ng.getById(texturec.resource_index).getComponent(
-							TagComponent.class).name);
+					.setText(ng.getById(texturec.resource_index).getComponent(TagComponent.class).name);
 			CreatorTexture.textureDraw.setChecked(texturec.draw);
 		} else {
 			CreatorTexture.removeTexture();
 		}
-		TransformComponent transformc = e
-				.getComponent(TransformComponent.class);
+		TransformComponent transformc = e.getComponent(TransformComponent.class);
 		CreatorTransform.addTransform();
 		if (transformc != null) {
 			CreatorTransform.transformAngle.setText(transformc.angle + "");
 			CreatorTransform.transformDepth.setText(transformc.z + "");
-			CreatorTransform.transformPositionX.setText(transformc.position.x
-					+ "");
-			CreatorTransform.transformPositionY.setText(transformc.position.y
-					+ "");
+			CreatorTransform.transformPositionX.setText(transformc.position.x + "");
+			CreatorTransform.transformPositionY.setText(transformc.position.y + "");
 			CreatorTransform.transformScaleX.setText(transformc.scale.x + "");
 			CreatorTransform.transformScaleY.setText(transformc.scale.y + "");
 		} else {
@@ -205,7 +211,8 @@ public class Interface extends Stage {
 		}
 	}
 
-	public static void deselect() {
+	public static void deselect(Entity e) {
+		sel.remove(e.getComponent(TagComponent.class).name);
 		selected = -1;
 		CreatorAnimation.removeAnimation();
 		CreatorButton.removeButton();
@@ -235,23 +242,28 @@ public class Interface extends Stage {
 		CreatorTransform.transformNew.remove();
 	}
 
-	public static void addEntity(Entity e) {
+	public static void addEntity(final Entity e) {
 		if (entityMap.get(e.id) == null) {
 			select(e);
-			println("Entity " + e.getId() +": " + e.getComponent(TagComponent.class).name
-					+ " added.");
-			final ImageTextButton ent = new ImageTextButton(
-					e.getComponent(TagComponent.class).name, entityStyle);
+			deselect(e);
+			println("Entity " + e.getId() + ": " + e.getComponent(TagComponent.class).name + " added.");
+			final ImageTextButton ent = new ImageTextButton(e.getComponent(TagComponent.class).name, entityStyle);
 			ent.setName("" + e.id);
 			ent.addListener(new ClickListener() {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
-					select(ng.getById(Integer
-							.parseInt(ent.getName().toString())));
+					if(!ent.isChecked())
+						deselect(e);
+					else
+						select(ng.getById(Integer.parseInt(ent.getName().toString())));
 				};
 			});
 			entityMap.put(e.id, ent);
-			entities.add(ent).row();
+			if (e.getComponent(ResourceComponent.class) != null) {
+				assets.add(ent).row();
+			} else {
+				entities.add(ent).row();
+			}
 		} else {
 			changeEntity(e);
 		}
@@ -259,21 +271,16 @@ public class Interface extends Stage {
 
 	public static void changeEntity(Entity e) {
 		if (entityMap.get(e.id) != null) {
-			println("Entity " + e.getId() +": " +  e.getComponent(TagComponent.class).name
-					+ " changed.");
-			select(e);
-			entityMap.get(e.id)
-					.setText(e.getComponent(TagComponent.class).name);
+			entityMap.get(e.id).setText(e.getComponent(TagComponent.class).name);
 		}
 	}
 
 	public static void deleteEntity(Entity e) {
 		if (entityMap.get(e.id) != null) {
 			if (e.id == selected) {
-				deselect();
+				deselect(e);
 			}
-			println("Entity " + e.getId() +": " +  e.getComponent(TagComponent.class).name
-					+ " deleted.");
+			println("Entity " + e.getId() + ": " + e.getComponent(TagComponent.class).name + " deleted.");
 			ImageTextButton but = entityMap.remove(e.id);
 			but.remove();
 		}
@@ -309,7 +316,7 @@ public class Interface extends Stage {
 		w = Gdx.graphics.getWidth();
 		h = Gdx.graphics.getHeight();
 		skin = new Skin(Gdx.files.internal("debug/darkui.json"));
-		skin.getFont("default-font").getData().setScale(0.1f);
+		skin.getFont("default-font").getData().setScale(size * 0.1f);
 		buttons = new TextureAtlas("debug/def_but.atlas");
 
 		Creator.buttons = buttons;
@@ -318,8 +325,7 @@ public class Interface extends Stage {
 		Creator.h = h;
 
 		entityStyle.up = new TextureRegionDrawable(buttons.findRegion("but", 0));
-		entityStyle.checked = new TextureRegionDrawable(buttons.findRegion(
-				"but", 1));
+		entityStyle.checked = new TextureRegionDrawable(buttons.findRegion("but", 1));
 		entityStyle.font = skin.getFont("default-font");
 
 		top = createTopMenu();
@@ -341,12 +347,10 @@ public class Interface extends Stage {
 	Table createBottomMenu() {
 		Table table = new Table(skin);
 
-		final ImageButton but = new ImageButton(new TextureRegionDrawable(
-				buttons.findRegion("expand", 0)), new TextureRegionDrawable(
-				buttons.findRegion("expand", 1)));
+		final ImageButton but = new ImageButton(new TextureRegionDrawable(buttons.findRegion("expand", 0)),
+				new TextureRegionDrawable(buttons.findRegion("expand", 1)));
 
-		debug = new TextArea("This is ngeen(all lowercase) version 1.1.\n",
-				skin);
+		debug = new TextArea("This is ngeen(all lowercase) version 1.1.\n", skin);
 
 		debugPane = new ScrollPane(debug, skin);
 		debugPane.setScrollbarsOnTop(false);
@@ -356,7 +360,7 @@ public class Interface extends Stage {
 		table.add(debugPane).expand().fill();
 		table.add(but);
 
-		table.setSize(w, 64);
+		table.setSize(w, icons);
 		table.setPosition(0, 0);
 
 		// expand
@@ -364,7 +368,7 @@ public class Interface extends Stage {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				if (bottom.getHeight() == 250) {
-					bottom.setSize(w, 64);
+					bottom.setSize(w, icons);
 				} else
 					bottom.setSize(w, 250);
 			};
@@ -375,30 +379,53 @@ public class Interface extends Stage {
 	}
 
 	Table createLeftMenu() {
-		Table table = new Table(skin);
+		final Table table = new Table(skin);
 
-		final ImageButton but = new ImageButton(new TextureRegionDrawable(
-				buttons.findRegion("expand", 0)), new TextureRegionDrawable(
-				buttons.findRegion("expand", 1)));
+		final ImageButton but = new ImageButton(new TextureRegionDrawable(buttons.findRegion("expand", 0)),
+				new TextureRegionDrawable(buttons.findRegion("expand", 1)));
+
+		final ImageButton switchb = new ImageButton(new TextureRegionDrawable(buttons.findRegion("report", 0)),
+				new TextureRegionDrawable(buttons.findRegion("report", 1)));
 
 		entities = new Table(skin);
-		ScrollPane pane = new ScrollPane(entities, skin);
-		pane.setCancelTouchFocus(false);
+		assets = new Table(skin);
+		final ScrollPane pane1 = new ScrollPane(entities, skin);
+		pane1.setCancelTouchFocus(false);
+		final ScrollPane pane2 = new ScrollPane(assets, skin);
+		pane2.setCancelTouchFocus(false);
 
-		table.add(pane).expand().fill();
+		table.add(switchb).row();
+		table.add(pane1).expand().fill();
 		table.add(but);
 
-		table.setSize(64, h - 64 * 2);
-		table.setPosition(0, 64);
+		table.setSize(icons, h - icons * 2);
+		table.setPosition(0, icons);
 
 		// expand
 		but.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (left.getWidth() == 64) {
-					left.setSize(250, h - 64 * 2);
+				if (left.getWidth() == icons) {
+					left.setSize(250, h - icons * 2);
 				} else
-					left.setSize(64, h - 64 * 2);
+					left.setSize(icons, h - icons * 2);
+			};
+		});
+
+		// switch
+		switchb.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				assetSel = !assetSel;
+				if (assetSel) {
+					final Table adder = new Table(skin);
+					adder.add(pane2).expand().fill();
+					table.getCells().get(1).setActor(adder);
+				} else {
+					final Table adder = new Table(skin);
+					adder.add(pane1).expand().fill();
+					table.getCells().get(1).setActor(adder);
+				}
 			};
 		});
 
@@ -411,44 +438,34 @@ public class Interface extends Stage {
 		final ImageButton[] but = new ImageButton[7];
 		final CheckBox[] box = new CheckBox[3];
 		final CheckBoxStyle[] boxStyle = new CheckBoxStyle[3];
-		boxStyle[0] = new CheckBoxStyle(new TextureRegionDrawable(
-				buttons.findRegion("pause", 0)), new TextureRegionDrawable(
-				buttons.findRegion("pause", 1)), new BitmapFont(), new Color());
-		boxStyle[1] = new CheckBoxStyle(new TextureRegionDrawable(
-				buttons.findRegion("play", 0)), new TextureRegionDrawable(
-				buttons.findRegion("play", 1)), new BitmapFont(), new Color());
-		boxStyle[2] = new CheckBoxStyle(new TextureRegionDrawable(
-				buttons.findRegion("mute", 0)), new TextureRegionDrawable(
-				buttons.findRegion("mute", 1)), new BitmapFont(), new Color());
+		boxStyle[0] = new CheckBoxStyle(new TextureRegionDrawable(buttons.findRegion("pause", 0)),
+				new TextureRegionDrawable(buttons.findRegion("pause", 1)), new BitmapFont(), new Color());
+		boxStyle[1] = new CheckBoxStyle(new TextureRegionDrawable(buttons.findRegion("play", 0)),
+				new TextureRegionDrawable(buttons.findRegion("play", 1)), new BitmapFont(), new Color());
+		boxStyle[2] = new CheckBoxStyle(new TextureRegionDrawable(buttons.findRegion("mute", 0)),
+				new TextureRegionDrawable(buttons.findRegion("mute", 1)), new BitmapFont(), new Color());
 		box[0] = new CheckBox("", boxStyle[0]);
 		box[1] = new CheckBox("", boxStyle[1]);
 		box[2] = new CheckBox("", boxStyle[2]);
 
-		but[0] = new ImageButton(new TextureRegionDrawable(buttons.findRegion(
-				"new", 0)), new TextureRegionDrawable(buttons.findRegion("new",
-				1)));
-		but[1] = new ImageButton(new TextureRegionDrawable(buttons.findRegion(
-				"zoomin", 0)), new TextureRegionDrawable(buttons.findRegion(
-				"zoomin", 1)));
-		but[2] = new ImageButton(new TextureRegionDrawable(buttons.findRegion(
-				"zoomout", 0)), new TextureRegionDrawable(buttons.findRegion(
-				"zoomout", 1)));
+		but[0] = new ImageButton(new TextureRegionDrawable(buttons.findRegion("new", 0)),
+				new TextureRegionDrawable(buttons.findRegion("new", 1)));
+		but[1] = new ImageButton(new TextureRegionDrawable(buttons.findRegion("zoomin", 0)),
+				new TextureRegionDrawable(buttons.findRegion("zoomin", 1)));
+		but[2] = new ImageButton(new TextureRegionDrawable(buttons.findRegion("zoomout", 0)),
+				new TextureRegionDrawable(buttons.findRegion("zoomout", 1)));
 		TextureRegion t = new TextureRegion(buttons.findRegion("fast", 0));
 		TextureRegion t1 = new TextureRegion(buttons.findRegion("fast", 1));
 		t.flip(true, false);
 		t1.flip(true, false);
-		but[3] = new ImageButton(new TextureRegionDrawable(t),
-				new TextureRegionDrawable(t1));
-		but[4] = new ImageButton(new TextureRegionDrawable(buttons.findRegion(
-				"restart", 0)), new TextureRegionDrawable(buttons.findRegion(
-				"restart", 1)));
+		but[3] = new ImageButton(new TextureRegionDrawable(t), new TextureRegionDrawable(t1));
+		but[4] = new ImageButton(new TextureRegionDrawable(buttons.findRegion("restart", 0)),
+				new TextureRegionDrawable(buttons.findRegion("restart", 1)));
 		t = buttons.findRegion("fast", 0);
 		t1 = buttons.findRegion("fast", 1);
-		but[5] = new ImageButton(new TextureRegionDrawable(t),
-				new TextureRegionDrawable(t1));
-		but[6] = new ImageButton(new TextureRegionDrawable(buttons.findRegion(
-				"exit", 0)), new TextureRegionDrawable(buttons.findRegion(
-				"exit", 1)));
+		but[5] = new ImageButton(new TextureRegionDrawable(t), new TextureRegionDrawable(t1));
+		but[6] = new ImageButton(new TextureRegionDrawable(buttons.findRegion("exit", 0)),
+				new TextureRegionDrawable(buttons.findRegion("exit", 1)));
 
 		table.add(but[0]).expand();
 		table.add(but[1]).expand();
@@ -542,8 +559,8 @@ public class Interface extends Stage {
 				Gdx.app.exit();
 			};
 		});
-		table.setSize(w, 64);
-		table.setPosition(0, h - 64);
+		table.setSize(w, icons);
+		table.setPosition(0, h - icons);
 		table.setBackground("square");
 		return table;
 	}
@@ -551,9 +568,8 @@ public class Interface extends Stage {
 	Table createRightMenu() {
 		Table table = new Table(skin);
 
-		final ImageButton but = new ImageButton(new TextureRegionDrawable(
-				buttons.findRegion("expand", 0)), new TextureRegionDrawable(
-				buttons.findRegion("expand", 1)));
+		final ImageButton but = new ImageButton(new TextureRegionDrawable(buttons.findRegion("expand", 0)),
+				new TextureRegionDrawable(buttons.findRegion("expand", 1)));
 
 		components = new Table(skin);
 
@@ -603,28 +619,28 @@ public class Interface extends Stage {
 
 		ScrollPane lookPane = new ScrollPane(components, skin);
 		lookPane.setCancelTouchFocus(false);
+		lookPane.setScrollingDisabled(true, false);
 
 		table.add(but);
 		table.add(lookPane).expand().fill();
 
-		table.setSize(64, h - 64 * 2);
-		table.setPosition(w - 64, 64);
+		table.setSize(icons, h - icons * 2);
+		table.setPosition(w - icons, icons);
 
 		// expand
 		but.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (right.getWidth() == 64) {
-					right.setPosition(w - 350, 64);
-					right.setSize(350, h - 64 * 2);
+				if (right.getWidth() == icons) {
+					right.setPosition(w - 350, icons);
+					right.setSize(350, h - icons * 2);
 				} else {
-					right.setPosition(w - 64, 64);
-					right.setSize(64, h - 64 * 2);
+					right.setPosition(w - icons, icons);
+					right.setSize(icons, h - icons * 2);
 				}
 			};
 		});
 
-		deselect();
 		table.setBackground("square");
 		return table;
 	}

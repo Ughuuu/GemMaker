@@ -1,10 +1,10 @@
 {
-com.badlogic.gdx.graphics.g2d.BitmapFont: { default-font: { file: ../data/font/ubuntu.fnt } },
+com.badlogic.gdx.graphics.g2d.BitmapFont: { default-font: { file: ../data/font/roboto_regular.fnt } },
 com.badlogic.gdx.graphics.Color: {
-	green: { a: 1, b: 0.5, g: 0.23, r: 0.21 },
+	green: { a: 1, b: 0.4, g: 0.2, r: 0.2 },
 	white: { a: 1, b: 1, g: 1, r: 1 },
-	blue: { a: 1, b: 0.5, g: 0.25, r: 0.22 },
-	black: { a: 1, b: 0.21, g: 0.17, r: 0.18 }
+	blue: { a: 1, b: 0.4, g: 0.2, r: 0.1 },
+	black: { a: 1, b: 0.1, g: 0.1, r: 0.1 }
 },
 com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	dialogDim: { name: white, color: { r: 0.18, g: 0.17, b: 0.21, a: 1 } }

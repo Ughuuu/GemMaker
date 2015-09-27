@@ -7,7 +7,10 @@ import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.ngeen.components.AnimationComponent;
 import com.ngeen.components.ButtonComponent;
 import com.ngeen.components.CameraComponent;
@@ -23,6 +26,7 @@ import com.ngeen.components.TextComponent;
 import com.ngeen.components.TextureComponent;
 import com.ngeen.components.TransformComponent;
 import com.ngeen.factories.CollidableFactory;
+import com.ngeen.ui.Interface;
 
 public class EntityHelper {
 	CollidableFactory collidableFactory;
@@ -44,6 +48,7 @@ public class EntityHelper {
 		if (engine.getManager(TagManager.class).isRegistered(tag))
 			return null;
 		Entity ent = engine.createEntity(transform);
+		ent.getComponent(TransformComponent.class).scale = new Vector2(1,1);
 		ent.getComponent(TagComponent.class).name = tag;
 		ent.getComponent(GroupComponent.class).name = group;
 		engine.getManager(TagManager.class).register(tag, ent);
@@ -85,7 +90,7 @@ public class EntityHelper {
 	}
 
 	public void addComponent(Class<? extends Component> component, Entity e) {
-		e.edit().create(component);
+		Component com = e.edit().create(component);
 		if (component.equals(AnimationComponent.class)) {
 
 		}
@@ -117,10 +122,15 @@ public class EntityHelper {
 
 		}
 		if (component.equals(TextureComponent.class)) {
-
+			Entity res = Interface.ng.getByTag("n.png");
+			TextureComponent texture = (TextureComponent)com;
+			texture.resource_index = res.id;
+			texture.tex = new Sprite((Texture)res.getComponent(ResourceComponent.class).resource);
 		}
 		if (component.equals(TransformComponent.class)) {
-
+			TransformComponent transf = (TransformComponent)com;
+			transf.scale = new Vector2(1,1);
+			transf.position = new Vector2(0,0);
 		}
 	}
 }

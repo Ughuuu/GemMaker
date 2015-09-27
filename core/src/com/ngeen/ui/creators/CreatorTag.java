@@ -59,13 +59,21 @@ public class CreatorTag {
 		tag.add(tagNameLabel);
 		tag.add(tagName);
 		tag.row();
+		
+		tagName.setTextFieldListener(new TextFieldListener() {			
+			@Override
+			public void keyTyped(TextField textField, char c) {
+				Interface.ng.getById(Interface.selected).getComponent(TagComponent.class).name = tagName.getText();
+				Interface.reselect();
+			};
+		});
 
 		// remove
 		tagDel.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				Interface.ng.removeEntity(Interface.selected);
-				Interface.deselect();
+				//Interface.deselect();
 			};
 		});
 	}

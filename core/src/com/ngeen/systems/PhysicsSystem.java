@@ -27,9 +27,9 @@ public class PhysicsSystem extends IntervalEntityProcessingSystem {
 	@Override
 	protected void begin() {
 		if (Constant.DEBUG){
-			Matrix4 mat = new Matrix4(Constant.CAMERA.combined);
-			mat.scl(Constant.INV_PIXEL_TO_METER);
-			debugRenderer.render(world, mat);
+			//Matrix4 mat = new Matrix4(Constant.CAMERA.combined);
+			//mat.scl(Constant.INV_PIXEL_TO_METER);
+			//debugRenderer.render(world, mat);
 		}
 		world.step(Constant.MS, 6, 2);
 	}

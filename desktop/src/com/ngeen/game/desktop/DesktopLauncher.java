@@ -10,8 +10,10 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
-		config.width = 1400;
-		config.height = 787;
+		config.width = LwjglApplicationConfiguration.getDesktopDisplayMode().width;
+		config.height = LwjglApplicationConfiguration.getDesktopDisplayMode().height;
+		//config.fullscreen = true;
+		config.vSyncEnabled = true;
 		new LwjglApplication(new Main(), config);
 	}
 }
