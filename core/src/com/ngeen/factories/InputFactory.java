@@ -1,18 +1,18 @@
-package com.ngeen.helper;
+package com.ngeen.factories;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
-import com.ngeen.holder.Ngeen;
+import com.ngeen.engine.Ngeen;
 
-public class InputHelper implements GestureListener, InputProcessor {
+public class InputFactory implements GestureListener, InputProcessor {
 
 	private final Ngeen ng;
 	boolean control = false, shift = false, alt = false;
 
-	public InputHelper(Ngeen ng) {
+	public InputFactory(Ngeen ng) {
 		this.ng = ng;
 	}
 
@@ -153,8 +153,7 @@ public class InputHelper implements GestureListener, InputProcessor {
 	}
 
 	@Override
-	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2,
-			Vector2 pointer1, Vector2 pointer2) {
+	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
 		// TODO Auto-generated method stub
 		return false;
 	}

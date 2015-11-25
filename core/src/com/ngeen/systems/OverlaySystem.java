@@ -9,19 +9,23 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ngeen.components.CameraComponent;
 import com.ngeen.components.TagComponent;
+import com.ngeen.components.MaterialComponent;
 import com.ngeen.components.TransformComponent;
+import com.ngeen.debug.Debugger;
+import com.ngeen.engine.Constant;
 import com.ngeen.helper.ComputeHelper;
-import com.ngeen.holder.Constant;
 
 @Wire
 public class OverlaySystem extends EntityProcessingSystem {
 	private ShapeRenderer shapeRenderer;
 	ComponentMapper<TransformComponent> transformMapper;
+	ComponentMapper<MaterialComponent> textureMapper;
 	ComponentMapper<TagComponent> tagComponent;
-	public int x1, y1, x2, y2;
+	public static float x1, y1, x2, y2;
 
 	@SuppressWarnings("unchecked")
 	public OverlaySystem() {
@@ -29,20 +33,14 @@ public class OverlaySystem extends EntityProcessingSystem {
 		shapeRenderer = new ShapeRenderer();
 	}
 
-	private void changeCamera() {
-		Matrix4 comb = Constant.CAMERA.getComponent(CameraComponent.class).camera.combined;
-		Matrix4 pos = ComputeHelper.getCombined(Constant.CAMERA.getComponent(TransformComponent.class));
-		Matrix4 cpy = comb.cpy();
-		shapeRenderer.setProjectionMatrix(cpy.mul(pos));
-	}
-
 	private void drawSelection() {
+		Matrix4 comb = Constant.UI_CAMERA.getComponent(CameraComponent.class).camera.combined;
+		shapeRenderer.setProjectionMatrix(comb);
 		shapeRenderer.rect(x1, y1, x2 - x1, y2 - y1);
 	}
 
 	@Override
 	public void begin() {
-		changeCamera();
 		shapeRenderer.begin(ShapeType.Line);
 		drawSelection();
 	}
@@ -50,7 +48,19 @@ public class OverlaySystem extends EntityProcessingSystem {
 	@Override
 	protected void process(Entity e) {
 		TransformComponent transform = transformMapper.get(e);
-		shapeRenderer.rect(transform.position.x - 5, transform.position.y - 5, 5, 5);
+		MaterialComponent texture = textureMapper.get(e);
+		float w = 1, h = 1;
+		if (texture != null) {
+			w = texture.tex.getWidth();
+			h = texture.tex.getHeight();
+		}
+
+		Matrix4 comb = Constant.CAMERA.getComponent(CameraComponent.class).camera.combined;
+		Matrix4 pos = ComputeHelper.getCombined(Constant.CAMERA.getComponent(TransformComponent.class));
+		Matrix4 pos2 = ComputeHelper.getCombined(transform);
+		shapeRenderer.setProjectionMatrix(pos2.mul(pos).mul(comb));
+
+		shapeRenderer.rect(-w / 2, -h / 2, w, h);
 	}
 
 	@Override

@@ -6,8 +6,9 @@ import com.artemis.Entity;
 import com.artemis.annotations.Wire;
 import com.artemis.systems.EntityProcessingSystem;
 import com.ngeen.components.TagComponent;
+import com.ngeen.components.MaterialComponent;
 import com.ngeen.components.TransformComponent;
-import com.ngeen.holder.Constant;
+import com.ngeen.engine.Constant;
 
 @Wire
 public class LogSystem extends EntityProcessingSystem {

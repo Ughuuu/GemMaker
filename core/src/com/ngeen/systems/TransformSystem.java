@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ngeen.components.TagComponent;
 import com.ngeen.components.TransformComponent;
-import com.ngeen.holder.Constant;
+import com.ngeen.engine.Constant;
 
 @Wire
 public class TransformSystem extends EntityProcessingSystem {

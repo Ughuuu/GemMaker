@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ngeen.components.PhysicsComponent;
 import com.ngeen.components.TransformComponent;
-import com.ngeen.holder.Constant;
+import com.ngeen.engine.Constant;
 
 @Wire
 public class PhysicsSystem extends IntervalEntityProcessingSystem {
