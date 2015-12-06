@@ -10,7 +10,8 @@ import java.util.List;
  *
  */
 public class ChildComponent extends BaseComponent {
-	public List<Integer> child;
+	
+	private List<Integer> child;
 
 	/**
 	 * Constructs a new ChildComponent.
@@ -18,5 +19,9 @@ public class ChildComponent extends BaseComponent {
 	public ChildComponent() {
 		super();
 		child = new ArrayList<Integer>();
+	}
+	
+	public List<Integer> getChildrenId(){
+		return child;
 	}
 }

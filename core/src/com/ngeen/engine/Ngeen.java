@@ -2,13 +2,6 @@ package com.ngeen.engine;
 
 import java.util.List;
 
-import com.artemis.BaseSystem;
-import com.artemis.Entity;
-import com.artemis.World;
-import com.artemis.WorldConfiguration;
-import com.artemis.managers.GroupManager;
-import com.artemis.managers.TagManager;
-import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -38,7 +31,7 @@ import com.ngeen.tester.Test;
 
 public class Ngeen extends ApplicationAdapter {
 
-	private GestureListener sceneSystem, inputEditor;
+	private GestureListener sceneSystem, editorInput;
 	private Debugger debug;
 
 	public Entity getByName(String tag) {

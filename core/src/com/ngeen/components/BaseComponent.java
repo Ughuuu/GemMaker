@@ -1,8 +1,11 @@
 package com.ngeen.components;
 
+import com.ngeen.engine.Ngeen;
+
 public class BaseComponent {
+	
 	protected int id, parent = -1;
-	protected boolean enable = true;
+	public boolean enable = true;
 	private static int unique_id = 0;
 
 	/**
@@ -10,5 +13,13 @@ public class BaseComponent {
 	 */
 	public BaseComponent() {
 		id = unique_id++;
+	}
+	
+	public int getId(){
+		return id;
+	}
+	
+	public int getParentId(){
+		return parent;
 	}
 }
