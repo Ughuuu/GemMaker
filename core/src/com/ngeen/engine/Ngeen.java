@@ -10,42 +10,58 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.ngeen.components.CameraComponent;
-import com.ngeen.debug.Debugger;
-import com.ngeen.debug.Spy;
+import com.ngeen.component.CameraComponent;
+import com.ngeen.entity.Entity;
 import com.ngeen.factories.CollidableFactory;
 import com.ngeen.factories.InputFactory;
 import com.ngeen.factories.LoaderFactory;
 import com.ngeen.scene.LoadScene;
 import com.ngeen.scene.Scene;
-import com.ngeen.systems.LogSystem;
+import com.ngeen.systems.DebugSystem;
 import com.ngeen.systems.OverlaySystem;
 import com.ngeen.systems.PhysicsSystem;
 import com.ngeen.systems.RenderSystem;
 import com.ngeen.systems.SceneSystem;
 import com.ngeen.systems.TransformSystem;
-import com.ngeen.tester.Test;
 
+/**
+ * Main engine class. Links all elements and holds entities.
+ * @author Dragos
+ *
+ */
 public class Ngeen extends ApplicationAdapter {
+	private GestureListener _SceneSystem, _EditorInput;
+	private LoaderFactory _Loader;
+	private Debugger _Debug;
+	public static SpriteBatch BATCH;
 
-	private GestureListener sceneSystem, editorInput;
-	private Debugger debug;
-
+	/**
+	 * Get entity by name.
+	 * @param tag The name of the object.
+	 * @return
+	 */
 	public Entity getByName(String tag) {
 		return null;
 	}
 
+	/**
+	 * Get entity by it's id.
+	 * @param id
+	 * @return
+	 */
 	public Entity getById(int id) {
 		return null;
 	}
 
+	/**
+	 * Remove entity by id.
+	 * @param id
+	 */
 	public void removeEntity(int id) {
-	}
-
-	public void clear() {
 	}
 
 	private void addDummyEntities() {
@@ -93,7 +109,7 @@ public class Ngeen extends ApplicationAdapter {
 			debug = new Debugger(ii, this);
 			multiplexer.addProcessor(debug);
 		}
-		multiplexer.addProcessor((InputProcessor) inputEditor);
+		multiplexer.addProcessor((InputProcessor) editorInput);
 		multiplexer.addProcessor((InputProcessor) this);
 		multiplexer.addProcessor(new GestureDetector(sceneSystem));
 		Gdx.input.setInputProcessor(multiplexer);

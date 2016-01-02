@@ -19,15 +19,6 @@ public class SceneSystem extends BaseSystem implements GestureListener, InputPro
 	public SceneSystem() {
 	}
 
-	public Scene getScene() {
-		return scene;
-	}
-
-	public void setScene(Scene scene) {
-		this.scene = scene;
-		scene.onInit();
-	}
-
 	@Override
 	protected void processSystem() {
 		if (scene != null && Constant.GAME_STATE)

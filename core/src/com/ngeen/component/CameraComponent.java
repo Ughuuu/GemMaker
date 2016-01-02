@@ -1,21 +1,22 @@
-package com.ngeen.components;
+package com.ngeen.component;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.ngeen.asset.AssetVariable;
 
 /**
- * Contains a public Camera from libgdx library.
+ * Camera component. By default it is global. You need to link it to work.
  * 
  * @author Dragos
  *
  */
 public class CameraComponent extends BaseComponent {
 	
-	public Camera camera;
-	private float fov;
+	public AssetVariable<Camera> Camera;
+	private float _Fov;
 
 	/**
 	 * Creates an OrtographicCamera with give width and height.
@@ -25,7 +26,7 @@ public class CameraComponent extends BaseComponent {
 	 */
 	public CameraComponent(float width, float height) {
 		super();
-		camera = new OrthographicCamera(width, height);
+		Camera.setElement(new OrthographicCamera(width, height));
 	}
 
 	/**
@@ -38,7 +39,7 @@ public class CameraComponent extends BaseComponent {
 	 */
 	public CameraComponent(float fov, float width, float height) {
 		super();
-		this.fov = fov;
-		camera = new PerspectiveCamera(fov, width, height);
+		this._Fov = fov;
+		Camera.setElement(new PerspectiveCamera(fov, width, height));
 	}
 }

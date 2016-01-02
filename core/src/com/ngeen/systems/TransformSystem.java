@@ -9,8 +9,8 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.physics.box2d.World;
-import com.ngeen.components.TagComponent;
-import com.ngeen.components.TransformComponent;
+import com.ngeen.component.TagComponent;
+import com.ngeen.component.TransformComponent;
 import com.ngeen.engine.Constant;
 
 @Wire
