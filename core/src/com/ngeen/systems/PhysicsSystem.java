@@ -7,8 +7,8 @@ import com.artemis.systems.IntervalEntityProcessingSystem;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.ngeen.components.PhysicsComponent;
-import com.ngeen.components.TransformComponent;
+import com.ngeen.component.PhysicsComponent;
+import com.ngeen.component.TransformComponent;
 import com.ngeen.engine.Constant;
 
 @Wire

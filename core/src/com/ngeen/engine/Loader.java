@@ -17,70 +17,116 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class Loader {
+	/**
+	 * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shader
+	 */
+	private final String[][] _Types = { { "png", "jpg", "jpeg", "gif" }, 
+			{ "pack", "atlas" }, 
+			{ "fnt" },
+			{ "wav", "ogg", "mp3" }, 
+			{ "wav", "ogg", "mp3" }, 
+			{ ".vert" } };
+	
+	private final Class<?>[] _ClassType = {
+		Texture.class, TextureAtlas.class, BitmapFont.class, 
+		Sound.class, Music.class, ShaderProgram.class
+	};
+	
+	/**
+	 * Name of first stage ever made. Load Stage.
+	 * Used only if assets are found directly in data folder.
+	 * If so, they are considered to be in ./data/LoadStage/
+	 */
+	private final String _LoadStage = "LoadStage";
+	
+	/**
+	 * All underlying assets are kept here.
+	 */
+	private AssetManager _Manager;
+	
+	/**
+	 * If this factory still loads objects or not.
+	 */
+	private boolean _Loading = false;
 
 	/**
-	 * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shaders
+	 * Map from Stage Name Folder(Ex. LoadStage, GameStage, etc.) in data to All the files in it.
+	 * The string also has an index number to follow it, representing the Types it holds.
 	 */
-	private static final String[][] types = { { "png", "jpg", "jpeg", "gif" }, { "pack", "atlas" }, { "fnt" },
-			{ "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { ".vert" } };
-	private static ArrayList<String> folderName = new ArrayList<String>();
-	private static boolean loading = false;
-
-	private static boolean checkExt(String name, int i) {
-		for (int j = 0; j < types[i].length; j++) {
-			if (name.compareTo(types[i][j]) == 0 || name.compareTo(types[i][j].toUpperCase()) == 0) {
+	private Map<String, List<FileHandle> > _Folders = new HashMap<String, List<FileHandle> >();
+	
+	/**
+	 * Check if given file is of specific given type.
+	 * This is done only when specified. Cannot be done in Release mode.
+	 * @param name Name of the file
+	 * @param i Index of _Types array of arrays.
+	 * @return If it is of specified type or not.
+	 */
+	private boolean checkExt(String name, int i) {
+		for (int j = 0; j < _Types[i].length; j++) {
+			if (name.compareTo(_Types[i][j]) == 0 || 
+					name.compareTo(_Types[i][j].toUpperCase()) == 0) {
 				return true;
 			}
 		}
 		return false;
 	}
+	
+	private void loadAsset(String path, int resType){
 
-	private static void preLoad(String loc, int resource) {
-		final AssetManager manager = Constant.MANAGER;
-		FileHandle dirHandle;
-		String path = "";
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			path = loc;
-			dirHandle = Gdx.files.internal(path);
-		} else {
-			path = "./bin/" + loc;
-			dirHandle = Gdx.files.internal(path);
+		switch (resType) {
+		case 0: {
+			_Manager.load(path, Texture.class);
+			break;
 		}
+		case 1: {
+			_Manager.load(path, TextureAtlas.class);
+			break;
+		}
+		case 2: {
+			_Manager.load(path, BitmapFont.class);
+			break;
+		}
+		case 3: {
+			_Manager.load(path, Sound.class);
+			break;
+		}
+		case 4: {
+			_Manager.load(path, Music.class);
+			break;
+		}
+		case 5: {
+			_Manager.load((path).substring(0, (path).length() - 5), ShaderProgram.class);
+			break;
+		}
+		}
+	}
+	
+	private static void preLoad() {
+		FileHandle dirHandle;
+		
+		//Desktop or Android. IOS or Windows Phone not tested.
+		if (Gdx.app.getType() == ApplicationType.Android) {
+			dirHandle = Gdx.files.internal("data");
+		} else {
+			dirHandle = Gdx.files.internal("./bin/data");
+		}
+		
+		getHandles(dirHandle, handles);
 		for (FileHandle entry : dirHandle.list()) {
+			if(entry.isDirectory()){//this has to be a class name.
+				
+			}
 			String name = entry.name();
+			entry.path();
 			if (!checkExt(entry.extension(), resource))
 				continue;
-			switch (resource) {
-			case 0: {
-				manager.load(path + name, Texture.class);
-				break;
-			}
-			case 1: {
-				manager.load(path + name, TextureAtlas.class);
-				break;
-			}
-			case 2: {
-				manager.load(path + name, BitmapFont.class);
-				break;
-			}
-			case 3: {
-				manager.load(path + name, Sound.class);
-				break;
-			}
-			case 4: {
-				manager.load(path + name, Music.class);
-				break;
-			}
-			case 5: {
-				manager.load((path + name).substring(0, (path + name).length() - 5), ShaderProgram.class);
-				break;
-			}
-			}
 		}
 	}
 
@@ -119,8 +165,7 @@ public class Loader {
 		return false;
 	}
 
-	public static void dispose() {
-		final AssetManager manager = Constant.MANAGER;
-		manager.dispose();
+	public void dispose() {
+		_Manager.dispose();
 	}
 }

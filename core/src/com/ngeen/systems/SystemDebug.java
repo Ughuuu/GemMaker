@@ -1,13 +1,16 @@
 package com.ngeen.systems;
 
-import com.ngeen.engine.Constant;
-
-public class LogSystem extends EntityProcessingSystem {
+/**
+ * 
+ * @author Dragos
+ *
+ */
+public class SystemDebug extends SystemBase {
 	private ComponentMapper<TransformComponent> transformMapper;
 	private ComponentMapper<TagComponent> tagMapper;
 
 	@SuppressWarnings("unchecked")
-	public LogSystem() {
+	public DebugSystem() {
 		super(Aspect.all(TransformComponent.class));
 	}
 
