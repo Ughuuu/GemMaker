@@ -1,4 +1,4 @@
-package com.ngeen.factories;
+package com.ngeen.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,9 +20,8 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.ngeen.engine.Constant;
 
-public class LoaderFactory {
+public class Loader {
 
 	/**
 	 * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shaders

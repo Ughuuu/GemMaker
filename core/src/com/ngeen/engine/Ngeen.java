@@ -14,11 +14,10 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.ngeen.components.CameraComponent;
+import com.ngeen.components.CollidableFactory;
 import com.ngeen.debug.Debugger;
 import com.ngeen.debug.Spy;
-import com.ngeen.factories.CollidableFactory;
-import com.ngeen.factories.InputFactory;
-import com.ngeen.factories.LoaderFactory;
+import com.ngeen.entity.Entity;
 import com.ngeen.scene.LoadScene;
 import com.ngeen.scene.Scene;
 import com.ngeen.systems.LogSystem;
@@ -29,11 +28,16 @@ import com.ngeen.systems.SceneSystem;
 import com.ngeen.systems.TransformSystem;
 import com.ngeen.tester.Test;
 
-public class Ngeen extends ApplicationAdapter {
+public class Ngeen extends ApplicationAdapter{
 
+	public static Ngeen ng = new Ngeen();
+	
+	//public static SpriteBatch BATCH;
+	private int CAMERA_ID, UI_CAMERA_ID;
+	private AssetManager MANAGER;	
+	
 	private GestureListener sceneSystem, editorInput;
-	private Debugger debug;
-
+		
 	public Entity getByName(String tag) {
 		return null;
 	}
@@ -49,20 +53,18 @@ public class Ngeen extends ApplicationAdapter {
 	}
 
 	private void addDummyEntities() {
-		/*
-		 * Entity cameraEntity = entityHelper.createPositional("~CAMERA",
-		 * "~ENGINE"); CameraComponent camera =
-		 * cameraEntity.edit().create(CameraComponent.class); camera.camera =
-		 * new OrthographicCamera(Constant.W, Constant.H); Constant.CAMERA =
-		 * cameraEntity;
-		 * 
-		 * cameraEntity = entityHelper.createPositional("~UI_CAMERA",
-		 * "~ENGINE"); camera =
-		 * cameraEntity.edit().create(CameraComponent.class); camera.camera =
-		 * new OrthographicCamera(Constant.W, Constant.H);
-		 * camera.camera.translate(Constant.W / 2, Constant.H / 2, 0);
-		 * camera.camera.update(); Constant.UI_CAMERA = cameraEntity;
-		 */
+		 Entity cameraEntity = entityHelper.createPositional("~CAMERA",
+		 "~ENGINE"); CameraComponent camera =
+		 cameraEntity.edit().create(CameraComponent.class); camera.camera =
+		 new OrthographicCamera(Constant.W, Constant.H); Constant.CAMERA =
+		 cameraEntity;
+		  
+		 cameraEntity = entityHelper.createPositional("~UI_CAMERA",
+		 "~ENGINE"); camera =
+		 cameraEntity.edit().create(CameraComponent.class); camera.camera =
+		 new OrthographicCamera(Constant.W, Constant.H);
+		 camera.camera.translate(Constant.W / 2, Constant.H / 2, 0);
+		 camera.camera.update(); Constant.UI_CAMERA = cameraEntity;		 
 	}
 
 	public void zoom() {
@@ -78,7 +80,7 @@ public class Ngeen extends ApplicationAdapter {
 	}
 
 	public void load(String name) {
-		LoaderFactory.preLoadAll(name);
+		Loader.preLoadAll(name);
 	}
 
 	public void init() {
@@ -110,7 +112,7 @@ public class Ngeen extends ApplicationAdapter {
 	}
 
 	public void update(float delta) {
-		LoaderFactory.done();
+		Loader.done();
 	}
 
 	public void restart() {

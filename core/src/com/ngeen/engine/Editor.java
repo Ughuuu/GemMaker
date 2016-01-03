@@ -1,20 +1,14 @@
-package com.ngeen.factories;
+package com.ngeen.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
-import com.ngeen.engine.Ngeen;
 
-public class InputFactory implements GestureListener, InputProcessor {
+public class Editor implements GestureListener, InputProcessor {
 
-	private final Ngeen ng;
 	boolean control = false, shift = false, alt = false;
-
-	public InputFactory(Ngeen ng) {
-		this.ng = ng;
-	}
 
 	@Override
 	public boolean keyDown(int keycode) {

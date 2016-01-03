@@ -1,16 +1,7 @@
 package com.ngeen.systems;
 
-import com.artemis.Aspect;
-import com.artemis.ComponentMapper;
-import com.artemis.Entity;
-import com.artemis.annotations.Wire;
-import com.artemis.systems.EntityProcessingSystem;
-import com.ngeen.components.TagComponent;
-import com.ngeen.components.MaterialComponent;
-import com.ngeen.components.TransformComponent;
 import com.ngeen.engine.Constant;
 
-@Wire
 public class LogSystem extends EntityProcessingSystem {
 	private ComponentMapper<TransformComponent> transformMapper;
 	private ComponentMapper<TagComponent> tagMapper;
