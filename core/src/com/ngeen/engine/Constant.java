@@ -1,19 +1,17 @@
 package com.ngeen.engine;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public class Constant {
 	public final static int ENTITIES_CACHE = 500;
+	public final static int COMPONENT_CACHE = 100;
 	public final static int DEBUG_LEVEL = 1;
 	public static final float EPSILON = 1e-10f;
 	public static final boolean DEBUG = true;
 
 	public static Vector2 GRAVITY = new Vector2(0, -1f);
-	
+
 	public static float W = 1024;
 	public static float H = 576;
 	public static float GAME_SPEED = 1;

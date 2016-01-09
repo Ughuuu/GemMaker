@@ -1,10 +1,10 @@
 package com.ngeen.game.desktop;
 
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.ngeen.engine.Ngeen;
-import com.ngeen.ui.Main;
 
 public class DesktopLauncher {
 	public static void main(String[] arg) {
@@ -12,8 +12,10 @@ public class DesktopLauncher {
 		// System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
 		config.width = LwjglApplicationConfiguration.getDesktopDisplayMode().width;
 		config.height = LwjglApplicationConfiguration.getDesktopDisplayMode().height;
+		config.addIcon("icon64.png", FileType.Internal);
+		config.addIcon("icon16.png", FileType.Internal);
 		// config.fullscreen = true;
 		config.vSyncEnabled = true;
-		new LwjglApplication(new Main(), config);
+		new LwjglApplication(new Ngeen(), config);
 	}
 }

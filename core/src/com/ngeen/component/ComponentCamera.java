@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.ngeen.asset.AssetVariable;
+import com.ngeen.engine.Constant;
+import com.ngeen.engine.Ngeen;
 
 /**
  * Camera component. By default it is global. You need to link it to work.
@@ -13,10 +14,15 @@ import com.ngeen.asset.AssetVariable;
  * @author Dragos
  *
  */
-public class CameraComponent extends BaseComponent {
-	
-	public AssetVariable<Camera> Camera;
+public class ComponentCamera extends ComponentBase {
+
+	public Camera Camera;
 	private float _Fov;
+
+	public ComponentCamera(Ngeen ng) {
+		super(ng);
+		createCamera(Constant.W,Constant.H);
+	}
 
 	/**
 	 * Creates an OrtographicCamera with give width and height.
@@ -24,9 +30,8 @@ public class CameraComponent extends BaseComponent {
 	 * @param width
 	 * @param height
 	 */
-	public CameraComponent(float width, float height) {
-		super();
-		Camera.setElement(new OrthographicCamera(width, height));
+	public void createCamera(float width, float height) {
+		Camera = new OrthographicCamera(width, height);
 	}
 
 	/**
@@ -37,9 +42,8 @@ public class CameraComponent extends BaseComponent {
 	 * @param width
 	 * @param height
 	 */
-	public CameraComponent(float fov, float width, float height) {
-		super();
+	public void createCamera(float fov, float width, float height) {
 		this._Fov = fov;
-		Camera.setElement(new PerspectiveCamera(fov, width, height));
+		Camera = new PerspectiveCamera(fov, width, height);
 	}
 }

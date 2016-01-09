@@ -7,6 +7,11 @@ import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 
 public class Editor implements GestureListener, InputProcessor {
+	private final Ngeen _Ng;
+
+	public Editor(Ngeen ng) {
+		_Ng = ng;
+	}
 
 	boolean control = false, shift = false, alt = false;
 

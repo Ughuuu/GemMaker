@@ -1,29 +1,26 @@
 package com.ngeen.systems;
 
+import java.util.List;
+
 public class SystemConfiguration {
-	/**
-	 * Next system configuration in chain.
-	 */
-	private SystemConfiguration next = null;
-	
-	/**
-	 * Either and or or.
-	 */
-	private boolean nextAnd = false;
-	
+	private Class<?>[] All;
+	private List<Class<?>[]> Ones;
+
 	/**
 	 * Class of current cell.
 	 */
 	private Class<?> cls;
-	
-	
-	public SystemConfiguration(Class<?> cls){
-		this.cls = cls;
+
+	public SystemConfiguration() {
 	}
-	
-	public SystemConfiguration add(boolean func, Class<?> cls){
-		nextAnd = func;
-		this.next = new SystemConfiguration(cls);
-		return next;
+
+	public SystemConfiguration all(Class<?>... cls) {
+		All = cls;
+		return this;
+	}
+
+	public SystemConfiguration one(Class<?>... cls) {
+		Ones.add(cls);
+		return this;
 	}
 }
