@@ -1,4 +1,4 @@
-package com.ngeen.misc;
+package com.ngeen.asset;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -19,8 +19,9 @@ public class ShaderLoader extends SynchronousAssetLoader<ShaderProgram, ShaderLo
 	}
 
 	public ShaderProgram load(AssetManager assetManager, String fileName, FileHandle file, ShaderParameter parameter) {
-		final ShaderProgram shader = new ShaderProgram(resolve(fileName + VERTEX_SHADER_EXTENSION),
-				resolve(fileName + FRAGMENT_SHADER_EXTENSION));
+		String shaderName = fileName = (fileName).substring(0, (fileName).length() - 5);
+		final ShaderProgram shader = new ShaderProgram(resolve(shaderName + VERTEX_SHADER_EXTENSION),
+				resolve(shaderName + FRAGMENT_SHADER_EXTENSION));
 		if (shader.isCompiled() == false) {
 			throw new IllegalStateException(shader.getLog());
 		}

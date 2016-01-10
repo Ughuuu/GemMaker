@@ -1,6 +1,10 @@
 package com.ngeen.engine;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.ngeen.component.ComponentCamera;
+import com.ngeen.entity.Entity;
 
 /**
  * Information data about engine.
@@ -9,16 +13,25 @@ import com.badlogic.gdx.math.Vector2;
  *
  */
 public class EngineInfo {
+	public final static int EntitiesCache = 1;
+	
+	public final static int ComponentCache = 100;
+
+	public static Color BackgroundColor = new Color(.6f, .2f, .1f, 1);
 	/**
 	 * Screen Width.
 	 */
-	public static float Width;
+	public static float Width = 1024;
 
 	/**
 	 * Screen Height.
 	 */
-	public static float Height;
+	public static float Height = 600;
 
+	public static float ScreenWidth;
+	
+	public static float ScreenHeight;
+	
 	/**
 	 * Mathematical constant. Very small float number.
 	 */
@@ -64,4 +77,20 @@ public class EngineInfo {
 	 * MeterPerPixel. Used for Box1d.
 	 */
 	public static final float MeterPerPixel = 1.f / PixelPerMeter;
+	
+	protected static void makeBasicEntities(Ngeen ng){
+		ScreenWidth = Gdx.graphics.getWidth();
+		ScreenHeight = Gdx.graphics.getHeight();
+		
+		Entity camera = ng.EntityBuilder.makeEntity("~CAMERA");
+		Entity uiCamera = ng.EntityBuilder.makeEntity("~UICAMERA");
+		
+		ComponentCamera cam = camera.addComponent(ComponentCamera.class);
+		cam.createCamera(Width, Height);
+		
+		ComponentCamera uiCam = uiCamera.addComponent(ComponentCamera.class);
+		uiCam.createCamera(ScreenWidth, ScreenHeight);
+		uiCam.Camera.translate(ScreenWidth/2, ScreenHeight/2, 0);
+		uiCam.Camera.update();
+	}
 }

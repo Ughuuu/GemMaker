@@ -1,4 +1,4 @@
-package com.ngeen.misc;
+package com.ngeen.asset;
 
 public class Pair<X, Y> {
 	public X x;

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.ngeen.engine.Constant;
+import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 
 /**
@@ -21,7 +21,7 @@ public class ComponentCamera extends ComponentBase {
 
 	public ComponentCamera(Ngeen ng) {
 		super(ng);
-		createCamera(Constant.W,Constant.H);
+		createCamera(EngineInfo.Width,EngineInfo.Height);
 	}
 
 	/**

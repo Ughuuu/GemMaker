@@ -19,6 +19,7 @@ public abstract class ComponentBase {
 	protected boolean Enable = true;
 	private static int _UniqueId = 0;
 	private final Ngeen _Ng;
+	protected int OwnerId = -1;
 
 	/**
 	 * Create a BaseComponent with an unique id.
@@ -52,5 +53,13 @@ public abstract class ComponentBase {
 	 */
 	public final void setEnabled(boolean Enable) {
 		this.Enable = Enable;
+	}
+	
+	public void setOwner(int ParentId){
+		OwnerId = ParentId;
+	}
+	
+	public void remove(){
+		_Ng.EntityBuilder.getById(OwnerId).removeComponent(this.getClass(), Id);
 	}
 }

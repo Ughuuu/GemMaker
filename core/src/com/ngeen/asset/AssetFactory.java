@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
@@ -30,6 +33,17 @@ public class AssetFactory {
 	private final Class<?>[] _ClassType = { Texture.class, TextureAtlas.class, BitmapFont.class, Sound.class,
 			Music.class, ShaderProgram.class };
 
+	private final Map<Class<?>, Integer> _ClassTypeIndex = new HashMap<Class<?>, Integer>() {
+		{
+			put(Texture.class, 0);
+			put(TextureAtlas.class, 0);
+			put(BitmapFont.class, 0);
+			put(Sound.class, 0);
+			put(Music.class, 0);
+			put(ShaderProgram.class, 0);
+		}
+	};
+
 	/**
 	 * All underlying assets are kept here.
 	 */
@@ -46,6 +60,8 @@ public class AssetFactory {
 
 	private Map<String, Integer> _AssetNameMap;
 
+	private String _PrePath;
+
 	/**
 	 * Map from Stage Name Folder(Ex. LoadStage, GameStage, etc.) in data to All
 	 * the files in it. The string also has an index number to follow it,
@@ -59,6 +75,12 @@ public class AssetFactory {
 		_AssetMap = new HashMap<Integer, Asset>();
 		_AssetNameMap = new HashMap<String, Integer>();
 		_UpdateFolders = new ArrayList<String>();
+
+		if (Gdx.app.getType() == ApplicationType.Android) {
+			_PrePath = "data/";
+		} else {
+			_PrePath = "./bin/data/";
+		}
 	}
 
 	/**
@@ -88,7 +110,6 @@ public class AssetFactory {
 	 * @return Coresponding index in data types table.
 	 */
 	private int getExt(String name) {
-		AssetManager a;
 		for (int i = 0; i < _Types.length; i++) {
 			if (checkExt(name, i) == true)
 				return i;
@@ -97,19 +118,15 @@ public class AssetFactory {
 	}
 
 	private void loadAsset(String path, int resType) {
-		if (resType == 5) {
-			path = (path).substring(0, (path).length() - 5);
-		}
 		_Manager.load(path, _ClassType[resType]);
 	}
 
 	public void unloadAsset(String path, int resType, String folder) {
-		if (resType == 5) {
-			path = (path).substring(0, (path).length() - 5);
-		}
 		try {
-			_Manager.unload(path);
+			_Manager.unload(_PrePath + folder + path);
 			_Folders.get(folder + resType).remove(path);
+			int ind = _AssetNameMap.remove(folder + path);
+			_AssetMap.remove(ind);
 		} catch (Exception e) {
 			Debugger.println(path + " is not loaded.");// Known bug. Sorry.
 		}
@@ -117,37 +134,32 @@ public class AssetFactory {
 
 	public void scoutFiles() {
 		_UpdateFolders.add("");
-		FileHandle dirHandle;
-		String prePath = "data/";
+		FileHandle dirHandle = Gdx.files.internal(_PrePath);
 		String folder = "", actualFolder = "";
-
-		// Desktop or Android. IOS or Windows Phone not tested.
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			dirHandle = Gdx.files.internal(prePath);
-		} else {
-			prePath = "./bin/data/";
-			dirHandle = Gdx.files.internal(prePath);
-		}
 
 		for (FileHandle entry : dirHandle.list()) {
 			String name = entry.name();
 			String extension = entry.extension();
 
 			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(name, name);
+				enqueFolder(name + "/", name + "/");
 			} else {
 				int extensionKey = getExt(extension);
 				List<String> list = null;
 				if (_Folders.containsKey(folder + extensionKey) == false) {
 					list = new ArrayList<String>();
 					_Folders.put(folder + extensionKey, list);
-				}else{
+				} else {
 					list = _Folders.get(folder + extensionKey);
 				}
-				loadAsset(prePath + name, extensionKey);
+				loadAsset(_PrePath + name, extensionKey);
 				list.add(name);
 			}
 		}
+	}
+	
+	public void enqueFolder(String folder){
+		enqueFolder(folder,folder);
 	}
 
 	/**
@@ -155,36 +167,27 @@ public class AssetFactory {
 	 * 
 	 * @param folder
 	 */
-	public void enqueFolder(String folder, String actualFolder) {
+	private void enqueFolder(String folder, String actualFolder) {
 		_UpdateFolders.add(folder);
-		FileHandle dirHandle;
-		String prePath = "data/" + actualFolder;
-
-		// Desktop or Android. IOS or Windows Phone not tested.
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			dirHandle = Gdx.files.internal(prePath);
-		} else {
-			prePath = "./bin/data/" + actualFolder;
-			dirHandle = Gdx.files.internal(prePath);
-		}
+		FileHandle dirHandle = Gdx.files.internal(_PrePath + actualFolder);
 
 		for (FileHandle entry : dirHandle.list()) {
 			String name = entry.name();
 			String extension = entry.extension();
 
 			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(folder, actualFolder + "/" + name);
+				enqueFolder(folder, actualFolder + name);
 			} else {
 				int extensionKey = getExt(extension);
 				List<String> list = null;
 				if (_Folders.containsKey(folder + extensionKey) == false) {
 					list = new ArrayList<String>();
 					_Folders.put(folder + extensionKey, list);
-				}else{
+				} else {
 					list = _Folders.get(folder + extensionKey);
 				}
-				loadAsset(prePath + "/" + name, extensionKey);
-				list.add(actualFolder + "/" + name);
+				loadAsset(_PrePath + actualFolder + name, extensionKey);
+				list.add(name);
 			}
 		}
 	}
@@ -195,46 +198,28 @@ public class AssetFactory {
 	 * @param folder
 	 *            Folder name that is in the map.
 	 */
-	public void loadFolder(String folder) {
-		String prePath = "";
-
-		// Desktop or Android. IOS or Windows Phone not tested.
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			prePath = "data/";
-		} else {
-			prePath = "./bin/data/";
-		}
-
+	public void addFolder(String folder) {
+		folder += "/";
 		for (int i = 0; i < _Types.length; i++) {
 			List<String> names = _Folders.get(folder + i);
 			if (names != null) {
 				for (String name : names) {
-					loadAsset(prePath + name, i);
+					loadAsset(_PrePath + name, i);
 				}
 			}
 		}
 	}
 
 	private void addAssets(String folder) {
-		String prePath = "";
-
-		// Desktop or Android. IOS or Windows Phone not tested.
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			prePath = "data/";
-		} else {
-			prePath = "./bin/data/";
-		}
-
 		for (int i = 0; i < _Types.length; i++) {
 			List<String> names = _Folders.get(folder + i);
 			if (names != null) {
 				for (String name : names) {
-					Asset addNew = new Asset(_Ng, prePath + name, _Manager.get(prePath + name), i, folder);
+					Asset addNew = new Asset(_Ng, name, _Manager.get(_PrePath + folder + name), i, folder);
 					_AssetMap.put(addNew.getId(), addNew);
-					_AssetNameMap.put(addNew.getPath(), addNew.getId());
+					_AssetNameMap.put(addNew.getFolder() + addNew.getPath(), addNew.getId());
 				}
 			}
-			_Folders.remove(folder + i);
 		}
 	}
 
@@ -256,45 +241,84 @@ public class AssetFactory {
 	}
 
 	/**
+	 * Has to be called to keep the loading going.
+	 * 
+	 * @return
+	 */
+	public boolean finish() {
+		_Manager.finishLoading();
+		for (int i = 0; i < _UpdateFolders.size(); i++) {
+			String folder = _UpdateFolders.get(i);
+			addAssets(folder);
+		}
+		_UpdateFolders.clear();
+		return true;
+	}
+
+	public float getPercentage() {
+		return _Manager.getProgress();
+	}
+
+	/**
 	 * Free all the assets.
 	 */
 	public void dispose() {
 		_Manager.dispose();
 	}
 
-	public void getAsset(String path) {
+	public List<String> getAssetsNameFolder(String folder) {
+		List<String> ret = new ArrayList<String>();
+		for (int i = 0; i < _Types.length; i++) {
+			List<String> names = _Folders.get(folder + i);
+			if (names != null) {
+				for (String name : names) {
+					ret.add(name);
+				}
+			}
+		}
+		return ret;
+	}
 
+	/**
+	 * Set of String because we might have doubles.
+	 * 
+	 * @param folder
+	 * @return
+	 */
+	public Set<String> getFolderNames() {
+		Set<String> ret = new TreeSet<String>();
+		for (Entry<String, List<String>> folderNamePair : _Folders.entrySet()) {
+			String n = folderNamePair.getKey();
+			ret.add(n.substring(0, n.length() - 1));
+		}
+		return ret;
 	}
 
 	/**
 	 * Free all the assets.
 	 */
 	public void disposeFolder(String folder) {
-		String prePath = "";
-
-		// Desktop or Android. IOS or Windows Phone not tested.
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			prePath = "data/";
-		} else {
-			prePath = "./bin/data/";
-		}
 
 		for (int i = 0; i < _Types.length; i++) {
 			List<String> names = _Folders.get(folder + i);
 			if (names != null) {
-				for (String name : names) {
-					unloadAsset(prePath + name, i, folder);
+				while (names.size() != 0) {
+					unloadAsset(names.get(0), i, folder);
 				}
 			}
 			_Folders.remove(folder + i);
 		}
 	}
 
-	public Asset getAssetById(int id) {
-		return _AssetMap.get(id);
+	public <T> Asset<T> getAssetById(int id) {
+		Asset<T> asset = _AssetMap.get(id);
+		return asset;
 	}
 
-	public Asset getAssetById(String path) {
-		return _AssetMap.get(_AssetNameMap.get(path));
+	public <T> Asset<T> getAsset(String path) {
+		Integer id = _AssetNameMap.get(path);
+		if (id == null)
+			return null;
+		return getAssetById(id);
 	}
 }

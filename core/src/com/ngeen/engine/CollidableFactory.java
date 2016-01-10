@@ -1,10 +1,9 @@
-package com.ngeen.entity;
+package com.ngeen.engine;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.ngeen.engine.Constant;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -62,7 +61,7 @@ public class CollidableFactory {
 	}
 
 	public Body createBody(BodyType t, Vector2 pos) {
-		pos.scl(Constant.INV_PIXEL_TO_METER);
+		pos.scl(EngineInfo.MeterPerPixel);
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = t;
 		bodyDef.position.set(pos);

@@ -2,6 +2,7 @@ package com.ngeen.asset;
 
 import java.util.List;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.ngeen.engine.Ngeen;
 
 /**
@@ -29,14 +30,15 @@ public class Asset<T> {
 		this._Asset = _Asset;
 		this._ResId = _ResId;
 		this._Folder = _Folder;
+		if(_Folder.equals("/")){
+			_Folder = "";
+		}
+		_Id = _UniqueId;
+		_UniqueId++;
 	}
 
-	public final T getAsset(Class<T> cls) {
+	public final T getData() {
 		return _Asset;
-	}
-
-	public final String getData() {
-		return _Path;
 	}
 
 	public void dispose() {
@@ -52,5 +54,9 @@ public class Asset<T> {
 
 	public final String getPath() {
 		return _Path;
+	}
+	
+	public String getFolder(){
+		return _Folder;
 	}
 }

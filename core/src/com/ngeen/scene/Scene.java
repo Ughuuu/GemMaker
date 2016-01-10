@@ -3,6 +3,7 @@ package com.ngeen.scene;
 import com.badlogic.gdx.math.Vector2;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.Entity;
 
 /**
  * Extend this class to have Scene functionality. A scene is called every frame.
@@ -11,10 +12,22 @@ import com.ngeen.engine.Ngeen;
  *
  */
 public class Scene {
-	protected final Ngeen ng;
+	protected Ngeen ng;
+	private SceneFactory _SceneFactory;
+	
+	protected Entity CreateObject(String name){
+		return ng.EntityBuilder.makeEntity(name);
+	}
 
-	public Scene(Ngeen ng) {
+	public Scene() {
+	}
+	
+	protected void addNgeen(final Ngeen ng){
 		this.ng = ng;
+	}
+	
+	protected void addSceneFactory(final SceneFactory _SceneFactory){
+		this._SceneFactory = _SceneFactory;
 	}
 
 	/**
@@ -26,14 +39,6 @@ public class Scene {
 
 	public void onExit() {
 		Debugger.println("onExit()");
-	}
-
-	public void onLeave() {
-		Debugger.println("onLeave()");
-	}
-
-	public void onEnter() {
-		Debugger.println("onEnter()");
 	}
 
 	public void onUpdate(float delta) {
@@ -90,6 +95,6 @@ public class Scene {
 	}
 
 	public void changeScene(String newScene) {
-		ng.SceneSystem.setScene(ng.SceneBuilder.makeScene(newScene));
+		_SceneFactory.changeScene(newScene);
 	}
 }

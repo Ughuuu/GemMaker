@@ -1,13 +1,13 @@
 package com.ngeen.systems;
 
+import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-public class RenderSystem extends SystemBase {
+public class SystemRender extends SystemBase {
 	// private SpriteBatch batch;
 
-	@SuppressWarnings("unchecked")
-	public RenderSystem() {
-		super(new SystemConfiguration().all());
+	public SystemRender(Ngeen ng, SystemConfiguration conf) {
+		super(ng, conf);
 		// this.batch = new SpriteBatch();
 	}
 

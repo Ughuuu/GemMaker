@@ -3,8 +3,8 @@ package com.ngeen.component;
 import com.badlogic.gdx.math.Vector3;
 import com.ngeen.engine.Ngeen;
 
-public class ComponentTransform extends ComponentBase {
-	public ComponentTransform(Ngeen ng) {
+public class ComponentPoint extends ComponentBase {
+	public ComponentPoint(Ngeen ng) {
 		super(ng);
 	}
 

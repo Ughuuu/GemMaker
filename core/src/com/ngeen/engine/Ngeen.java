@@ -11,13 +11,14 @@ import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.ngeen.asset.AssetFactory;
 import com.ngeen.component.ComponentFactory;
-import com.ngeen.asset.AssetFactory;
-import com.ngeen.entity.Entity;
 import com.ngeen.entity.EntityFactory;
+import com.ngeen.asset.AssetFactory;
 import com.ngeen.scene.Scene;
 import com.ngeen.scene.SceneFactory;
+import com.ngeen.systems.SystemOverlay;
 import com.ngeen.systems.SceneSystem;
 import com.ngeen.systems.SystemBase;
+import com.ngeen.systems.SystemConfiguration;
 
 /**
  * Main engine class. Links all elements and holds entities.
@@ -26,24 +27,33 @@ import com.ngeen.systems.SystemBase;
  *
  */
 public class Ngeen extends ApplicationAdapter {
-	private GestureListener _EditorInput;
-	public SceneSystem SceneSystem;
 	public AssetFactory Loader;
 	public EntityFactory EntityBuilder;
-	public SceneFactory SceneBuilder;
-	public ComponentFactory ComponentBuilder;
+	
+	protected SceneFactory SceneBuilder;
+	private GestureListener _EditorInput;
+	protected ComponentFactory ComponentBuilder;	
+	private SceneSystem _SceneSystem;
+	private SystemOverlay _OverlaySystem;
 
 	public void init() {
 		_EditorInput = new Editor(this);
 		Loader = new AssetFactory(this);
-		EntityBuilder = new EntityFactory(this);
-		SceneBuilder = new SceneFactory(this);
 		ComponentBuilder = new ComponentFactory(this);
-		SceneSystem = new SceneSystem(this, "LoadScene");
+		EntityBuilder = new EntityFactory(this, ComponentBuilder);
+		
+		_OverlaySystem = new SystemOverlay(this, new SystemConfiguration().all());
+		_SceneSystem = new SceneSystem(this);
+		
+		SceneBuilder = new SceneFactory(this, _SceneSystem);
+		SceneBuilder.changeScene("LoadScene");
 		final InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor((InputProcessor) _EditorInput);
-		multiplexer.addProcessor(new GestureDetector(SceneSystem));
+		multiplexer.addProcessor(new GestureDetector(_SceneSystem));
+		multiplexer.addProcessor((InputProcessor)_OverlaySystem);
 		Gdx.input.setInputProcessor(multiplexer);
+		
+		EngineInfo.makeBasicEntities(this);
 	}
 
 	private void updateSystem(SystemBase system) {
@@ -55,10 +65,12 @@ public class Ngeen extends ApplicationAdapter {
 
 	public void update(float delta) {
 		Loader.done();
-		updateSystem(SceneSystem);
+		updateSystem(_SceneSystem);
+		updateSystem(_OverlaySystem);
 	}
 
 	public void restart() {
+		remove();
 	}
 
 	@Override
@@ -69,8 +81,8 @@ public class Ngeen extends ApplicationAdapter {
 
 	@Override
 	public void render() {
-		Gdx.gl.glClearColor(Constant.BACKGROUND_COLOR.r, Constant.BACKGROUND_COLOR.g, Constant.BACKGROUND_COLOR.b,
-				Constant.BACKGROUND_COLOR.a);
+		Gdx.gl.glClearColor(EngineInfo.BackgroundColor.r, EngineInfo.BackgroundColor.g, EngineInfo.BackgroundColor.b,
+				EngineInfo.BackgroundColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		update(Gdx.graphics.getDeltaTime());
 	}
@@ -79,7 +91,8 @@ public class Ngeen extends ApplicationAdapter {
 	public void resize(int w, int h) {
 	}
 
-	public void dispose() {
-		// Constant.BATCH.dispose();
+	public void remove() {
+		EntityBuilder.clear();
+		ComponentBuilder.clear();
 	}
 }

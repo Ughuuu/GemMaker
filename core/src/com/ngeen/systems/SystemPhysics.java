@@ -2,20 +2,21 @@ package com.ngeen.systems;
 
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.ngeen.engine.Constant;
+import com.ngeen.engine.EngineInfo;
+import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-public class PhysicsSystem extends SystemBase {
-	public World world = new World(Constant.GRAVITY, true);
+public class SystemPhysics extends SystemBase {
+	public World world = new World(EngineInfo.Gravity, true);
 	public Box2DDebugRenderer debugRenderer;
 
-	public PhysicsSystem() {
-		super(new SystemConfiguration().all());
+	public SystemPhysics(Ngeen ng, SystemConfiguration conf) {
+		super(ng, conf);
 		debugRenderer = new Box2DDebugRenderer();
 	}
 
 	public void onBeforeUpdate() {
-		world.step(Constant.MS, 6, 2);
+		world.step(EngineInfo.Ms, 6, 2);
 	};
 
 	@Override

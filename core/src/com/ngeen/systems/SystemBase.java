@@ -6,17 +6,23 @@ import com.ngeen.entity.Entity;
 
 public abstract class SystemBase {
 	protected boolean Enable;
-	protected SystemConfiguration config = null;
-	public static Ngeen ng;
+	protected SystemConfiguration _Config = null;
+	public final Ngeen _Ng;
 	public float deltaTime;
 
-	public SystemBase() {
-		config = new SystemConfiguration();
+	public SystemBase(Ngeen ng) {
+		_Config = new SystemConfiguration();
+		this._Ng = ng;
 	}
 
-	public SystemBase(SystemConfiguration conf) {
+	public SystemBase(Ngeen ng, SystemConfiguration conf) {
 		Enable = true;
-		this.config = conf;
+		this._Config = conf;
+		this._Ng = ng;
+	}
+	
+	public SystemConfiguration getConfiguration(){
+		return _Config;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package com.ngeen.misc;
+package com.ngeen.asset;
 
 public class ShaderData {
 	Float[] data;
