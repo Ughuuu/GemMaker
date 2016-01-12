@@ -2,6 +2,7 @@ package com.ngeen.scene;
 
 import com.badlogic.gdx.math.Vector2;
 import com.ngeen.debug.Debugger;
+import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
@@ -96,5 +97,13 @@ public class Scene {
 
 	public void changeScene(String newScene) {
 		_SceneFactory.changeScene(newScene);
+	}
+	
+	protected Entity findObject(String name){
+		return ng.EntityBuilder.getByName(name);
+	}
+	
+	protected Entity findObject(int id){
+		return ng.EntityBuilder.getById(id);
 	}
 }

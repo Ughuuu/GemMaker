@@ -2,13 +2,13 @@ package com.ngeen.scene;
 
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
-import com.ngeen.systems.SceneSystem;
+import com.ngeen.systems.SystemScene;
 
 public class SceneFactory {
 	private final Ngeen _Ng;
-	private final SceneSystem _SceneSystem;
+	private final SystemScene _SceneSystem;
 
-	public SceneFactory(Ngeen ng, SceneSystem _SceneSystem) {
+	public SceneFactory(Ngeen ng, SystemScene _SceneSystem) {
 		_Ng = ng;
 		this._SceneSystem = _SceneSystem;
 	}

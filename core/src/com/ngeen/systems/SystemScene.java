@@ -1,35 +1,60 @@
 package com.ngeen.systems;
 
+import java.util.List;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.ngeen.component.ComponentScript;
+import com.ngeen.component.Script;
+import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 import com.ngeen.scene.Scene;
 
-public class SceneSystem extends SystemBase implements GestureListener, InputProcessor {
-	private Scene scene;
+public class SystemScene extends SystemBase implements GestureListener, InputProcessor {
+	private Scene _Scene;
+	private Scene _RequestChange;
 	
-	public SceneSystem(Ngeen ng) {
-		super(ng);
+	public SystemScene(Ngeen ng, SystemConfiguration conf) {
+		super(ng, conf);
+	}
+	
+	public Class<?> getScene(){
+		return _Scene.getClass();
 	}
 	
 	public void setScene(Scene sc){
 		if(sc!=null){
-			if(scene!=null)
-			scene.onExit();
-			this.scene = sc;
-			scene.onInit();
+			this._RequestChange = sc;
+		}
+	}
+	
+	@Override
+	public void onUpdate(Entity ent){
+		List<ComponentScript> scripts = ent.getComponents(ComponentScript.class);
+		
+		for(ComponentScript script : scripts){
+			script.getScipt().onUpdate(deltaTime);
 		}
 	}
 	
 	@Override
 	public void onBeforeUpdate(){
-		if (scene != null)
-			scene.onUpdate(deltaTime);
+		if(_RequestChange != null){
+			if(_Scene!=null)
+			_Scene.onExit();
+			_Scene = _RequestChange;
+			_Ng.XmlSave.Load();
+			_RequestChange = null;
+			Debugger.log("Loaded scene " + _Scene);
+			_Scene.onInit();
+		}
+		if (_Scene != null)
+			_Scene.onUpdate(deltaTime);
 	}
 	
 	@Override
@@ -37,13 +62,13 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 		x = x / (float) Gdx.graphics.getWidth() * EngineInfo.Width;
 		y = EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height;
 		if (EngineInfo.Debug) {
-			SystemOverlay.x1 = x;
-			SystemOverlay.y1 = y;
-			SystemOverlay.x2 = x;
-			SystemOverlay.y2 = y;
+			SystemOverlay._X1 = x;
+			SystemOverlay._Y1 = y;
+			SystemOverlay._X2 = x;
+			SystemOverlay._Y2 = y;
 		}
-		if (scene != null)
-			scene.onTouchDown(x, y, pointer);
+		if (_Scene != null)
+			_Scene.onTouchDown(x, y, pointer);
 		return false;
 	}
 
@@ -52,11 +77,11 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 		x = (int) (x / (float) Gdx.graphics.getWidth() * EngineInfo.Width);
 		y = (int) (EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height);
 		if (EngineInfo.Debug) {
-			SystemOverlay.x2 = x;
-			SystemOverlay.y2 = y;
+			SystemOverlay._X2 = x;
+			SystemOverlay._Y2 = y;
 		}
-		if (scene != null)
-			scene.onTouchDrag(x, y, pointer);
+		if (_Scene != null)
+			_Scene.onTouchDrag(x, y, pointer);
 		return false;
 	}
 
@@ -65,13 +90,13 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 		x = (int) (x / (float) Gdx.graphics.getWidth() * EngineInfo.Width);
 		y = (int) (EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height);
 		if (EngineInfo.Debug) {
-			SystemOverlay.x1 = -1;
-			SystemOverlay.y1 = -1;
-			SystemOverlay.x2 = -1;
-			SystemOverlay.y2 = -1;
+			SystemOverlay._X1 = -1;
+			SystemOverlay._Y1 = -1;
+			SystemOverlay._X2 = -1;
+			SystemOverlay._Y2 = -1;
 		}
-		if (scene != null)
-			scene.onTouchUp(x, y, pointer);
+		if (_Scene != null)
+			_Scene.onTouchUp(x, y, pointer);
 		return false;
 	}
 
@@ -79,8 +104,8 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 	public boolean tap(float x, float y, int count, int button) {
 		x = x / (float) Gdx.graphics.getWidth() * EngineInfo.Width;
 		y = EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height;
-		if (scene != null)
-			scene.onTap(x, y, count);
+		if (_Scene != null)
+			_Scene.onTap(x, y, count);
 		return false;
 	}
 
@@ -88,8 +113,8 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 	public boolean longPress(float x, float y) {
 		x = x / (float) Gdx.graphics.getWidth() * EngineInfo.Width;
 		y = EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height;
-		if (scene != null)
-			scene.onLongPress(x, y);
+		if (_Scene != null)
+			_Scene.onLongPress(x, y);
 		return false;
 	}
 
@@ -97,8 +122,8 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 	public boolean fling(float x, float y, int button) {
 		x = x / (float) Gdx.graphics.getWidth() * EngineInfo.Width;
 		y = EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height;
-		if (scene != null)
-			scene.onFling(x, y);
+		if (_Scene != null)
+			_Scene.onFling(x, y);
 		return false;
 	}
 
@@ -108,8 +133,8 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 		y = EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height;
 		deltaX = deltaX / Gdx.graphics.getWidth() * EngineInfo.Width;
 		deltaY = deltaY / Gdx.graphics.getHeight() * EngineInfo.Height;
-		if (scene != null)
-			scene.onPan(x, y, deltaX, deltaY);
+		if (_Scene != null)
+			_Scene.onPan(x, y, deltaX, deltaY);
 		return false;
 	}
 
@@ -117,29 +142,29 @@ public class SceneSystem extends SystemBase implements GestureListener, InputPro
 	public boolean panStop(float x, float y, int pointer, int button) {
 		x = x / (float) Gdx.graphics.getWidth() * EngineInfo.Width;
 		y = EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height;
-		if (scene != null)
-			scene.onPanStop(x, y);
+		if (_Scene != null)
+			_Scene.onPanStop(x, y);
 		return false;
 	}
 
 	@Override
 	public boolean zoom(float initialDistance, float distance) {
-		if (scene != null)
-			scene.onZoom(initialDistance, distance);
+		if (_Scene != null)
+			_Scene.onZoom(initialDistance, distance);
 		return false;
 	}
 
 	@Override
 	public boolean keyDown(int keycode) {
-		if (scene != null)
-			scene.onKeyDown(keycode);
+		if (_Scene != null)
+			_Scene.onKeyDown(keycode);
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		if (scene != null)
-			scene.onKeyUp(keycode);
+		if (_Scene != null)
+			_Scene.onKeyUp(keycode);
 		return false;
 	}
 

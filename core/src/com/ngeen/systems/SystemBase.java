@@ -1,6 +1,8 @@
 package com.ngeen.systems;
 
-import com.ngeen.component.ComponentDrawble;
+import java.util.Comparator;
+
+import com.ngeen.component.ComponentMaterial;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
@@ -9,6 +11,20 @@ public abstract class SystemBase {
 	protected SystemConfiguration _Config = null;
 	public final Ngeen _Ng;
 	public float deltaTime;
+	
+	static class EntityComparator implements Comparator<Entity>{
+
+		@Override
+		public int compare(Entity o1, Entity o2) {
+			if(o1.hashCode() > o2.hashCode())
+				return 1;
+			if(o1.hashCode() < o2.hashCode())
+				return -1;
+			return 0;
+		}		
+	}
+	
+	private final static Comparator<Entity> _EntityComparator = new EntityComparator();
 
 	public SystemBase(Ngeen ng) {
 		_Config = new SystemConfiguration();
@@ -66,5 +82,9 @@ public abstract class SystemBase {
 	 * Called when this system is destroyed.
 	 */
 	public void onDestroy() {
+	}
+	
+	public Comparator getComparator(){
+		return _EntityComparator;
 	}
 }

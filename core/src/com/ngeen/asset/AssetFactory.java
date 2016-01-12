@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
@@ -28,21 +29,10 @@ public class AssetFactory {
 	 * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shader
 	 */
 	private final String[][] _Types = { { "png", "jpg", "jpeg", "gif" }, { "pack", "atlas" }, { "fnt" },
-			{ "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { ".vert" } };
+			{ "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { "vert" } };
 
 	private final Class<?>[] _ClassType = { Texture.class, TextureAtlas.class, BitmapFont.class, Sound.class,
 			Music.class, ShaderProgram.class };
-
-	private final Map<Class<?>, Integer> _ClassTypeIndex = new HashMap<Class<?>, Integer>() {
-		{
-			put(Texture.class, 0);
-			put(TextureAtlas.class, 0);
-			put(BitmapFont.class, 0);
-			put(Sound.class, 0);
-			put(Music.class, 0);
-			put(ShaderProgram.class, 0);
-		}
-	};
 
 	/**
 	 * All underlying assets are kept here.
@@ -72,6 +62,7 @@ public class AssetFactory {
 	public AssetFactory(Ngeen ng) {
 		_Ng = ng;
 		_Manager = new AssetManager();
+		_Manager.setLoader(ShaderProgram.class, new ShaderLoader(new InternalFileHandleResolver()));
 		_AssetMap = new HashMap<Integer, Asset>();
 		_AssetNameMap = new HashMap<String, Integer>();
 		_UpdateFolders = new ArrayList<String>();
@@ -142,7 +133,7 @@ public class AssetFactory {
 			String extension = entry.extension();
 
 			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(name + "/", name + "/");
+				enqueFolder(name + "/", "");
 			} else {
 				int extensionKey = getExt(extension);
 				List<String> list = null;
@@ -159,7 +150,7 @@ public class AssetFactory {
 	}
 	
 	public void enqueFolder(String folder){
-		enqueFolder(folder,folder);
+		enqueFolder(folder,"");
 	}
 
 	/**
@@ -169,16 +160,19 @@ public class AssetFactory {
 	 */
 	private void enqueFolder(String folder, String actualFolder) {
 		_UpdateFolders.add(folder);
-		FileHandle dirHandle = Gdx.files.internal(_PrePath + actualFolder);
+		FileHandle dirHandle = Gdx.files.internal(_PrePath + folder + actualFolder);
 
 		for (FileHandle entry : dirHandle.list()) {
 			String name = entry.name();
 			String extension = entry.extension();
 
 			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(folder, actualFolder + name);
+				enqueFolder(folder, actualFolder + name + "/");
 			} else {
 				int extensionKey = getExt(extension);
+				if(extensionKey == -1){
+					continue;
+				}
 				List<String> list = null;
 				if (_Folders.containsKey(folder + extensionKey) == false) {
 					list = new ArrayList<String>();
@@ -186,8 +180,8 @@ public class AssetFactory {
 				} else {
 					list = _Folders.get(folder + extensionKey);
 				}
-				loadAsset(_PrePath + actualFolder + name, extensionKey);
-				list.add(name);
+				loadAsset(_PrePath + folder + actualFolder + name, extensionKey);
+				list.add(actualFolder + name);
 			}
 		}
 	}
@@ -317,8 +311,10 @@ public class AssetFactory {
 
 	public <T> Asset<T> getAsset(String path) {
 		Integer id = _AssetNameMap.get(path);
-		if (id == null)
+		if (id == null){
+			Debugger.log("Asset not found " + path);
 			return null;
+		}
 		return getAssetById(id);
 	}
 }

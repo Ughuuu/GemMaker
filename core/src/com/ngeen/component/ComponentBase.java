@@ -1,6 +1,11 @@
 package com.ngeen.component;
 
+import java.io.IOException;
+
+import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.Entity;
 
 /**
  * The base for all Components. Has to be implemented.
@@ -18,7 +23,7 @@ public abstract class ComponentBase {
 	 */
 	protected boolean Enable = true;
 	private static int _UniqueId = 0;
-	private final Ngeen _Ng;
+	protected final Ngeen _Ng;
 	protected int OwnerId = -1;
 
 	/**
@@ -62,4 +67,12 @@ public abstract class ComponentBase {
 	public void remove(){
 		_Ng.EntityBuilder.getById(OwnerId).removeComponent(this.getClass(), Id);
 	}
+	
+	public Entity getOwner(){
+		return _Ng.EntityBuilder.getById(OwnerId);
+	}
+	
+	protected abstract void Save(XmlWriter element) throws Exception;
+	
+	protected abstract void Load(XmlReader.Element element) throws Exception;
 }

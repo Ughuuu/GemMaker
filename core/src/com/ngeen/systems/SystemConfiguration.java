@@ -1,28 +1,35 @@
 package com.ngeen.systems;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SystemConfiguration {
-	private Set<Class<?>> All;
+import com.ngeen.engine.EngineInfo;
 
-	/**
-	 * Class of current cell.
-	 */
-	private Class<?> cls;
+public class SystemConfiguration {
+	private Set<Class<?>> _All;
+
+	private BitSet _Configuration = new BitSet(EngineInfo.TotalComponents);
 
 	public SystemConfiguration() {
 	}
 	
 	public SystemConfiguration(Set<Class<?>> All) {
-		this.All = All;
+		this._All = All;
+	}
+	
+	private void configure(){
+		_Configuration.clear();
+		for(Class<?> cls : _All){
+			_Configuration.set(EngineInfo.ComponentIndexMap.get(cls));
+		}
 	}
 
 	public SystemConfiguration all(Class<?>... cls) {
-		All = new TreeSet<Class<?>>(new Comparator<Class<?>>() {
+		_All = new TreeSet<Class<?>>(new Comparator<Class<?>>() {
 
 			@Override
 			public int compare(Class<?> o1, Class<?> o2) {
@@ -34,27 +41,32 @@ public class SystemConfiguration {
 				return 0;
 			}
 		});
-		All.addAll(Arrays.asList(cls));
+		_All.addAll(Arrays.asList(cls));
+		configure();
 		return this;
 	}
 	
-	public final Set<Class<?>> getConfiguration(){
-		return All;
+	public final Set<Class<?>> getConfigurationTypes(){
+		return _All;
+	}
+	
+	public final BitSet getConfiguration(){
+		return _Configuration;
 	}
 	
 	public boolean equals(SystemConfiguration obj){
-		return All.equals(obj.getConfiguration());		
+		return _All.equals(obj.getConfiguration());		
 	}
 	
 	public boolean equals(Set<Class<?>> obj){
-		return All.equals(obj);		
+		return _All.equals(obj);		
 	}
 	
 	public void addClass(Class<?>... cls){
-		All.addAll(Arrays.asList(cls));
+		_All.addAll(Arrays.asList(cls));
 	}
 	
 	public void removeClass(Class<?>... cls){
-		All.removeAll(Arrays.asList(cls));
+		_All.removeAll(Arrays.asList(cls));
 	}
 }

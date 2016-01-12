@@ -1,9 +1,13 @@
 package com.ngeen.engine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.ngeen.component.ComponentCamera;
+import com.badlogic.gdx.math.Vector3;
+import com.ngeen.component.*;
 import com.ngeen.entity.Entity;
 
 /**
@@ -13,6 +17,20 @@ import com.ngeen.entity.Entity;
  *
  */
 public class EngineInfo {
+	
+	public final static Map<Class<?>, Integer> ComponentIndexMap = new HashMap<Class<?>, Integer>(){{
+		put(ComponentCamera.class,0);
+		put(ComponentMaterial.class,1);
+		put(ComponentMesh.class,2);
+		put(ComponentPoint.class,3);
+		put(ComponentRigid.class,4);
+		put(ComponentScript.class,5);
+		put(ComponentSprite.class,6);
+		put(ComponentVariable.class,7);
+	}};
+	
+	public final static int TotalComponents = ComponentIndexMap.size();
+	
 	public final static int EntitiesCache = 1;
 	
 	public final static int ComponentCache = 100;
@@ -82,15 +100,23 @@ public class EngineInfo {
 		ScreenWidth = Gdx.graphics.getWidth();
 		ScreenHeight = Gdx.graphics.getHeight();
 		
+		Width = Height / ScreenHeight * ScreenWidth;
+		
 		Entity camera = ng.EntityBuilder.makeEntity("~CAMERA");
 		Entity uiCamera = ng.EntityBuilder.makeEntity("~UICAMERA");
 		
-		ComponentCamera cam = camera.addComponent(ComponentCamera.class);
+		ComponentCamera cam = camera.getComponent(ComponentCamera.class);
+		if(cam == null)cam= camera.addComponent(ComponentCamera.class);
 		cam.createCamera(Width, Height);
+		ComponentPoint pos = camera.getComponent(ComponentPoint.class);
+		if(pos == null)pos= camera.addComponent(ComponentPoint.class);
 		
-		ComponentCamera uiCam = uiCamera.addComponent(ComponentCamera.class);
+		ComponentCamera uiCam = uiCamera.getComponent(ComponentCamera.class);
+		if(uiCam == null)uiCam= uiCamera.addComponent(ComponentCamera.class);
 		uiCam.createCamera(ScreenWidth, ScreenHeight);
-		uiCam.Camera.translate(ScreenWidth/2, ScreenHeight/2, 0);
-		uiCam.Camera.update();
+
+		ComponentPoint uiPos = uiCamera.getComponent(ComponentPoint.class);
+		if(uiPos == null)uiPos= uiCamera.addComponent(ComponentPoint.class);
+		uiPos.setPosition(new Vector3(ScreenWidth/2, ScreenHeight/2,0));
 	}
 }
