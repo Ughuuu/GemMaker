@@ -9,6 +9,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.ngeen.component.ComponentScript;
 import com.ngeen.component.XmlComponent;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
@@ -26,23 +27,14 @@ public class XmlEntity {
 	public void Save() {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
-			StringWriter writer = new StringWriter();
-			XmlWriter xml = new XmlWriter(writer);
-			xml.element(scene).attribute("Width", EngineInfo.Width).attribute("Height", EngineInfo.Height);
-
-			List<Entity> entities = _Ng.EntityBuilder.getEntities();
-			for (Entity ent : entities) {
-				ent.Save(xml, _XmlComponent);
-			}
-			xml.pop();
 			FileHandle handle = Gdx.files.external(scene + ".xml");
-			handle.writeString(writer.toString(), false);
+			handle.writeString(Dump(), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void Dump() {
+	public String Dump() {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
 			StringWriter writer = new StringWriter();
@@ -54,11 +46,12 @@ public class XmlEntity {
 				ent.Save(xml, _XmlComponent);
 			}
 			xml.pop();
-			FileHandle handle = Gdx.files.external(scene + ".xml");
-			Debugger.log(writer.toString());
+			return writer.toString();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Debugger.log(e.toString());
+			//e.printStackTrace();
 		}
+		return "";
 	}
 
 	public void Load() {
@@ -73,10 +66,16 @@ public class XmlEntity {
 				String name = el.get("Name");
 				_Ng.EntityBuilder.makeEntity(name).Load(el, _XmlComponent);
 			}
-			Dump();
+			List<Entity> entities = _Ng.EntityBuilder.getEntities();
+			for (Entity ent : entities) {
+				ent.setParent(_Ng.getEntity(ent._ParentName));
+				if(ent.hasComponent(ComponentScript.class)){
+					ent.getComponent(ComponentScript.class).setEnabled(true);
+				}
+			}
 		} catch (Exception e) {
-			//Debugger.log(e.toString());
-			e.printStackTrace();
+			Debugger.log(e.toString());
+			//e.printStackTrace();
 		}
 	}
 }

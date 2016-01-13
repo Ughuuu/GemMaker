@@ -8,14 +8,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.ngeen.component.ComponentBase;
 import com.ngeen.component.ComponentFactory;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.engine.SystemFactory;
 import com.ngeen.systems.SystemBase;
 import com.ngeen.systems.SystemConfiguration;
 
@@ -24,6 +27,7 @@ public class EntityFactory {
 	private Map<String, Integer> _EntityNameMap;
 
 	private Map<Comparator<Entity>, Map<BitSet, Set<Entity>>> _EntityTrees;
+	private final SystemFactory _SystemBuilder;
 
 	private Entity[] _EntityCache;
 	private int _EntityCacheIndex = 0;
@@ -31,8 +35,9 @@ public class EntityFactory {
 	private final ComponentFactory _ComponentFactory;
 	private final Set<Entity> _EmptySet = new TreeSet<Entity>();
 
-	public EntityFactory(Ngeen ng, ComponentFactory _ComponentFactory) {
+	public EntityFactory(Ngeen ng, ComponentFactory _ComponentFactory, SystemFactory _SystemBuilder) {
 		_Ng = ng;
+		this._SystemBuilder = _SystemBuilder;
 		this._ComponentFactory = _ComponentFactory;
 		_EntityCache = new Entity[EngineInfo.EntitiesCache];
 		_EntityMap = new HashMap<Integer, Entity>();
@@ -40,9 +45,9 @@ public class EntityFactory {
 		_EntityTrees = new HashMap<Comparator<Entity>, Map<BitSet, Set<Entity>>>();
 	}
 
-	public Entity makeEntity(String name){
-		if(_EntityNameMap.containsKey(name)==true){
-			Debugger.log("Object already exists " + name +".");
+	public Entity makeEntity(String name) {
+		if (_EntityNameMap.containsKey(name) == true) {
+			Debugger.log("Object already exists " + name + ".");
 			return _EntityMap.get((_EntityNameMap.get(name)));
 		}
 		Entity ret;
@@ -57,38 +62,70 @@ public class EntityFactory {
 		_EntityNameMap.put(ret.Name, ret.Id);
 		return ret;
 	}
-	
-	protected void treeRemoveObject(Entity e){
-		for(Entry<Comparator<Entity>, Map<BitSet, Set<Entity>>> EntityTreePair : _EntityTrees.entrySet()){
+
+	public Entity makeEntity(Entity ent) {
+		String name = ent.Name + "1";
+		if (_EntityNameMap.containsKey(name) == true) {
+			Debugger.log("Object already exists " + name + ".");
+			return _EntityMap.get((_EntityNameMap.get(name)));
+		}
+		Entity ret;
+		if (_EntityCacheIndex != 0) {// reuse deleted entities
+			_EntityCacheIndex--;
+			ret = _EntityCache[_EntityCacheIndex];
+			ret.reset(name);
+		} else {
+			ret = new Entity(_Ng, _ComponentFactory, name);
+		}
+		_EntityMap.put(ret.Id, ret);
+		_EntityNameMap.put(ret.Name, ret.Id);
+		for (ComponentBase comp : ent.getComponents()) {
+
+		}
+		return ret;
+	}
+
+	public void setEntityName(String oldName, String newName) {
+		if (_EntityNameMap.containsKey(newName) == true) {
+			return;
+		}
+		Integer id = _EntityNameMap.remove(oldName);
+		Entity ent = _EntityMap.get(id);
+		ent.Name = newName;
+		_EntityNameMap.put(newName, id);
+	}
+
+	protected void treeRemoveObject(Entity e) {
+		for (Entry<Comparator<Entity>, Map<BitSet, Set<Entity>>> EntityTreePair : _EntityTrees.entrySet()) {
 			Map<BitSet, Set<Entity>> EntityTree = EntityTreePair.getValue();
-			
-			for(Map.Entry<BitSet, Set<Entity>> entitiesWithClass : EntityTree.entrySet()){
+
+			for (Map.Entry<BitSet, Set<Entity>> entitiesWithClass : EntityTree.entrySet()) {
 				BitSet typeArray = (BitSet) e.getConfiguration().clone();
 				BitSet entities = (BitSet) entitiesWithClass.getKey();
-				
+
 				typeArray.and(entities);
-				
-				if(entities.equals(typeArray)){
-					entitiesWithClass.getValue().remove(e);	
+
+				if (entities.equals(typeArray)) {
+					entitiesWithClass.getValue().remove(e);
 				}
-				
+
 			}
 		}
 	}
 
-	protected void treeAddObject(Entity e){
-		for(Entry<Comparator<Entity>, Map<BitSet, Set<Entity>>> EntityTreePair : _EntityTrees.entrySet()){
+	protected void treeAddObject(Entity e) {
+		for (Entry<Comparator<Entity>, Map<BitSet, Set<Entity>>> EntityTreePair : _EntityTrees.entrySet()) {
 			Map<BitSet, Set<Entity>> EntityTree = EntityTreePair.getValue();
-			
-			for(Map.Entry<BitSet, Set<Entity>> entitiesWithClass : EntityTree.entrySet()){
+
+			for (Map.Entry<BitSet, Set<Entity>> entitiesWithClass : EntityTree.entrySet()) {
 				BitSet typeArray = (BitSet) e.getConfiguration().clone();
 				BitSet entities = (BitSet) entitiesWithClass.getKey();
 
 				typeArray.and(entities);
-				
-				if(entities.equals(typeArray)){
+
+				if (entities.equals(typeArray)) {
 					entitiesWithClass.getValue().add(e);
-				}				
+				}
 			}
 		}
 	}
@@ -103,7 +140,7 @@ public class EntityFactory {
 			_EntityCacheIndex++;
 		}
 	}
-	
+
 	public void removeEntity(String name) {
 		Integer id = _EntityNameMap.remove(name);
 		Entity ent = _EntityMap.remove(id);
@@ -139,7 +176,7 @@ public class EntityFactory {
 	 */
 	public Entity getByName(String tag) {
 		Integer id = _EntityNameMap.get(tag);
-		if(id == null)
+		if (id == null)
 			return null;
 		return _EntityMap.get(id);
 	}
@@ -153,13 +190,13 @@ public class EntityFactory {
 	public Entity getById(int id) {
 		return _EntityMap.get(id);
 	}
-	
-	public void clear(){
+
+	public void clear() {
 		_EntityMap.clear();
 		_EntityNameMap.clear();
 
-		for(Map.Entry<Comparator<Entity>, Map<BitSet, Set<Entity>>> entry : _EntityTrees.entrySet()){
-			for(Entry<BitSet, Set<Entity>> entities : entry.getValue().entrySet()){
+		for (Map.Entry<Comparator<Entity>, Map<BitSet, Set<Entity>>> entry : _EntityTrees.entrySet()) {
+			for (Entry<BitSet, Set<Entity>> entities : entry.getValue().entrySet()) {
 				entities.getValue().clear();
 			}
 		}
@@ -167,29 +204,37 @@ public class EntityFactory {
 		_EntityCacheIndex = 0;
 
 	}
-	
-	public void addSystem(SystemBase system){
+
+	public void addSystem(SystemBase system) {
 		Comparator<Entity> comp = system.getComparator();
 		SystemConfiguration config = system.getConfiguration();
-		if(!_EntityTrees.containsKey(comp)){
+		if (!_EntityTrees.containsKey(comp)) {
 			_EntityTrees.put(comp, new HashMap<BitSet, Set<Entity>>());
 		}
-		if(!_EntityTrees.get(comp).containsKey(config)){
-			_EntityTrees.get(comp).put(config.getConfiguration(), new TreeSet<Entity>(comp));
+		for (BitSet bits : config.getConfiguration()) {
+			if (!_EntityTrees.get(comp).containsKey(bits)) {
+				_EntityTrees.get(comp).put(bits, new TreeSet<Entity>(comp));
+			}
 		}
 	}
-	
-	public Set<Entity> getEntitiesForSystem(SystemBase system){
+
+	public Set<Entity> getEntitiesForSystem(SystemBase system) {
 		Comparator<Entity> comp = system.getComparator();
 		SystemConfiguration config = system.getConfiguration();
-		if(config.getConfigurationTypes() == null){
+		List<BitSet> configs = config.getConfiguration();
+		if (configs == null) {
 			return _EmptySet;
 		}
-		Set<Entity> entSet = _EntityTrees.get(comp).get(config.getConfiguration());
+		Set<Entity> entSet = new TreeSet<Entity>(comp);
+
+		for (BitSet configuration : configs) {
+			Set<Entity> currentSet = _EntityTrees.get(comp).get(configuration);
+			entSet.addAll(currentSet);
+		}
 		return entSet;
 	}
-	
-	public List<Entity> getEntities(){
+
+	public List<Entity> getEntities() {
 		return new ArrayList(_EntityMap.values());
 	}
 }

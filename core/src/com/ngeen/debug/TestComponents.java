@@ -15,14 +15,11 @@ public class TestComponents {
 		assert(ent.getId() == ent2.getId());
 		ent.addComponent(ComponentCamera.class);
 		assert(ent.getComponent(ComponentCamera.class)!=null);
-		assert(ent.getComponentTypes().contains(ComponentCamera.class));
 		ent.addComponent(ComponentPoint.class);
 		assert(ent.getComponent(ComponentPoint.class)!=null);
-		assert(ent.getComponentTypes().contains(ComponentPoint.class));
 		ent.addComponent(ComponentPoint.class);
 		assert(ent.getComponent(ComponentPoint.class)!=null);
-		assert(ent.getComponentTypes().contains(ComponentPoint.class));
-		assert(ent.getComponents(ComponentPoint.class).size()==2);
+		assert(ent.getComponents(ComponentPoint.class).size()==1);
 		
 		ent.removeComponent(ComponentPoint.class);
 		assert(ent.getComponents(ComponentPoint.class).size()==0);

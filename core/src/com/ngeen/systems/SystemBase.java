@@ -30,7 +30,7 @@ public abstract class SystemBase {
 		_Config = new SystemConfiguration();
 		this._Ng = ng;
 	}
-
+	
 	public SystemBase(Ngeen ng, SystemConfiguration conf) {
 		Enable = true;
 		this._Config = conf;

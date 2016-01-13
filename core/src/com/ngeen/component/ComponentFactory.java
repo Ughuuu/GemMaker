@@ -35,12 +35,11 @@ public class ComponentFactory {
 				el = (T) list.get(size);
 				_ComponentCacheIndex.put(type, size);
 			} else {
-				el = (T) type.getConstructor(Ngeen.class).newInstance(_Ng);
+				el = (T) type.getConstructor(Ngeen.class, Entity.class).newInstance(_Ng, ent);
 			}
-			el.OwnerId = ent.getId();
 			return el;
 		} catch (Exception e) {
-			Debugger.log(e.toString());
+			e.printStackTrace();
 		}
 		return null;
 	}

@@ -8,13 +8,14 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.ngeen.asset.MeshFactory;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.Entity;
 
 public class ComponentMesh extends ComponentBase{
 	public Mesh _Vertices;
 	BoundingBox Box;
 	
-	public ComponentMesh(Ngeen ng) {
-		super(ng);
+	public ComponentMesh(Ngeen ng, Entity ent) {
+		super(ng, ent);
 	}
 	
 	public Mesh createMesh(int size, int ind){
@@ -29,9 +30,10 @@ public class ComponentMesh extends ComponentBase{
 		}
 	}
 	
-	public void setVertices(Mesh Vertices){
+	public ComponentMesh setVertices(Mesh Vertices){
 		_Vertices = Vertices;
 		computeBox();
+		return this;
 	}
 	
 	public Mesh getVertices(){
@@ -41,7 +43,7 @@ public class ComponentMesh extends ComponentBase{
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
 		element.element("Component")
-		.attribute("_Type", "ComponentMesh")
+		.attribute("_Type", this.getClass().getName())
 		//element.attribute("_ShaderName", _ShaderName)
 		       .pop();
 	}

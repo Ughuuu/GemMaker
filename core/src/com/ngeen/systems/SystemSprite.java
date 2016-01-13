@@ -15,11 +15,11 @@ import com.ngeen.entity.Entity;
 
 public class SystemSprite extends SystemBase {
 	private Matrix4 _CameraView;
-	private SpriteBatch _SpriteBatch;
+	protected SpriteBatch _SpriteBatch;
 	
-	public SystemSprite(Ngeen ng, SystemConfiguration conf) {
+	public SystemSprite(Ngeen ng, SystemConfiguration conf, SpriteBatch batch) {
 		super(ng, conf);
-		_SpriteBatch = new SpriteBatch();
+		_SpriteBatch = batch;
 	}
 
 	@Override
@@ -28,6 +28,7 @@ public class SystemSprite extends SystemBase {
 		_SpriteBatch.begin();
 		//_SpriteBatch.disableBlending();
 		 _SpriteBatch.setProjectionMatrix(_CameraView);
+		 _SpriteBatch.setTransformMatrix(new Matrix4());
 	}
 	
 	private Matrix4 getModel(Entity ent) {
@@ -38,17 +39,14 @@ public class SystemSprite extends SystemBase {
 	@Override
 	public void onUpdate(Entity ent) {
 		ComponentSprite sprComp = ent.getComponent(ComponentSprite.class);
-		ComponentVariable tex = ent.getComponent(ComponentVariable.class);
 		ComponentPoint pos = ent.getComponent(ComponentPoint.class);
-		Asset<Texture> text = (Asset<Texture>) tex.getData("texture");
 		Sprite spr = sprComp.getSprite();
 		
-		if(tex.Update){
-			tex.Update = false;
-			pos.Update = true;
-			sprComp.setTexture(text);
-			spr = sprComp.getSprite();
+		if(spr.getTexture()==null){
+			Debugger.log(ent.getName() + " doesn't have a right texture.");
+			return;
 		}
+		
 		if(pos.Update){
 			pos.Update = false;
 			spr.setPosition(pos.getPosition().x-spr.getWidth()/2, pos.getPosition().y - spr.getHeight()/2);

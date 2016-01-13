@@ -7,7 +7,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Tree;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.ngeen.component.*;
+import com.ngeen.component.ui.layout.ComponentUIContainer;
+import com.ngeen.component.ui.layout.ComponentUIHorizontalGroup;
+import com.ngeen.component.ui.layout.ComponentUIScrollPane;
+import com.ngeen.component.ui.layout.ComponentUISplitPane;
+import com.ngeen.component.ui.layout.ComponentUIStack;
+import com.ngeen.component.ui.layout.ComponentUITable;
+import com.ngeen.component.ui.layout.ComponentUITree;
+import com.ngeen.component.ui.layout.ComponentUIVerticalGroup;
+import com.ngeen.component.ui.widget.*;
 import com.ngeen.entity.Entity;
 
 /**
@@ -17,22 +34,62 @@ import com.ngeen.entity.Entity;
  *
  */
 public class EngineInfo {
-	
-	public final static Map<Class<?>, Integer> ComponentIndexMap = new HashMap<Class<?>, Integer>(){{
-		put(ComponentCamera.class,0);
-		put(ComponentMaterial.class,1);
-		put(ComponentMesh.class,2);
-		put(ComponentPoint.class,3);
-		put(ComponentRigid.class,4);
-		put(ComponentScript.class,5);
-		put(ComponentSprite.class,6);
-		put(ComponentVariable.class,7);
-	}};
-	
+
+	public final static Map<Class<?>, Integer> ComponentIndexMap = new HashMap<Class<?>, Integer>() {
+		{
+			int i=0;
+			put(ComponentCamera.class, i++);
+			put(ComponentMaterial.class, i++);
+			put(ComponentMesh.class, i++);
+			put(ComponentPoint.class, i++);
+			put(ComponentRigid.class, i++);
+			put(ComponentScript.class, i++);
+			put(ComponentSprite.class, i++);
+			put(ComponentUILayout.class, i++);
+			put(ComponentUIStage.class, i++);
+			put(ComponentUIWidget.class, i++);
+			
+			put(ComponentUIContainer.class, i++);
+			put(ComponentUIHorizontalGroup.class, i++);
+			put(ComponentUIScrollPane.class, i++);
+			put(ComponentUISplitPane.class, i++);
+			put(ComponentUIStack.class, i++);
+			put(ComponentUITable.class, i++);
+			put(ComponentUITree.class, i++);
+			put(ComponentUIVerticalGroup.class, i++);
+
+			put(ComponentUIButton.class, i++);
+			put(ComponentUIButtonGroup.class, i++);
+			put(ComponentUICheckBox.class, i++);
+			put(ComponentUIDialog.class, i++);
+			put(ComponentUIImage.class, i++);
+			put(ComponentUIImageButton.class, i++);
+			put(ComponentUILabel.class, i++);
+			put(ComponentUIList.class, i++);
+			put(ComponentUIProgressBar.class, i++);
+			put(ComponentUISelectBox.class, i++);
+			put(ComponentUISlider.class, i++);
+			put(ComponentUITextArea.class, i++);
+			put(ComponentUITextButton.class, i++);
+			put(ComponentUITextField.class, i++);
+			put(ComponentUITouchpad.class, i++);
+			put(ComponentUIWindow.class, i++);
+			
+		}
+	};
+
+	public final static Map<Integer, Class<?>> IndexComponentMap = new HashMap<Integer, Class<?>>() {
+		{
+			for (Map.Entry<Class<?>, Integer> entry : ComponentIndexMap.entrySet()) {
+				put(entry.getValue(), entry.getKey());
+			}
+		}
+	};
+
 	public final static int TotalComponents = ComponentIndexMap.size();
-	
+
 	public final static int EntitiesCache = 1;
-	
+
 	public final static int ComponentCache = 100;
 
 	public static Color BackgroundColor = new Color(.6f, .2f, .1f, 1);
@@ -47,9 +104,9 @@ public class EngineInfo {
 	public static float Height = 600;
 
 	public static float ScreenWidth;
-	
+
 	public static float ScreenHeight;
-	
+
 	/**
 	 * Mathematical constant. Very small float number.
 	 */
@@ -95,28 +152,29 @@ public class EngineInfo {
 	 * MeterPerPixel. Used for Box1d.
 	 */
 	public static final float MeterPerPixel = 1.f / PixelPerMeter;
-	
-	protected static void makeBasicEntities(Ngeen ng){
+
+	protected static void makeBasicEntities(Ngeen ng) {
 		ScreenWidth = Gdx.graphics.getWidth();
 		ScreenHeight = Gdx.graphics.getHeight();
-		
+
 		Width = Height / ScreenHeight * ScreenWidth;
-		
+
 		Entity camera = ng.EntityBuilder.makeEntity("~CAMERA");
 		Entity uiCamera = ng.EntityBuilder.makeEntity("~UICAMERA");
-		
-		ComponentCamera cam = camera.getComponent(ComponentCamera.class);
-		if(cam == null)cam= camera.addComponent(ComponentCamera.class);
+
+		ComponentCamera cam = camera.addComponent(ComponentCamera.class);
 		cam.createCamera(Width, Height);
-		ComponentPoint pos = camera.getComponent(ComponentPoint.class);
-		if(pos == null)pos= camera.addComponent(ComponentPoint.class);
-		
-		ComponentCamera uiCam = uiCamera.getComponent(ComponentCamera.class);
-		if(uiCam == null)uiCam= uiCamera.addComponent(ComponentCamera.class);
+		ComponentPoint pos = camera.addComponent(ComponentPoint.class);
+
+		ComponentCamera uiCam = uiCamera.addComponent(ComponentCamera.class);
 		uiCam.createCamera(ScreenWidth, ScreenHeight);
 
-		ComponentPoint uiPos = uiCamera.getComponent(ComponentPoint.class);
-		if(uiPos == null)uiPos= uiCamera.addComponent(ComponentPoint.class);
-		uiPos.setPosition(new Vector3(ScreenWidth/2, ScreenHeight/2,0));
+		ComponentPoint uiPos = uiCamera.addComponent(ComponentPoint.class);
+		uiPos.setPosition(new Vector3(ScreenWidth / 2, ScreenHeight / 2, 0));
+	}
+
+	protected static void makeOptionalEntities(Ngeen ng) {
+		ng.Loader.addFolder("../Debug/");
+		ng.Loader.finish();
 	}
 }

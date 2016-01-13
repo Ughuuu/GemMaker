@@ -27,8 +27,8 @@ public class ComponentCamera extends ComponentBase {
 	public Camera Camera;
 	private float _Fov = -1;
 
-	public ComponentCamera(Ngeen ng) {
-		super(ng);
+	public ComponentCamera(Ngeen ng, Entity ent) {
+		super(ng, ent);
 		createCamera(EngineInfo.Width,EngineInfo.Height);
 	}
 
@@ -38,8 +38,9 @@ public class ComponentCamera extends ComponentBase {
 	 * @param width
 	 * @param height
 	 */
-	public void createCamera(float width, float height) {
+	public ComponentCamera createCamera(float width, float height) {
 		Camera = new OrthographicCamera(width, height);
+		return this;
 	}
 
 	/**
@@ -50,15 +51,16 @@ public class ComponentCamera extends ComponentBase {
 	 * @param width
 	 * @param height
 	 */
-	public void createCamera(float fov, float width, float height) {
+	public ComponentCamera createCamera(float fov, float width, float height) {
 		this._Fov = fov;
 		Camera = new PerspectiveCamera(fov, width, height);
+		return this;
 	}
 	
 	@Override
 	protected void Save(XmlWriter element) throws Exception{
 		element.element("Component")
-				.attribute("_Type", "ComponentCamera")
+				.attribute("_Type", this.getClass().getName())
 				.attribute("Fov", _Fov)
 		       .attribute("ViewportWidth", Camera.viewportWidth)
 		       .attribute("ViewportHeight", Camera.viewportHeight)

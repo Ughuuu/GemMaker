@@ -34,12 +34,14 @@ public class TestAsset {
 		assert(folderNames.contains("LoadScene/"));
 		
 		ng.Loader.disposeFolder("LoadScene/");
+		ng.Loader.disposeFolder("LoadScene/");
 
 		font = ng.Loader.getAsset("LoadScene/fonts/AmaticSC-Regular.fnt");
 		pic = ng.Loader.getAsset("LoadScene/fonts/AmaticSC-Regular.png");
 		assert(font==null);
 		assert(pic==null);
 		
+		ng.Loader.enqueFolder("LoadScene/");
 		ng.Loader.enqueFolder("LoadScene/");
 
 		ng.Loader.finish();

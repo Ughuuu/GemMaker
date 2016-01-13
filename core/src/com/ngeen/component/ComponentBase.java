@@ -24,13 +24,15 @@ public abstract class ComponentBase {
 	protected boolean Enable = true;
 	private static int _UniqueId = 0;
 	protected final Ngeen _Ng;
-	protected int OwnerId = -1;
-
+	protected Entity _Owner;
+	protected boolean Saved = false;
+	
 	/**
 	 * Create a BaseComponent with an unique id.
 	 */
-	public ComponentBase(Ngeen ng) {
+	public ComponentBase(Ngeen ng, Entity ent) {
 		_Ng = ng;
+		_Owner = ent;
 		Id = _UniqueId++;
 	}
 
@@ -56,20 +58,23 @@ public abstract class ComponentBase {
 	 * @param Enable
 	 *            The state of working of the component.
 	 */
-	public final void setEnabled(boolean Enable) {
+	public <T extends ComponentBase> T setEnabled(boolean Enable) {
 		this.Enable = Enable;
+		return (T) this;
 	}
 	
-	public void setOwner(int ParentId){
-		OwnerId = ParentId;
+	protected <T extends ComponentBase> T setOwner(Entity ent){
+		_Owner = ent;
+		return (T) this;
 	}
 	
-	public void remove(){
-		_Ng.EntityBuilder.getById(OwnerId).removeComponent(this.getClass(), Id);
+	public <T extends ComponentBase> T remove(){
+		_Owner.removeComponent(this.getClass(), Id);
+		return (T) this;
 	}
 	
 	public Entity getOwner(){
-		return _Ng.EntityBuilder.getById(OwnerId);
+		return _Owner;
 	}
 	
 	protected abstract void Save(XmlWriter element) throws Exception;

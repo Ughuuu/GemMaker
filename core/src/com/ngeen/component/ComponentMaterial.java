@@ -11,13 +11,14 @@ import com.ngeen.asset.Asset;
 import com.ngeen.asset.Pair;
 import com.ngeen.asset.ShaderData;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.Entity;
 
 public class ComponentMaterial extends ComponentBase {
 	private Asset<ShaderProgram> _Shader;
 	private String _ShaderName;
 
-	public ComponentMaterial(Ngeen ng) {
-		super(ng);
+	public ComponentMaterial(Ngeen ng, Entity ent) {
+		super(ng, ent);
 	}
 	
 	public ShaderProgram getShader() {
@@ -27,20 +28,22 @@ public class ComponentMaterial extends ComponentBase {
 		return _Shader.getData();
 	}
 
-	public void setShader(Asset<ShaderProgram> shader) {
+	public ComponentMaterial setShader(Asset<ShaderProgram> shader) {
 		_ShaderName = shader.getFolder() + shader.getPath();
 		_Shader = shader;
+		return this;
 	}
 	
-	public void setShader(String shaderName) {
+	public ComponentMaterial setShader(String shaderName) {
 		_ShaderName = shaderName;
 		_Shader = _Ng.Loader.getAsset(shaderName);
+		return this;
 	}
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
 		element.element("Component")
-		.attribute("_Type", "ComponentMaterial")
+		.attribute("_Type", this.getClass().getName())
 		.attribute("_ShaderName", _ShaderName)
 		       .pop();
 	}
