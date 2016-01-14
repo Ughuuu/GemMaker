@@ -25,7 +25,7 @@ public class ComponentUIButtonGroup extends ComponentBase{
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", this.getClass().getName()).pop();
+		element.element("Component").attribute("_Type", _Type.getName()).pop();
 	}
 
 	@Override

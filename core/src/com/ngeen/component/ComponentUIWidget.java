@@ -8,7 +8,6 @@ import com.ngeen.entity.Entity;
 
 public class ComponentUIWidget extends ComponentBase{
 	protected Widget _Widget;
-	private Class<?> _Type;
 	
 	public ComponentUIWidget(Ngeen ng, Entity ent) {
 		super(ng, ent);

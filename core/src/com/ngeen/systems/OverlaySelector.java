@@ -114,8 +114,9 @@ public class OverlaySelector {
 				_ShapeRenderer.circle(0, 0, Float.max(w, h));
 			}
 		} else {
-			if (_Selected)
+			if (_Selected){
 				_ShapeRenderer.circle(0, 0, 6);
+			}
 			_ShapeRenderer.line(-3, -3, 3, 3);
 			_ShapeRenderer.line(-3, 3, 3, -3);
 			_ShapeRenderer.line(-3, -3, 3, 3);

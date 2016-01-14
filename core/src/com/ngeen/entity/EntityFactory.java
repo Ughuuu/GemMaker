@@ -1,6 +1,7 @@
 package com.ngeen.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
@@ -19,10 +20,12 @@ import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.engine.SystemFactory;
+import com.ngeen.engine.TypeObservable;
+import com.ngeen.engine.TypeObserver;
 import com.ngeen.systems.SystemBase;
 import com.ngeen.systems.SystemConfiguration;
 
-public class EntityFactory {
+public class EntityFactory extends TypeObservable<Entity>{
 	private Map<Integer, Entity> _EntityMap;
 	private Map<String, Integer> _EntityNameMap;
 
@@ -33,8 +36,8 @@ public class EntityFactory {
 	private int _EntityCacheIndex = 0;
 	private final Ngeen _Ng;
 	private final ComponentFactory _ComponentFactory;
-	private final Set<Entity> _EmptySet = new TreeSet<Entity>();
-
+	private final Set<Entity> _EmptySet;
+	
 	public EntityFactory(Ngeen ng, ComponentFactory _ComponentFactory, SystemFactory _SystemBuilder) {
 		_Ng = ng;
 		this._SystemBuilder = _SystemBuilder;
@@ -43,6 +46,7 @@ public class EntityFactory {
 		_EntityMap = new HashMap<Integer, Entity>();
 		_EntityNameMap = new HashMap<String, Integer>();
 		_EntityTrees = new HashMap<Comparator<Entity>, Map<BitSet, Set<Entity>>>();
+		_EmptySet = new TreeSet<Entity>();
 	}
 
 	public Entity makeEntity(String name) {
@@ -60,9 +64,15 @@ public class EntityFactory {
 		}
 		_EntityMap.put(ret.Id, ret);
 		_EntityNameMap.put(ret.Name, ret.Id);
+		NotifyAdd(ret);
 		return ret;
 	}
 
+	/**
+	 * Not yet implemented.
+	 * @param ent
+	 * @return
+	 */
 	public Entity makeEntity(Entity ent) {
 		String name = ent.Name + "1";
 		if (_EntityNameMap.containsKey(name) == true) {
@@ -132,6 +142,8 @@ public class EntityFactory {
 
 	public void removeEntity(int index) {
 		Entity ent = _EntityMap.remove(index);
+		if(ent == null)
+			return;
 		treeRemoveObject(ent);
 		cacheComponents(ent);
 		_EntityNameMap.remove(ent.Name);
@@ -139,20 +151,26 @@ public class EntityFactory {
 			_EntityCache[_EntityCacheIndex] = ent;
 			_EntityCacheIndex++;
 		}
+		NotifyRemove(ent);
 	}
 
 	public void removeEntity(String name) {
 		Integer id = _EntityNameMap.remove(name);
 		Entity ent = _EntityMap.remove(id);
+		if(ent == null)
+			return;
 		treeRemoveObject(ent);
 		cacheComponents(ent);
 		if (_EntityCacheIndex < EngineInfo.EntitiesCache) {
 			_EntityCache[_EntityCacheIndex] = ent;
 			_EntityCacheIndex++;
 		}
+		NotifyRemove(ent);
 	}
 
 	public void removeEntity(Entity ent) {
+		if(ent == null)
+			return;
 		treeRemoveObject(ent);
 		_EntityMap.remove(ent.Id);
 		_EntityNameMap.remove(ent.Name);
@@ -161,6 +179,7 @@ public class EntityFactory {
 			_EntityCache[_EntityCacheIndex] = ent;
 			_EntityCacheIndex++;
 		}
+		NotifyRemove(ent);
 	}
 
 	private void cacheComponents(Entity ent) {
@@ -170,8 +189,7 @@ public class EntityFactory {
 	/**
 	 * Get entity by name.
 	 * 
-	 * @param tag
-	 *            The name of the object.
+	 * @param tag The name of the object.
 	 * @return
 	 */
 	public Entity getByName(String tag) {
@@ -192,6 +210,9 @@ public class EntityFactory {
 	}
 
 	public void clear() {
+		for(Entry<Integer, Entity> entity:_EntityMap.entrySet()){
+			NotifyRemove((entity.getValue()));
+		}
 		_EntityMap.clear();
 		_EntityNameMap.clear();
 
@@ -200,9 +221,7 @@ public class EntityFactory {
 				entities.getValue().clear();
 			}
 		}
-
-		_EntityCacheIndex = 0;
-
+		//_EntityCacheIndex = 0;
 	}
 
 	public void addSystem(SystemBase system) {

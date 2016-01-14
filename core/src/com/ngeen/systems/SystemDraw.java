@@ -1,5 +1,6 @@
 package com.ngeen.systems;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -20,7 +21,10 @@ public class SystemDraw extends SystemBase {
 
 	@Override
 	public void onBeforeUpdate(){
-		 cam = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class).Camera.combined;
+		Entity ent = _Ng.EntityBuilder.getByName("~CAMERA");
+		ComponentCamera comp = ent.getComponent(ComponentCamera.class);
+		Camera camera = comp.Camera;
+		 cam = camera.combined;
 	}
 	
 	private Matrix4 getModel(Entity ent) {

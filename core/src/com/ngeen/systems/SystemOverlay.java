@@ -215,10 +215,10 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		_SpriteBatch.setProjectionMatrix(_Comb);
 		BitmapFont font = (BitmapFont) _Ng.Loader.getAsset("LoadScene/fonts/impact.fnt").getData();
 		font.getData().setScale(0.2f);
-		font.setColor(1, 1, 1, 0.5f);
+		//font.setColor(1, 1, 1, 0.5f);
 		for (Entity ent : _AllEntities) {
 			_SpriteBatch.setTransformMatrix(ent.getComponent(ComponentPoint.class).getMatrix());
-			font.draw((Batch) _SpriteBatch, ent.getName(), 0, 0, 50, Align.left, false);
+			font.draw((Batch) _SpriteBatch, ent.getName(), 0, 0);
 		}
 		_SpriteBatch.end();
 		_AllEntities.clear();

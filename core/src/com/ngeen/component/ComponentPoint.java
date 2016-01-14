@@ -36,7 +36,7 @@ public class ComponentPoint extends ComponentBase {
 	}
 
 	protected void updateChildren(Vector3 pos, Vector3 rot, Vector3 sc) {
-		Set<Entity> entities = getOwner().getChildren();
+		List<Entity> entities = getOwner().getChildren();
 		for (Entity ent : entities) {
 			ComponentPoint point = ent.getComponent(ComponentPoint.class);
 			point.setPosition(new Vector3(point.getPosition()).add(pos));
@@ -92,7 +92,7 @@ public class ComponentPoint extends ComponentBase {
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", this.getClass().getName()).attribute("Position.x", Position.x)
+		element.element("Component").attribute("_Type", _Type.getName()).attribute("Position.x", Position.x)
 				.attribute("Position.y", Position.y).attribute("Position.z", Position.z).attribute("Scale.x", Scale.x)
 				.attribute("Scale.y", Scale.y).attribute("Scale.z", Scale.z).attribute("Rotation.x", Rotation.x)
 				.attribute("Rotation.y", Rotation.y).attribute("Rotation.z", Rotation.z).pop();
@@ -109,7 +109,6 @@ public class ComponentPoint extends ComponentBase {
 		Rotation.x = element.getFloat("Rotation.x");
 		Rotation.y = element.getFloat("Rotation.y");
 		Rotation.z = element.getFloat("Rotation.z");
-		Update = true;
 		Recalculate();
 	}
 }

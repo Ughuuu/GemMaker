@@ -9,7 +9,6 @@ public class SystemCamera extends SystemBase{
 
 	public SystemCamera(Ngeen ng, SystemConfiguration conf) {
 		super(ng, conf);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

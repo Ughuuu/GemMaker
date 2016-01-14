@@ -37,7 +37,7 @@ public class ComponentScript extends ComponentBase {
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", this.getClass().getName()).attribute("_ProgramName", _ProgramName)
+		element.element("Component").attribute("_Type", _Type.getName()).attribute("_ProgramName", _ProgramName)
 				.pop();
 	}
 

@@ -27,11 +27,15 @@ public class Entity {
 	private final ComponentFactory _ComponentFactory;
 	protected String Name;
 	protected int Id;
-	//protected boolean _Update = false;
+	/**
+	 * update some variables when parent or children change.
+	 */
+	protected boolean _Update = false;
 	protected Entity Parent;
 	protected String _ParentName = "null";
 	private static int _Unique_id = 0;
-	private Set<Entity> _Children;
+	private int _Order = -1;
+	private List<Entity> _Children;
 	private static final List emptyList = new ArrayList();
 	private BitSet _Configuration = new BitSet(EngineInfo.TotalComponents);
 
@@ -43,12 +47,7 @@ public class Entity {
 		this.Name = name;
 		Id = _Unique_id++;
 		_ComponentMap = new HashMap<Class<?>, Map<Integer, ComponentBase>>();
-		_Children = new TreeSet<Entity>(new Comparator<Entity>() {
-			@Override
-			public int compare(Entity o1, Entity o2) {
-				return Integer.signum(o1.hashCode() - o2.hashCode());
-			}
-		});
+		_Children = new ArrayList<Entity>();
 	}
 
 	protected void reset(String name) {
@@ -57,6 +56,7 @@ public class Entity {
 	}
 
 	public void remove() {
+		detachParent();
 		_Ng.EntityBuilder.removeEntity(this);
 	}
 
@@ -101,6 +101,8 @@ public class Entity {
 			_Ng.EntityBuilder.treeAddObject(this);
 			return (T) _ComponentMap.get(type).entrySet().iterator().next().getValue();
 		}
+
+		_ComponentFactory.insertSuperComponent(component);
 
 		Map<Integer, ComponentBase> list = null;
 		if (_ComponentMap.containsKey(type) == false) {
@@ -205,8 +207,8 @@ public class Entity {
 	public Entity getParent() {
 		return Parent;
 	}
-	
-	public Set<Entity> getChildren(){
+
+	public List<Entity> getChildren() {
 		return _Children;
 	}
 
@@ -223,33 +225,58 @@ public class Entity {
 		Entity ent = _Ng.EntityBuilder.getByName(name);
 		return setParent(ent);
 	}
-	
-	public boolean canParent(Entity e){
-		if(e == this || e == null){
+
+	public boolean canParent(Entity e) {
+		if (e == this || e == null) {
 			return false;
 		}
-		if(Parent == null){
+		if (Parent == null) {
 			return true;
 		}
 		return Parent.canParent(e);
 	}
 	
-	public Entity getLastParent(){
-		if(Parent == null){
+	private Entity getLastParentInternal(){
+		if (Parent == null) {
 			return this;
 		}
-		return Parent.getLastParent();
+		return Parent.getLastParentInternal();
+	}
+
+	public Entity getLastParent() {
+		Entity ent = getLastParentInternal();
+		if(ent == this){
+			return null;
+		}
+		return ent;
+	}
+	
+	protected void setOrder(int newOrder){
+		_Order = newOrder;
+	}
+	
+	public void getOrder(){
+		
+	}
+	
+	protected void recountChildren(int order){
+		for(Entity ent : _Children){
+			//if(order>ent.getor)
+			//ent.setOrder();
+		}
 	}
 
 	public Entity detachParent() {
+		if(Parent!=null)
+		Parent._Children.remove(this);
 		Parent = null;
 		_ParentName = "";
-		Parent._Children.remove(this);
+		_Order = -1;
 		return this;
 	}
 
 	protected void Save(XmlWriter element, XmlComponent _XmlComponent) throws Exception {
-		element.element("Entity").attribute("Name", Name).attribute("Parent", _ParentName);
+		element.element("Entity").attribute("Name", Name).attribute("Parent", _ParentName).attribute("_Order", _Order);
 		for (Map.Entry<Class<?>, Map<Integer, ComponentBase>> ComponentsIndexMap : _ComponentMap.entrySet()) {
 			for (Map.Entry<Integer, ComponentBase> Components : ComponentsIndexMap.getValue().entrySet()) {
 				_XmlComponent.Save(Components.getValue(), element);
@@ -280,6 +307,7 @@ public class Entity {
 
 	protected void Load(Element element, XmlComponent _XmlComponent) throws Exception {
 		_ParentName = element.get("Parent");
+		_Order = element.getInt("_Order");
 		for (Element el : element.getChildrenByName("Component")) {
 			String type = el.get("_Type");
 

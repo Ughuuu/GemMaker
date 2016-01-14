@@ -114,6 +114,7 @@ public class SystemFactory {
 	
 	protected void updateSystems(){
 		updateSystem(_SceneSystem);
+		
 		updateSystem(_PhysicsSystem);
 		updateSystem(_DrawingSystem);
 		updateSystem(_SpriteSystem);

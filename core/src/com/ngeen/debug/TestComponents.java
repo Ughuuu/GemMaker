@@ -6,7 +6,7 @@ import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
 public class TestComponents {
-	public TestComponents(Ngeen ng){
+	private void SimpleTest(Ngeen ng){
 		Entity ent = ng.EntityBuilder.makeEntity("dragos");
 		assert(ent!=null);
 		assert(ng.EntityBuilder.getByName("dragos")!=null);
@@ -33,7 +33,14 @@ public class TestComponents {
 		ent.remove();
 		
 		assert(ng.EntityBuilder.getByName("dragos")==null);
+	}
+	
+	private void StressTest(Ngeen ng){
 		
+	}
+	
+	public TestComponents(Ngeen ng){
+		SimpleTest(ng);
 		Debugger.log("TestComponents()---PASS");
 	}
 }

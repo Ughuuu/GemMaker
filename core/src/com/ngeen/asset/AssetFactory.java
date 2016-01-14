@@ -21,8 +21,11 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.engine.TypeObservable;
+import com.ngeen.engine.TypeObserver;
+import com.ngeen.entity.Entity;
 
-public class AssetFactory {
+public class AssetFactory{
 	private final Ngeen _Ng;
 
 	/**

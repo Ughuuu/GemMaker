@@ -7,9 +7,10 @@ import java.util.Map;
 
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.engine.TypeObservable;
 import com.ngeen.entity.Entity;
 
-public class ComponentFactory {
+public class ComponentFactory extends TypeObservable<ComponentBase>{
 	private final Ngeen _Ng;
 	// list not array because can't instantiate array of generic:(
 	private Map<Class<?>, List<ComponentBase>> _ComponentCache;
@@ -19,6 +20,12 @@ public class ComponentFactory {
 		_Ng = ng;
 		_ComponentCache = new HashMap<Class<?>, List<ComponentBase>>();
 		_ComponentCacheIndex = new HashMap<Class<?>, Integer>();
+	}
+	
+	public void insertSuperComponent(ComponentBase component){
+		//don't track these, as they are already accounted for.
+		//but do track them
+		NotifyAdd(component);
 	}
 
 	public <T extends ComponentBase> T createComponent(Class<?> type, Entity ent) {
@@ -33,6 +40,7 @@ public class ComponentFactory {
 			} else {
 				el = (T) type.getConstructor(Ngeen.class, Entity.class).newInstance(_Ng, ent);
 			}
+			NotifyAdd(el);
 			return el;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -43,6 +51,7 @@ public class ComponentFactory {
 	public <T extends ComponentBase> void removeComponent(Class<?> type, T component) {
 		Integer size = _ComponentCacheIndex.get(type);
 		List<ComponentBase> list = _ComponentCache.get(type);
+		//construct the cache
 		if (list == null) {
 			list = new ArrayList<ComponentBase>(EngineInfo.ComponentCache);
 			for (int i = 0; i < EngineInfo.ComponentCache; i++) {
@@ -53,11 +62,13 @@ public class ComponentFactory {
 			_ComponentCacheIndex.put(type, size);
 			_ComponentCache.put(type, list);
 		}
+		//add in cache
 		if (size < EngineInfo.ComponentCache) {
 			_ComponentCacheIndex.put(type, size + 1);
 			list.set(size, component);
 		}
 		size++;
+		NotifyRemove(component);
 	}
 	
 	public void clear(){

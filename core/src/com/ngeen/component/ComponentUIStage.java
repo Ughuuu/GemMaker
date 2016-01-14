@@ -30,7 +30,7 @@ public class ComponentUIStage extends ComponentBase{
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
 		element.element("Component")
-		.attribute("_Type", this.getClass().getName())
+		.attribute("_Type", _Type.getName())
 		.pop();
 	}
 

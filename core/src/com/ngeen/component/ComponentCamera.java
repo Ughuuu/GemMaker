@@ -27,7 +27,7 @@ public class ComponentCamera extends ComponentBase {
 	public Camera Camera;
 	private float _Fov = -1;
 
-	public ComponentCamera(Ngeen ng, Entity ent) {
+	public ComponentCamera(Ngeen ng, Entity ent) {		
 		super(ng, ent);
 		createCamera(EngineInfo.Width,EngineInfo.Height);
 	}
@@ -60,7 +60,7 @@ public class ComponentCamera extends ComponentBase {
 	@Override
 	protected void Save(XmlWriter element) throws Exception{
 		element.element("Component")
-				.attribute("_Type", this.getClass().getName())
+				.attribute("_Type", _Type.getName())
 				.attribute("Fov", _Fov)
 		       .attribute("ViewportWidth", Camera.viewportWidth)
 		       .attribute("ViewportHeight", Camera.viewportHeight)

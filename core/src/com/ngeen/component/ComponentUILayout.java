@@ -12,7 +12,6 @@ import com.ngeen.entity.Entity;
 
 public class ComponentUILayout extends ComponentBase{
 	protected WidgetGroup _Layout;
-	private Class<?> _Type;
 	
 	public ComponentUILayout(Ngeen ng, Entity ent) {
 		super(ng, ent);

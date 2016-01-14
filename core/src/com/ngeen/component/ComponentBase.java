@@ -18,6 +18,8 @@ public abstract class ComponentBase {
 	 * The unique id of the current component. First is guaranteed to be 0.
 	 */
 	protected int Id;
+	protected Class<?> _Type;
+	protected Class<?> _SubType;
 	/**
 	 * Variable holds if the component is active or not.
 	 */
@@ -32,6 +34,8 @@ public abstract class ComponentBase {
 	 */
 	public ComponentBase(Ngeen ng, Entity ent) {
 		_Ng = ng;
+		_Type = this.getClass();
+		_SubType = this.getClass().getSuperclass();
 		_Owner = ent;
 		Id = _UniqueId++;
 	}
@@ -75,6 +79,14 @@ public abstract class ComponentBase {
 	
 	public Entity getOwner(){
 		return _Owner;
+	}
+	
+	public Class<?> getType(){
+		return _Type;
+	}
+	
+	public Class<?> getSubType(){
+		return _SubType;
 	}
 	
 	protected abstract void Save(XmlWriter element) throws Exception;

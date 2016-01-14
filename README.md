@@ -1,2 +1,2 @@
 # ngeen
-ngeen is a video game engine. It is made with libGDX and Artemis-odb.
+ngeen is a video game engine. It is made with libGDX.

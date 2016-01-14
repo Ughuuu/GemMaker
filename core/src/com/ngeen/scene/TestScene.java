@@ -39,7 +39,7 @@ public class TestScene extends Scene {
 		startTestSuite();
 
 		ent = CreateObject("Hello");
-		ent.addComponent(ComponentPoint.class).setPosition(new Vector3(10, 0, 0)).setScale(1);
+		ent.addComponent(ComponentPoint.class).setPosition(new Vector3(-100, 0, 0)).setScale(1);
 		ent.addComponent(ComponentSprite.class).setTexture("LoadScene/textures/ok.png");
 		ent.addComponent(ComponentScript.class).setScript(ExampleScript.class);
 
@@ -60,14 +60,9 @@ public class TestScene extends Scene {
 
 	@Override
 	public void onInit() {
-		doStuff();
-		// Gdx.app.exit();
 	}
 
 	@Override
 	public void onUpdate(float delta) {
-		// findObject("~CAMERA").getComponent(ComponentCamera.class).Camera.rotate(0.1f,
-		// 0, 0, 1);
-		// findObject("~CAMERA").getComponent(ComponentCamera.class).Camera.update();
 	}
 }
