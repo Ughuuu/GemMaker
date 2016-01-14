@@ -27,6 +27,7 @@ public class Entity {
 	private final ComponentFactory _ComponentFactory;
 	protected String Name;
 	protected int Id;
+	//protected boolean _Update = false;
 	protected Entity Parent;
 	protected String _ParentName = "null";
 	private static int _Unique_id = 0;

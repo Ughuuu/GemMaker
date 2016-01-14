@@ -12,6 +12,7 @@ import com.ngeen.component.ComponentRigid;
 import com.ngeen.component.ComponentScript;
 import com.ngeen.component.ComponentSprite;
 import com.ngeen.component.ComponentUILayout;
+import com.ngeen.component.ComponentUIStage;
 import com.ngeen.component.ComponentUIWidget;
 import com.ngeen.debug.Debugger;
 import com.ngeen.entity.Entity;
@@ -24,6 +25,7 @@ import com.ngeen.systems.SystemOverlay;
 import com.ngeen.systems.SystemPhysics;
 import com.ngeen.systems.SystemScene;
 import com.ngeen.systems.SystemSprite;
+import com.ngeen.systems.SystemStage;
 import com.ngeen.systems.SystemTable;
 import com.ngeen.systems.SystemWidget;
 
@@ -36,6 +38,7 @@ public class SystemFactory {
 	protected SystemPhysics _PhysicsSystem;
 	protected SystemDraw _DrawingSystem;
 	protected SystemSprite _SpriteSystem;
+	protected SystemStage _StageSystem;
 	protected SystemTable _TableSystem;
 	protected SystemWidget _WidgetSystem;
 	
@@ -47,6 +50,7 @@ public class SystemFactory {
 	private SystemConfiguration _CameraConfiguration;
 	private SystemConfiguration _ConfigurationTable;
 	private SystemConfiguration _ConfigurationWidget;
+	private SystemConfiguration _ConfigurationStage;
 	
 	public SystemFactory(Ngeen ng){
 		_Ng = ng;
@@ -62,6 +66,7 @@ public class SystemFactory {
 		_CameraConfiguration = new SystemConfiguration().all(ComponentPoint.class, ComponentCamera.class);
 		_ConfigurationTable = new SystemConfiguration().all(ComponentPoint.class, ComponentUILayout.class);
 		_ConfigurationWidget = new SystemConfiguration().all(ComponentPoint.class, ComponentUIWidget.class);
+		_ConfigurationStage = new SystemConfiguration().all(ComponentPoint.class, ComponentUIStage.class);
 	}
 	
 	protected void sendConfigurations(EntityFactory EntityBuilder){
@@ -73,6 +78,7 @@ public class SystemFactory {
 		EntityBuilder.addSystem(_SystemCamera);
 		EntityBuilder.addSystem(_TableSystem);
 		EntityBuilder.addSystem(_WidgetSystem);
+		EntityBuilder.addSystem(_StageSystem);
 	}
 	
 	protected void createMainSystems(SpriteBatch batch){
@@ -89,7 +95,8 @@ public class SystemFactory {
 
 	protected void createUISystems() {
 		_TableSystem = new SystemTable(_Ng, _ConfigurationTable);
-		_WidgetSystem = new SystemWidget(_Ng, _ConfigurationWidget);		
+		_WidgetSystem = new SystemWidget(_Ng, _ConfigurationWidget);
+		_StageSystem = new SystemStage(_Ng, _ConfigurationStage);
 	}
 
 	private void updateSystem(SystemBase system) {
@@ -111,8 +118,11 @@ public class SystemFactory {
 		updateSystem(_DrawingSystem);
 		updateSystem(_SpriteSystem);
 		updateSystem(_SystemCamera);
-		updateSystem(_OverlaySystem);
+
 		updateSystem(_TableSystem);
 		updateSystem(_WidgetSystem);
+		updateSystem(_StageSystem);
+		
+		updateSystem(_OverlaySystem);
 	}
 }

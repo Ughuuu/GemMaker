@@ -1,14 +1,10 @@
 package com.ngeen.component;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;

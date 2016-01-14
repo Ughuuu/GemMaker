@@ -1,20 +1,15 @@
 package com.ngeen.systems;
 
-import java.util.List;
 import java.util.Set;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.ngeen.component.ComponentCamera;
 import com.ngeen.component.ComponentPoint;
 import com.ngeen.component.ComponentSprite;
-import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 

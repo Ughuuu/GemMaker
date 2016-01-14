@@ -44,22 +44,18 @@ public class TestScene extends Scene {
 		ent.addComponent(ComponentScript.class).setScript(ExampleScript.class);
 
 		Entity stage = CreateObject("Stage");
-		stage.addComponent(ComponentPoint.class);
+		stage.addComponent(ComponentPoint.class).setPosition(new Vector3(300,0,0));
 		stage.addComponent(ComponentUIStage.class);
 		
 		Entity table = CreateObject("Table");
-		table.addComponent(ComponentPoint.class);
+		table.addComponent(ComponentPoint.class).setPosition(new Vector3(200,0,0));
 		table.addComponent(ComponentUITable.class);
 		table.setParent("Stage");
 		
 		Entity widget = CreateObject("Widget");
-		widget.addComponent(ComponentPoint.class);
+		widget.addComponent(ComponentPoint.class).setPosition(new Vector3(100,0,0));
 		widget.addComponent(ComponentUILabel.class);
-		widget.setParent("Tage");
-		
-		table.getComponent(ComponentPoint.class).setPosition(new Vector3(100,0,0));
-		// ng.XmlSave.Save();
-		// ng.XmlSave.Load();
+		widget.setParent("Table");
 	}
 
 	@Override

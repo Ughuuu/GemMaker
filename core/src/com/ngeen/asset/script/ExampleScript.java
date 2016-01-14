@@ -15,12 +15,10 @@ public class ExampleScript extends Script {
 	float dir = -1;
 
 	public void onInit() {
-		point = holder.getComponent(ComponentPoint.class);
+		point = holder.getComponent(ComponentPoint.class).setPosition(new Vector3(100,2,5));
 	}
 
 	public void onUpdate(float delta) {
-		float x = (float) (50.0f * Math.sin(System.currentTimeMillis()/50)/3);
-		float y = (float) (50 * Math.cos(System.currentTimeMillis()/50)/10);
-		point.setPosition(new Vector3(x+50, y+50, 0.0f));
+		
 	}
 }
