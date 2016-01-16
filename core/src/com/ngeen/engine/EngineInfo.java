@@ -48,6 +48,7 @@ public class EngineInfo {
 			put(ComponentUILayout.class, i++);
 			put(ComponentUIStage.class, i++);
 			put(ComponentUIWidget.class, i++);
+			put(ComponentVariable.class, i++);
 			
 			put(ComponentUIContainer.class, i++);
 			put(ComponentUIHorizontalGroup.class, i++);

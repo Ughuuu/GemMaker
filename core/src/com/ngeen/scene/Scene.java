@@ -1,28 +1,12 @@
 package com.ngeen.scene;
 
 import com.badlogic.gdx.math.Vector2;
-import com.ngeen.asset.Asset;
-import com.ngeen.debug.Debugger;
-import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-/**
- * Extend this class to have Scene functionality. A scene is called every frame.
- * 
- * @author Dragos
- *
- */
 public class Scene {
 	protected Ngeen ng;
 	private SceneFactory _SceneFactory;
-	
-	protected Entity CreateObject(String name){
-		return ng.EntityBuilder.makeEntity(name);
-	}
-
-	public Scene() {
-	}
 	
 	protected void addNgeen(final Ngeen ng){
 		this.ng = ng;
@@ -30,6 +14,10 @@ public class Scene {
 	
 	protected void addSceneFactory(final SceneFactory _SceneFactory){
 		this._SceneFactory = _SceneFactory;
+	}
+	
+	protected Entity CreateObject(String name){
+		return ng.EntityBuilder.makeEntity(name);
 	}
 
 	/**

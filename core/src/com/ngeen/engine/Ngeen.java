@@ -1,33 +1,21 @@
 package com.ngeen.engine;
 
-import java.util.Set;
+import java.sql.Time;
+import java.util.concurrent.TimeUnit;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ngeen.asset.Asset;
 import com.ngeen.asset.AssetFactory;
 import com.ngeen.asset.MeshFactory;
-import com.ngeen.component.*;
-import com.ngeen.component.ui.widget.*;
-import com.ngeen.debug.Debugger;
+import com.ngeen.component.ComponentFactory;
+import com.ngeen.component.XmlComponent;
 import com.ngeen.entity.Entity;
 import com.ngeen.entity.EntityFactory;
 import com.ngeen.entity.XmlEntity;
-import com.ngeen.asset.AssetFactory;
-import com.ngeen.scene.Scene;
 import com.ngeen.scene.SceneFactory;
-import com.ngeen.systems.*;
 
 /**
  * Main engine class. Links all elements and holds entities.
@@ -77,7 +65,6 @@ public class Ngeen extends ApplicationAdapter {
 	}
 
 	public void update(float delta) {
-		Loader.done();
 		_SystemBuilder.updateSystems();
 	}
 

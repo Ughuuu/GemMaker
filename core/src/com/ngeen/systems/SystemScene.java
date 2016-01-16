@@ -6,18 +6,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.ngeen.component.ComponentScript;
-import com.ngeen.component.Script;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 import com.ngeen.scene.Scene;
+import com.ngeen.scene.SceneInterface;
 
 public class SystemScene extends SystemBase implements GestureListener, InputProcessor {
+	private SceneInterface _SceneInterface;
 	private Scene _Scene;
-	private Scene _RequestChange;
+	private SceneInterface _RequestChange;
 	
 	public SystemScene(Ngeen ng, SystemConfiguration conf) {
 		super(ng, conf);
@@ -27,7 +27,7 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 		return _Scene.getClass();
 	}
 	
-	public void setScene(Scene sc){
+	public void setScene(SceneInterface sc){
 		if(sc!=null){
 			this._RequestChange = sc;
 		}
@@ -38,7 +38,9 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 		List<ComponentScript> scripts = ent.getComponents(ComponentScript.class);
 		
 		for(ComponentScript script : scripts){
-			script.getScipt().onUpdate(deltaTime);
+			if(script.isValid()){
+				script.getScript().onUpdate(deltaTime);
+			}
 		}
 	}
 	
@@ -47,7 +49,8 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 		if(_RequestChange != null){
 			if(_Scene!=null)
 			_Scene.onExit();
-			_Scene = _RequestChange;
+			_SceneInterface = _RequestChange;
+			_Scene = (Scene)_SceneInterface;
 			_Ng.XmlSave.Load();
 			_RequestChange = null;
 			Debugger.log("Loaded scene " + _Scene);

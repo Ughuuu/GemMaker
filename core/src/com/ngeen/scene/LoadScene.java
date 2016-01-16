@@ -1,13 +1,11 @@
 package com.ngeen.scene;
 
-import com.ngeen.debug.Debugger;
-import com.ngeen.engine.Ngeen;
-import com.ngeen.entity.Entity;
+import com.badlogic.gdx.math.Vector2;
 
-public class LoadScene extends Scene {
-	@Override
+public class LoadScene extends Scene implements SceneInterface {
+	
 	public void onInit() {
 		ng.Loader.finish();//blocking load
 		ng.changeScene("TestScene");
-	};
+	}
 }

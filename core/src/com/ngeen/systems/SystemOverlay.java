@@ -45,8 +45,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	private BoundingBox _Selection = new BoundingBox();
 	private Matrix4 _Comb;
 	private int _ModifyType = 0;
-	private boolean _Moving = false, _DeleteSelected = false, _SelectAll = false, _WriteMode = false, _Shift = false,
-			_Ctrl, _Alt;
+	private boolean _DeleteSelected = false, _SelectAll = false, _WriteMode = false, _Shift = false, _Ctrl, _Alt;
 	private String _EntityName = "null";
 	private SpriteBatch _SpriteBatch;
 	private Set<Entity> _AllEntities = new TreeSet<Entity>(new Comparator<Entity>() {
@@ -99,12 +98,8 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	}
 
 	private void MoveAll() {
-		if (_Moving)
-			_ModifyType = 1;
-		else {
-		}
 		for (Entity ent : _Selected) {
-			if(ent.getParent() != null && _Selected.contains(ent.getParent()))
+			if (ent.getParent() != null && _Selected.contains(ent.getParent()))
 				continue;
 			float deltaX = Gdx.input.getDeltaX(), deltaY = Gdx.input.getDeltaY();
 			Vector3 modif = new Vector3(deltaX, deltaY, 0);
@@ -132,8 +127,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		}
 		_X1 = _X2;
 		_Y1 = _Y2;
-		if (_Moving)
-			_ModifyType = 0;
 	}
 
 	void DeleteAll() {
@@ -142,15 +135,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		}
 		_Selected.clear();
 		_DeleteSelected = false;
-	}
-
-	void TestMoving() {
-		for (Entity ent : _Selected) {
-			_Moving = _OverlaySelector.OnEntity(_Selection.min, ent);
-			if (_Moving == true) {
-				break;
-			}
-		}
 	}
 
 	void SelectAll() {
@@ -173,10 +157,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		_Comb = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class).Camera.combined;
 		_ShapeRenderer.begin(ShapeType.Line);
 		computeSelection();
-		if (!_Moving) {
-			TestMoving();
-		}
-		if (_Moving == true || _ModifyType != 0) {
+		if (_ModifyType != 0) {
 			MoveAll();
 			return;
 		}
@@ -188,19 +169,15 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	@Override
 	public void onUpdate(Entity ent) {
 		_AllEntities.add(ent);
-		if (_Moving) {
+		if (_Selecting)
+			_OverlaySelector.Select(ent, _Selected, _Selection);
 
-		} else {
-			if (_Selecting)
-				_OverlaySelector.Select(ent, _Selected, _Selection);
-		}
 		_OverlaySelector.Overlay(ent, _Comb, _Selected.contains(ent));
 	}
 
 	void resetState() {
 		reload = false;
 		_ModifyType = 0;
-		_Moving = false;
 		_DeleteSelected = false;
 		_SelectAll = false;
 		_WriteMode = false;
@@ -215,7 +192,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		_SpriteBatch.setProjectionMatrix(_Comb);
 		BitmapFont font = (BitmapFont) _Ng.Loader.getAsset("LoadScene/fonts/impact.fnt").getData();
 		font.getData().setScale(0.2f);
-		//font.setColor(1, 1, 1, 0.5f);
+		// font.setColor(1, 1, 1, 0.5f);
 		for (Entity ent : _AllEntities) {
 			_SpriteBatch.setTransformMatrix(ent.getComponent(ComponentPoint.class).getMatrix());
 			font.draw((Batch) _SpriteBatch, ent.getName(), 0, 0);
@@ -335,12 +312,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		_ModifyType = 0;
 		if (button != Input.Buttons.LEFT) {
 			return false;
-		}
-		for (Entity ent : _Selected) {
-			_Moving = _OverlaySelector.OnEntity(_Selection.min, ent);
-			if (_Moving == true) {
-				break;
-			}
 		}
 		_Selecting = true;
 		_X1 = screenX;

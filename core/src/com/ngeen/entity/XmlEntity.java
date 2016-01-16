@@ -18,6 +18,7 @@ import com.ngeen.engine.Ngeen;
 public class XmlEntity {
 	private final XmlComponent _XmlComponent;
 	private final Ngeen _Ng;
+	private final String path = "scenes/";
 
 	public XmlEntity(Ngeen _Ng, XmlComponent _XmlComponent) {
 		this._Ng = _Ng;
@@ -27,7 +28,7 @@ public class XmlEntity {
 	public void Save() {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
-			FileHandle handle = Gdx.files.external(scene + ".xml");
+			FileHandle handle = Gdx.files.local(path + scene + ".xml");
 			handle.writeString(Dump(), false);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,7 +59,7 @@ public class XmlEntity {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
 			XmlReader xml = new XmlReader();
-			XmlReader.Element element = xml.parse(Gdx.files.external(scene + ".xml"));
+			XmlReader.Element element = xml.parse(Gdx.files.local(path + scene + ".xml"));
 			_Ng.EntityBuilder.clear();
 			EngineInfo.Width = element.getFloat("Width");
 			EngineInfo.Height = element.getFloat("Height");

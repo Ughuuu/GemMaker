@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.ngeen.asset.Asset;
 import com.ngeen.asset.script.ExampleScript;
@@ -25,7 +26,7 @@ import com.ngeen.debug.TestSystemConfiguration;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-public class TestScene extends Scene {
+public class TestScene extends Scene implements SceneInterface{
 	Entity ent;
 
 	void startTestSuite() {
@@ -56,13 +57,5 @@ public class TestScene extends Scene {
 		widget.addComponent(ComponentPoint.class).setPosition(new Vector3(100,0,0));
 		widget.addComponent(ComponentUILabel.class);
 		widget.setParent("Table");
-	}
-
-	@Override
-	public void onInit() {
-	}
-
-	@Override
-	public void onUpdate(float delta) {
 	}
 }
