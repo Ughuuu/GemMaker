@@ -35,6 +35,8 @@ public class Test extends Script {
 		v2.add(center);
 		pct = new Vector3(v2.x, v2.y, 0);
 		point.setPosition(pct);
+		//point.setScale(100/v2.len());
+		point.setScale(1);
 		
 	}
 }

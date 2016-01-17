@@ -74,6 +74,7 @@ public class XmlEntity {
 					ent.getComponent(ComponentScript.class).setEnabled(true);
 				}
 			}
+			_Ng.resize((int)EngineInfo.ScreenWidth, (int)EngineInfo.ScreenHeight);
 		} catch (Exception e) {
 			Debugger.log(e.toString());
 			//e.printStackTrace();
