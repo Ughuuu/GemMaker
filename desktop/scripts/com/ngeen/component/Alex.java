@@ -10,7 +10,7 @@ import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.entity.Entity;
 
-public class Test2 extends Script {
+public class Alex extends Script {
 	ComponentPoint point;
 	Vector2 center = new Vector2();
 	float spd;

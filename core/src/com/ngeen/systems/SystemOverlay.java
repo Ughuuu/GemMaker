@@ -232,6 +232,9 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 			_DeleteSelected = true;
 		}
 		if (Input.Keys.F2 == keycode) {
+			if(_Selected.size() == 0){
+				return false;
+			}
 			if (_WriteMode) {
 				_WriteMode = false;
 			} else {
