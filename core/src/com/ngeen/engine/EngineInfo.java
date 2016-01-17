@@ -175,7 +175,10 @@ public class EngineInfo {
 	}
 
 	protected static void makeOptionalEntities(Ngeen ng) {
-		ng.Loader.addFolder("../Debug/");
-		ng.Loader.finish();
+		if(Debug){
+			ng.Loader.enqueFolder("engine/");
+			ng.Loader.addFolder("engine/");
+			ng.Loader.finish();
+		}
 	}
 }

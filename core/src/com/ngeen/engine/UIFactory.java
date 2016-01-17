@@ -39,6 +39,7 @@ public class UIFactory {
 	protected void createMultiplexer() {
 		Gdx.input.setInputProcessor(_InputMultiplexer);
 		_InputMultiplexer.addProcessor(new GestureDetector(_Ng._SystemBuilder._SceneSystem));
+		if(_Ng._SystemBuilder._OverlaySystem != null)
 		_InputMultiplexer.addProcessor((InputProcessor) _Ng._SystemBuilder._OverlaySystem);
 	}
 }

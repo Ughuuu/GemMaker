@@ -1,11 +1,17 @@
 package com.ngeen.entity;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
@@ -19,6 +25,7 @@ public class XmlEntity {
 	private final XmlComponent _XmlComponent;
 	private final Ngeen _Ng;
 	private final String path = "scenes/";
+	private int _SaveTime;
 
 	public XmlEntity(Ngeen _Ng, XmlComponent _XmlComponent) {
 		this._Ng = _Ng;
@@ -29,7 +36,14 @@ public class XmlEntity {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
 			FileHandle handle = Gdx.files.local(path + scene + ".xml");
+			_SaveTime = (int) (TimeUtils.millis() / 1000);
 			handle.writeString(Dump(), false);
+
+			File f = Gdx.files.local(path + scene + ".xml").file();
+			BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+
+			FileTime ft = attr.lastModifiedTime();
+			_SaveTime = (int) (ft.toMillis()*1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -50,7 +64,7 @@ public class XmlEntity {
 			return writer.toString();
 		} catch (Exception e) {
 			Debugger.log(e.toString());
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 		return "";
 	}
@@ -60,9 +74,9 @@ public class XmlEntity {
 			String scene = _Ng.getCurrentScene().getName();
 			XmlReader xml = new XmlReader();
 			XmlReader.Element element = xml.parse(Gdx.files.local(path + scene + ".xml"));
-			_Ng.EntityBuilder.clear();
 			EngineInfo.Width = element.getFloat("Width");
 			EngineInfo.Height = element.getFloat("Height");
+			_Ng.restart();
 			for (Element el : element.getChildrenByName("Entity")) {
 				String name = el.get("Name");
 				_Ng.EntityBuilder.makeEntity(name).Load(el, _XmlComponent);
@@ -70,14 +84,32 @@ public class XmlEntity {
 			List<Entity> entities = _Ng.EntityBuilder.getEntities();
 			for (Entity ent : entities) {
 				ent.setParent(_Ng.getEntity(ent._ParentName));
-				if(ent.hasComponent(ComponentScript.class)){
+				if (ent.hasComponent(ComponentScript.class)) {
 					ent.getComponent(ComponentScript.class).setEnabled(true);
 				}
 			}
-			_Ng.resize((int)EngineInfo.ScreenWidth, (int)EngineInfo.ScreenHeight);
+			_Ng.resize((int) EngineInfo.ScreenWidth, (int) EngineInfo.ScreenHeight);
 		} catch (Exception e) {
 			Debugger.log(e.toString());
-			//e.printStackTrace();
+			// e.printStackTrace();
+		}
+	}
+
+	public void checkDate() {
+		try {
+		String scene = _Ng.getCurrentScene().getName();
+		File f = Gdx.files.local(path + scene + ".xml").file();
+		BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+
+		FileTime ft = attr.lastModifiedTime();
+		int time2 = (int) (ft.toMillis()*1000);
+		
+			if (time2 != _SaveTime) {
+				Load();
+			}
+			_SaveTime = time2;
+		} catch (Exception e) {
+			Debugger.log(e.toString());
 		}
 	}
 }

@@ -1,33 +1,37 @@
-<com.ngeen.scene.TestScene Width="1511.0526" Height="900.0">
+<com.ngeen.scene.TestScene Width="1216.5079" Height="1280.0">
 	<Entity Name="~CAMERA" Parent="null" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentCamera" Fov="-1.0" ViewportWidth="1511.0526" ViewportHeight="900.0"/>
-		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="0.0" Position.y="0.0" Position.z="0.0" Scale.x="1.0" Scale.y="1.0" Scale.z="1.0" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="107.75766" Position.y="44.166573" Position.z="0.0" Scale.x="3.2827387" Scale.y="1.4565477" Scale.z="1.0" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="8.0"/>
+		<Component _Type="com.ngeen.component.ComponentCamera" Fov="-1.0" ViewportWidth="1216.5079" ViewportHeight="1280.0"/>
 	</Entity>
 	<Entity Name="~UICAMERA" Parent="null" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentCamera" Fov="-1.0" ViewportWidth="1276.0" ViewportHeight="760.0"/>
-		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="638.0" Position.y="380.0" Position.z="0.0" Scale.x="1.0" Scale.y="1.0" Scale.z="1.0" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="479.0" Position.y="504.0" Position.z="0.0" Scale.x="1.0" Scale.y="1.0" Scale.z="1.0" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
+		<Component _Type="com.ngeen.component.ComponentCamera" Fov="-1.0" ViewportWidth="958.0" ViewportHeight="1008.0"/>
 	</Entity>
-	<Entity Name="Hello" Parent="~CAMERA" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-99.75674" Position.y="-6.9712653" Position.z="0.0" Scale.x="0.99999976" Scale.y="0.99999976" Scale.z="0.99999976" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
-		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test"/>
+	<Entity Name="Hello" Parent="~CAMERA" _Order="0">
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="107.08481" Position.y="95.274155" Position.z="0.0" Scale.x="0.69767654" Scale.y="0.69767654" Scale.z="0.69767654" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="8.0"/>
+		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test2"/>
 		<Component _Type="com.ngeen.component.ComponentSprite" _TextureAsset="LoadScene/textures/ok.png"/>
 	</Entity>
-	<Entity Name="Stage" Parent="~CAMERA" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-293.45004" Position.y="-62.34383" Position.z="0.0" Scale.x="0.3333339" Scale.y="0.3333339" Scale.z="0.3333339" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
+	<Entity Name="Stage" Parent="~CAMERA" _Order="1">
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-120.74759" Position.y="35.58979" Position.z="0.0" Scale.x="0.7943863" Scale.y="0.7943863" Scale.z="0.7943863" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="8.0"/>
 		<Component _Type="com.ngeen.component.ComponentUIStage"/>
-		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test"/>
+		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test2"/>
 		<Component _Type="com.ngeen.component.ComponentSprite" _TextureAsset="LoadScene/textures/ok.png"/>
 	</Entity>
-	<Entity Name="Table" Parent="Stage" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-374.35464" Position.y="-121.1187" Position.z="0.0" Scale.x="0.2542136" Scale.y="0.2542136" Scale.z="0.2542136" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
+	<Entity Name="Table" Parent="Stage" _Order="0">
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-110.674416" Position.y="79.87248" Position.z="0.0" Scale.x="0.7326757" Scale.y="0.7326757" Scale.z="0.7326757" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="8.0"/>
 		<Component _Type="com.ngeen.component.ui.layout.ComponentUITable"/>
-		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test"/>
+		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test2"/>
 		<Component _Type="com.ngeen.component.ComponentSprite" _TextureAsset="LoadScene/textures/ok.png"/>
 	</Entity>
-	<Entity Name="Widget" Parent="Table" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-354.3547" Position.y="-121.12068" Position.z="0.0" Scale.x="0.26710957" Scale.y="0.26710957" Scale.z="0.26710957" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="0.0"/>
+	<Entity Name="Widget" Parent="Table" _Order="0">
 		<Component _Type="com.ngeen.component.ui.widget.ComponentUILabel"/>
-		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test"/>
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="-123.8507" Position.y="64.82406" Position.z="0.0" Scale.x="0.7153604" Scale.y="0.7153604" Scale.z="0.7153604" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="8.0"/>
+		<Component _Type="com.ngeen.component.ComponentScript" _ProgramName="com.ngeen.component.Test2"/>
+		<Component _Type="com.ngeen.component.ComponentSprite" _TextureAsset="LoadScene/textures/ok.png"/>
+	</Entity>
+	<Entity Name="grigor" Parent="~CAMERA" _Order="2">
+		<Component _Type="com.ngeen.component.ComponentPoint" Position.x="363.1746" Position.y="271.9842" Position.z="0.0" Scale.x="1.294145" Scale.y="1.3055154" Scale.z="1.0" Rotation.x="0.0" Rotation.y="0.0" Rotation.z="8.0"/>
 		<Component _Type="com.ngeen.component.ComponentSprite" _TextureAsset="LoadScene/textures/ok.png"/>
 	</Entity>
 </com.ngeen.scene.TestScene>

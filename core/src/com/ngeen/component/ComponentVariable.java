@@ -6,7 +6,6 @@ import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
 public class ComponentVariable extends ComponentBase{
-
 	public ComponentVariable(Ngeen ng, Entity ent) {
 		super(ng, ent);
 		// TODO Auto-generated constructor stub

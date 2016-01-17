@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +28,6 @@ public class Entity {
 	private final ComponentFactory _ComponentFactory;
 	protected String Name;
 	protected int Id;
-	/**
-	 * update some variables when parent or children change.
-	 */
-	protected boolean _Update = false;
 	protected Entity Parent;
 	protected String _ParentName = "null";
 	private static int _Unique_id = 0;
@@ -218,6 +215,8 @@ public class Entity {
 		Parent = ent;
 		_ParentName = ent.Name;
 		Parent._Children.add(this);
+		this._Order = Parent._Children.size() - 1;
+		_Ng.EntityBuilder.Parented(this);
 		return this;
 	}
 
@@ -235,8 +234,8 @@ public class Entity {
 		}
 		return Parent.canParent(e);
 	}
-	
-	private Entity getLastParentInternal(){
+
+	private Entity getLastParentInternal() {
 		if (Parent == null) {
 			return this;
 		}
@@ -245,33 +244,42 @@ public class Entity {
 
 	public Entity getLastParent() {
 		Entity ent = getLastParentInternal();
-		if(ent == this){
+		if (ent == this) {
 			return null;
 		}
 		return ent;
 	}
-	
-	protected void setOrder(int newOrder){
-		_Order = newOrder;
+
+	protected void setOrder(int newOrder) {
+		Collections.swap(_Children, _Order, newOrder);
+		_Children.get(_Order)._Order = newOrder;
+		_Children.get(newOrder)._Order = _Order;
 	}
-	
-	public void getOrder(){
-		
+
+	public int getOrder() {
+		return _Order;
 	}
-	
-	protected void recountChildren(int order){
-		for(Entity ent : _Children){
-			//if(order>ent.getor)
-			//ent.setOrder();
+
+	private void recountChildren() {
+		int prev = -1;
+		for (int i = 0, j = 0; i < _Children.size(); i++, j++) {
+			Entity ent = _Children.get(i);
+			int act = ent._Order;
+			if (act - prev != -1) {
+				ent._Order--;
+			}
+			prev = act;
 		}
 	}
 
 	public Entity detachParent() {
-		if(Parent!=null)
-		Parent._Children.remove(this);
+		if (Parent != null)
+			Parent._Children.remove(this);
 		Parent = null;
 		_ParentName = "";
 		_Order = -1;
+		if (Parent != null)
+			Parent.recountChildren();
 		return this;
 	}
 
@@ -288,7 +296,13 @@ public class Entity {
 	private ComponentBase addComponentUnsafe(Class<?> type) {
 		_Ng.EntityBuilder.treeRemoveObject(this);
 
+		if (_ComponentMap.containsKey(type)) {
+			_Ng.EntityBuilder.treeAddObject(this);
+			return _ComponentMap.get(type).entrySet().iterator().next().getValue();
+		}
+
 		ComponentBase component = _ComponentFactory.createComponent(type, this);
+
 		Map<Integer, ComponentBase> list = null;
 		if (_ComponentMap.containsKey(component.getClass()) == false) {
 			list = new HashMap<Integer, ComponentBase>();

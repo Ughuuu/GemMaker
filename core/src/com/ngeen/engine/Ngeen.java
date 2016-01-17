@@ -1,12 +1,8 @@
 package com.ngeen.engine;
 
-import java.sql.Time;
-import java.util.concurrent.TimeUnit;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.ngeen.asset.Asset;
 import com.ngeen.asset.AssetFactory;
 import com.ngeen.asset.MeshFactory;
@@ -30,7 +26,7 @@ public class Ngeen extends ApplicationAdapter {
 	public XmlEntity XmlSave;
 	public UIFactory UIBuilder;
 
-	protected ComponentFactory ComponentBuilder;
+	protected ComponentFactory _ComponentBuilder;
 
 	protected SceneFactory SceneBuilder;
 	protected SystemFactory _SystemBuilder;
@@ -38,24 +34,24 @@ public class Ngeen extends ApplicationAdapter {
 	private XmlComponent _XmlComponent;
 
 	public void init() {
-		_SystemBuilder = new SystemFactory(this);
-		_SystemBuilder.createConfigurations();
 		Loader = new AssetFactory(this);
-		ComponentBuilder = new ComponentFactory(this);
-		EntityBuilder = new EntityFactory(this, ComponentBuilder, _SystemBuilder);
+		_ComponentBuilder = new ComponentFactory(this);
+		_SystemBuilder = new SystemFactory(this, _ComponentBuilder);
+		_SystemBuilder.createConfigurations();
+		EntityBuilder = new EntityFactory(this, _ComponentBuilder, _SystemBuilder);
 		_MeshBuilder = new MeshFactory(this);
 		UIBuilder = new UIFactory(this);
 
-		_SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);		
+		_SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);
 
 		SceneBuilder = new SceneFactory(this, _SystemBuilder._SceneSystem);
 		SceneBuilder.changeScene("LoadScene");
-		
+
 		EngineInfo.makeBasicEntities(this);
 		EngineInfo.makeOptionalEntities(this);
-		
+
 		_SystemBuilder.createUISystems();
-		
+
 		UIBuilder.createMultiplexer();
 
 		_SystemBuilder.sendConfigurations(EntityBuilder);
@@ -65,11 +61,15 @@ public class Ngeen extends ApplicationAdapter {
 	}
 
 	public void update(float delta) {
+		if (EngineInfo.Debug && EntityBuilder.getByName("~CAMERA") == null) {
+			EngineInfo.makeBasicEntities(this);
+		}
 		_SystemBuilder.updateSystems();
 	}
 
 	public void restart() {
-		remove();
+		EntityBuilder.clear();
+		EngineInfo.makeBasicEntities(this);
 	}
 
 	@Override
@@ -89,12 +89,12 @@ public class Ngeen extends ApplicationAdapter {
 	@Override
 	public void resize(int w, int h) {
 		EngineInfo.makeBasicEntities(this);
-		UIBuilder.resize(w,h);
+		UIBuilder.resize(w, h);
 	}
 
 	public void remove() {
 		EntityBuilder.clear();
-		ComponentBuilder.clear();
+		_ComponentBuilder.clear();
 	}
 
 	public Class<?> getCurrentScene() {

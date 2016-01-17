@@ -48,6 +48,10 @@ public class EntityFactory extends TypeObservable<Entity>{
 		_EntityTrees = new HashMap<Comparator<Entity>, Map<BitSet, Set<Entity>>>();
 		_EmptySet = new TreeSet<Entity>();
 	}
+	
+	protected void Parented(Entity ent){
+		NotifyParented(ent);
+	}
 
 	public Entity makeEntity(String name) {
 		if (_EntityNameMap.containsKey(name) == true) {
@@ -64,7 +68,6 @@ public class EntityFactory extends TypeObservable<Entity>{
 		}
 		_EntityMap.put(ret.Id, ret);
 		_EntityNameMap.put(ret.Name, ret.Id);
-		NotifyAdd(ret);
 		return ret;
 	}
 
@@ -151,7 +154,6 @@ public class EntityFactory extends TypeObservable<Entity>{
 			_EntityCache[_EntityCacheIndex] = ent;
 			_EntityCacheIndex++;
 		}
-		NotifyRemove(ent);
 	}
 
 	public void removeEntity(String name) {
@@ -165,7 +167,6 @@ public class EntityFactory extends TypeObservable<Entity>{
 			_EntityCache[_EntityCacheIndex] = ent;
 			_EntityCacheIndex++;
 		}
-		NotifyRemove(ent);
 	}
 
 	public void removeEntity(Entity ent) {
@@ -179,7 +180,6 @@ public class EntityFactory extends TypeObservable<Entity>{
 			_EntityCache[_EntityCacheIndex] = ent;
 			_EntityCacheIndex++;
 		}
-		NotifyRemove(ent);
 	}
 
 	private void cacheComponents(Entity ent) {
@@ -211,7 +211,7 @@ public class EntityFactory extends TypeObservable<Entity>{
 
 	public void clear() {
 		for(Entry<Integer, Entity> entity:_EntityMap.entrySet()){
-			NotifyRemove((entity.getValue()));
+			//NotifyRemove((entity.getValue()));
 		}
 		_EntityMap.clear();
 		_EntityNameMap.clear();

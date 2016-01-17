@@ -46,6 +46,9 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 	
 	@Override
 	public void onBeforeUpdate(){
+		if(_Scene != null && EngineInfo.Debug){
+			_Ng.XmlSave.checkDate();
+		}
 		if(_RequestChange != null){
 			if(_Scene!=null)
 			_Scene.onExit();

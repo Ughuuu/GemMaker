@@ -1,10 +1,15 @@
 package com.ngeen.engine;
 
-public interface TypeObserver<T> {
+import com.ngeen.component.ComponentBase;
+import com.ngeen.entity.Entity;
+
+public interface TypeObserver {
 	
-	public void Removed(T obj);
+	public void Removed(ComponentBase obj);
 	
-	public void Added(T obj);
+	public void Added(ComponentBase obj);
 	
-	public void Changed(T obj);
+	public void ChangedComponent(ComponentBase obj);
+	
+	public void Parented(Entity ent);
 }

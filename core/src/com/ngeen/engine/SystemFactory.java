@@ -5,6 +5,7 @@ import java.util.Set;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.ngeen.component.ComponentCamera;
+import com.ngeen.component.ComponentFactory;
 import com.ngeen.component.ComponentMaterial;
 import com.ngeen.component.ComponentMesh;
 import com.ngeen.component.ComponentPoint;
@@ -31,6 +32,7 @@ import com.ngeen.systems.SystemWidget;
 
 public class SystemFactory {
 	protected final Ngeen _Ng;
+	protected final ComponentFactory _ComponentBuilder;
 
 	protected SystemCamera _SystemCamera;
 	protected SystemScene _SceneSystem;
@@ -41,7 +43,7 @@ public class SystemFactory {
 	protected SystemStage _StageSystem;
 	protected SystemTable _TableSystem;
 	protected SystemWidget _WidgetSystem;
-	
+
 	private SystemConfiguration _PointConfiguration;
 	private SystemConfiguration _RigidConfiguration;
 	private SystemConfiguration _ScriptConfiguration;
@@ -51,9 +53,10 @@ public class SystemFactory {
 	private SystemConfiguration _ConfigurationTable;
 	private SystemConfiguration _ConfigurationWidget;
 	private SystemConfiguration _ConfigurationStage;
-	
-	public SystemFactory(Ngeen ng){
+
+	public SystemFactory(Ngeen ng, ComponentFactory _ComponentBuilder) {
 		_Ng = ng;
+		this._ComponentBuilder = _ComponentBuilder;
 	}
 
 	protected void createConfigurations() {
@@ -68,9 +71,10 @@ public class SystemFactory {
 		_ConfigurationWidget = new SystemConfiguration().all(ComponentPoint.class, ComponentUIWidget.class);
 		_ConfigurationStage = new SystemConfiguration().all(ComponentPoint.class, ComponentUIStage.class);
 	}
-	
-	protected void sendConfigurations(EntityFactory EntityBuilder){
+
+	protected void sendConfigurations(EntityFactory EntityBuilder) {
 		EntityBuilder.addSystem(_SceneSystem);
+		if(EngineInfo.Debug == true)
 		EntityBuilder.addSystem(_OverlaySystem);
 		EntityBuilder.addSystem(_PhysicsSystem);
 		EntityBuilder.addSystem(_DrawingSystem);
@@ -80,11 +84,13 @@ public class SystemFactory {
 		EntityBuilder.addSystem(_WidgetSystem);
 		EntityBuilder.addSystem(_StageSystem);
 	}
-	
-	protected void createMainSystems(SpriteBatch batch){
+
+	protected void createMainSystems(SpriteBatch batch) {
 		createConfigurations();
-		
+
 		_PhysicsSystem = new SystemPhysics(_Ng, _RigidConfiguration);
+
+		if(EngineInfo.Debug == true)
 		_OverlaySystem = new SystemOverlay(_Ng, _PointConfiguration, batch);
 		_SceneSystem = new SystemScene(_Ng, _ScriptConfiguration);
 		_DrawingSystem = new SystemDraw(_Ng, _DrawingConfiguration);
@@ -92,11 +98,10 @@ public class SystemFactory {
 		_SystemCamera = new SystemCamera(_Ng, _CameraConfiguration);
 	}
 
-
 	protected void createUISystems() {
 		_TableSystem = new SystemTable(_Ng, _ConfigurationTable);
 		_WidgetSystem = new SystemWidget(_Ng, _ConfigurationWidget);
-		_StageSystem = new SystemStage(_Ng, _ConfigurationStage);
+		_StageSystem = new SystemStage(_Ng, _ConfigurationStage, _ComponentBuilder);
 	}
 
 	private void updateSystem(SystemBase system) {
@@ -111,10 +116,9 @@ public class SystemFactory {
 		system.onAfterUpdate();
 		system.deltaTime = TimeUtils.millis() - time;
 	}
-	
-	protected void updateSystems(){
-		updateSystem(_SceneSystem);
-		
+
+	protected void updateSystems() {
+
 		updateSystem(_PhysicsSystem);
 		updateSystem(_DrawingSystem);
 		updateSystem(_SpriteSystem);
@@ -123,7 +127,10 @@ public class SystemFactory {
 		updateSystem(_TableSystem);
 		updateSystem(_WidgetSystem);
 		updateSystem(_StageSystem);
-		
+
+		if(EngineInfo.Debug == true)
 		updateSystem(_OverlaySystem);
+
+		updateSystem(_SceneSystem);
 	}
 }
