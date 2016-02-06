@@ -7,8 +7,8 @@ import com.ngeen.component.Script;
 import com.ngeen.entity.Entity;
 
 public class ExampleScript extends Script {
-	ComponentPoint point;
 	Vector2 center = new Vector2();
+	ComponentPoint point;
 	float spd;
 
 	@Override
@@ -19,7 +19,7 @@ public class ExampleScript extends Script {
 	@Override
 	public void onUpdate(float delta) {
 		Entity parent = holder.getParent();
-		
+
 		if (parent != null) {
 			Vector3 cnt = parent.getComponent(ComponentPoint.class).getPosition();
 			center = new Vector2(cnt.x, cnt.y);

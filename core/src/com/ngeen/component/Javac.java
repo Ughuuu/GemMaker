@@ -6,55 +6,29 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 /**
- * @hidden
- * A wrapper to ease the use of com.sun.tools.javac.Main.
- * 	
+ * @hidden A wrapper to ease the use of com.sun.tools.javac.Main.
+ * 
  * @author liyang
  */
 public final class Javac {
 
+	String bootclasspath;
+
 	String classpath;
+
+	String encoding;
+
+	String extdirs;
 
 	String outputdir;
 
 	String sourcepath;
-
-	String bootclasspath;
-
-	String extdirs;
-
-	String encoding;
 
 	String target;
 
 	public Javac(String classpath, String outputdir) {
 		this.classpath = classpath;
 		this.outputdir = outputdir;
-	}
-
-	/**
-	 * Compile the given source files.
-	 * 
-	 * @param srcFiles
-	 * @return null if success; or compilation errors
-	 */
-	public String compile(String srcFiles[]) {
-		StringWriter err = new StringWriter();
-		PrintWriter errPrinter = new PrintWriter(err);
-
-		String args[] = buildJavacArgs(srcFiles);
-		int resultCode = com.sun.tools.javac.Main.compile(args, errPrinter);
-
-		errPrinter.close();
-		return (resultCode == 0) ? null : err.toString();
-	}
-
-	public String compile(File srcFiles[]) {
-		String paths[] = new String[srcFiles.length];
-		for (int i = 0; i < paths.length; i++) {
-			paths[i] = srcFiles[i].getAbsolutePath();
-		}
-		return compile(paths);
 	}
 
 	private String[] buildJavacArgs(String srcFiles[]) {
@@ -96,56 +70,81 @@ public final class Javac {
 		return (String[]) args.toArray(new String[args.size()]);
 	}
 
-	public String getBootclasspath() {
-		return bootclasspath;
+	public String compile(File srcFiles[]) {
+		String paths[] = new String[srcFiles.length];
+		for (int i = 0; i < paths.length; i++) {
+			paths[i] = srcFiles[i].getAbsolutePath();
+		}
+		return compile(paths);
 	}
 
-	public void setBootclasspath(String bootclasspath) {
-		this.bootclasspath = bootclasspath;
+	/**
+	 * Compile the given source files.
+	 * 
+	 * @param srcFiles
+	 * @return null if success; or compilation errors
+	 */
+	public String compile(String srcFiles[]) {
+		StringWriter err = new StringWriter();
+		PrintWriter errPrinter = new PrintWriter(err);
+
+		String args[] = buildJavacArgs(srcFiles);
+		int resultCode = com.sun.tools.javac.Main.compile(args, errPrinter);
+
+		errPrinter.close();
+		return (resultCode == 0) ? null : err.toString();
+	}
+
+	public String getBootclasspath() {
+		return bootclasspath;
 	}
 
 	public String getClasspath() {
 		return classpath;
 	}
 
-	public void setClasspath(String classpath) {
-		this.classpath = classpath;
-	}
-
 	public String getEncoding() {
 		return encoding;
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
 	}
 
 	public String getExtdirs() {
 		return extdirs;
 	}
 
-	public void setExtdirs(String extdirs) {
-		this.extdirs = extdirs;
-	}
-
 	public String getOutputdir() {
 		return outputdir;
-	}
-
-	public void setOutputdir(String outputdir) {
-		this.outputdir = outputdir;
 	}
 
 	public String getSourcepath() {
 		return sourcepath;
 	}
 
-	public void setSourcepath(String sourcepath) {
-		this.sourcepath = sourcepath;
-	}
-
 	public String getTarget() {
 		return target;
+	}
+
+	public void setBootclasspath(String bootclasspath) {
+		this.bootclasspath = bootclasspath;
+	}
+
+	public void setClasspath(String classpath) {
+		this.classpath = classpath;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	public void setExtdirs(String extdirs) {
+		this.extdirs = extdirs;
+	}
+
+	public void setOutputdir(String outputdir) {
+		this.outputdir = outputdir;
+	}
+
+	public void setSourcepath(String sourcepath) {
+		this.sourcepath = sourcepath;
 	}
 
 	public void setTarget(String target) {

@@ -5,14 +5,14 @@ import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
 public class Script {
-	protected Ngeen ng;
 	protected Entity holder;
-	
-	public void onInit(){
-		Debugger.log("onInit()");		
+	protected Ngeen ng;
+
+	public void onInit() {
+		Debugger.log("onInit()");
 	}
-	
-	public void onUpdate(float delta){
+
+	public void onUpdate(float delta) {
 		Debugger.log("onUpdate(): " + delta);
 	}
 }

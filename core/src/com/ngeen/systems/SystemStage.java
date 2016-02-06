@@ -12,10 +12,10 @@ import com.ngeen.engine.TypeObserver;
 import com.ngeen.entity.Entity;
 
 public class SystemStage extends SystemBase implements TypeObserver {
-	private List<ComponentBase> _ChangedComponent;
 	private List<ComponentBase> _AddedComponent;
-	private List<ComponentBase> _RemovedComponent;
+	private List<ComponentBase> _ChangedComponent;
 	private final ComponentFactory _ComponentBuilder;
+	private List<ComponentBase> _RemovedComponent;
 	private final UISolver _UISolver = new UISolver();
 
 	public SystemStage(Ngeen ng, SystemConfiguration conf, ComponentFactory _ComponentBuilder) {
@@ -29,19 +29,8 @@ public class SystemStage extends SystemBase implements TypeObserver {
 	}
 
 	@Override
-	public void onUpdate(Entity ent) {
-		ComponentUIStage stage = ent.getComponent(ComponentUIStage.class).act();
-		stage.act();
-	}
-	
-	@Override
 	public void Added(ComponentBase obj) {
 		_UISolver.Added(obj);
-	}
-
-	@Override
-	public void Removed(ComponentBase obj) {
-		_UISolver.Removed(obj);
 	}
 
 	@Override
@@ -50,8 +39,19 @@ public class SystemStage extends SystemBase implements TypeObserver {
 	}
 
 	@Override
+	public void onUpdate(Entity ent) {
+		ComponentUIStage stage = ent.getComponent(ComponentUIStage.class).act();
+		stage.act();
+	}
+
+	@Override
 	public void Parented(Entity ent, Entity parent) {
 		_UISolver.Parented(ent, parent);
+	}
+
+	@Override
+	public void Removed(ComponentBase obj) {
+		_UISolver.Removed(obj);
 	}
 
 	@Override

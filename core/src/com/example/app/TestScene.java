@@ -14,18 +14,11 @@ import com.ngeen.debug.TestSystemConfiguration;
 import com.ngeen.entity.Entity;
 import com.ngeen.scene.Scene;
 
-public class TestScene extends Scene{
+public class TestScene extends Scene {
 	Entity ent;
 
-	void startTestSuite() {
-		new TestSystemConfiguration(ng);
-		new TestAsset(ng);
-		new TestComponents(ng);
-		new TestEntity(ng);
-	}
-
 	void doStuff() {
-		//startTestSuite();
+		// startTestSuite();
 
 		ent = CreateObject("Hello");
 		ent.addComponent(ComponentPoint.class).setPosition(new Vector3(-100, 0, 0)).setScale(1);
@@ -33,21 +26,29 @@ public class TestScene extends Scene{
 		ent.addComponent(ComponentScript.class).setScript(ExampleScript.class);
 
 		Entity stage = CreateObject("Stage");
-		stage.addComponent(ComponentPoint.class).setPosition(new Vector3(300,0,0));
+		stage.addComponent(ComponentPoint.class).setPosition(new Vector3(300, 0, 0));
 		stage.addComponent(ComponentUIStage.class);
-		
+
 		Entity table = CreateObject("Table");
-		table.addComponent(ComponentPoint.class).setPosition(new Vector3(200,0,0));
+		table.addComponent(ComponentPoint.class).setPosition(new Vector3(200, 0, 0));
 		table.addComponent(ComponentUITable.class);
 		table.setParent("Stage");
-		
+
 		Entity widget = CreateObject("Widget");
-		widget.addComponent(ComponentPoint.class).setPosition(new Vector3(100,0,0));
+		widget.addComponent(ComponentPoint.class).setPosition(new Vector3(100, 0, 0));
 		widget.addComponent(ComponentUILabel.class);
 		widget.setParent("Table");
 	}
-	
+
+	@Override
 	public void onInit() {
-		//doStuff();
+		// doStuff();
+	}
+
+	void startTestSuite() {
+		new TestSystemConfiguration(ng);
+		new TestAsset(ng);
+		new TestComponents(ng);
+		new TestEntity(ng);
 	}
 }

@@ -3,55 +3,30 @@ package com.ngeen.component;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.asset.Asset;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-public class ComponentSprite extends ComponentBase{
-	private Sprite spr;
+public class ComponentSprite extends ComponentBase {
 	private String _TextureAsset;
-	
+	private Sprite spr;
+
 	public ComponentSprite(Ngeen ng, Entity ent) {
 		super(ng, ent);
 	}
-	
-	public ComponentSprite setTexture(Asset<Texture> tex){
-		_TextureAsset = tex.getFolder() + tex.getPath();
-		spr = new Sprite(tex.getData());
-		return this;
-	}
-	
-	public ComponentSprite setTexture(String tex){
-		_TextureAsset = tex;
-		spr = new Sprite((Texture) _Ng.Loader.getAsset(tex).getData());
-		return this;
-	}
-	
-	public Texture getTexture(Asset<Texture> tex){
-		return spr.getTexture();
-	}
-	
-	public Sprite getSprite(){
-		return spr;
-	}
-	
-	public void setColor(Color col){
-		spr.setColor(col);
-	}
-	
-	public Color getColor(){
+
+	public Color getColor() {
 		return spr.getColor();
 	}
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component")
-				.attribute("_Type", _Type.getName())
-				.element("_TextureAsset").attribute("String", _TextureAsset).pop()
-		       .pop();
+	public Sprite getSprite() {
+		return spr;
+	}
+
+	public Texture getTexture(Asset<Texture> tex) {
+		return spr.getTexture();
 	}
 
 	@Override
@@ -59,5 +34,27 @@ public class ComponentSprite extends ComponentBase{
 		spr = new Sprite();
 		_TextureAsset = element.getChildByName("_TextureAsset").get("String");
 		setTexture(_TextureAsset);
+	}
+
+	@Override
+	protected void Save(XmlWriter element) throws Exception {
+		element.element("Component").attribute("_Type", _Type.getName()).element("_TextureAsset")
+				.attribute("String", _TextureAsset).pop().pop();
+	}
+
+	public void setColor(Color col) {
+		spr.setColor(col);
+	}
+
+	public ComponentSprite setTexture(Asset<Texture> tex) {
+		_TextureAsset = tex.getFolder() + tex.getPath();
+		spr = new Sprite(tex.getData());
+		return this;
+	}
+
+	public ComponentSprite setTexture(String tex) {
+		_TextureAsset = tex;
+		spr = new Sprite((Texture) _Ng.Loader.getAsset(tex).getData());
+		return this;
 	}
 }

@@ -4,13 +4,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.ngeen.component.ComponentPoint;
 import com.ngeen.component.Script;
-import com.ngeen.debug.Debugger;
-import com.ngeen.engine.EngineInfo;
 import com.ngeen.entity.Entity;
 
 public class Test2 extends Script {
-	ComponentPoint point;
 	Vector2 center = new Vector2();
+	ComponentPoint point;
 	float spd;
 
 	@Override
@@ -22,7 +20,7 @@ public class Test2 extends Script {
 	@Override
 	public void onUpdate(float delta) {
 		Entity parent = holder.getParent();
-		
+
 		if (parent != null) {
 			Vector3 cnt = parent.getComponent(ComponentPoint.class).getPosition();
 			center = new Vector2(cnt.x, cnt.y);
@@ -36,4 +34,3 @@ public class Test2 extends Script {
 		point.setPosition(pct);
 	}
 }
-

@@ -12,16 +12,39 @@ import com.ngeen.engine.EngineInfo;
 
 public class SystemConfiguration {
 	private Set<Class<?>> _All;
-	private Set<Class<?>> _Or;
-	private boolean _Unset = true;
-
 	private List<BitSet> _Configuration = new ArrayList<BitSet>();
+	private Set<Class<?>> _Or;
+
+	private boolean _Unset = true;
 
 	public SystemConfiguration() {
 	}
 
 	public SystemConfiguration(Set<Class<?>> All) {
 		this._All = All;
+	}
+
+	public void addClass(Class<?>... cls) {
+		_All.addAll(Arrays.asList(cls));
+	}
+
+	public SystemConfiguration all(Class<?>... cls) {
+		_Unset = false;
+		_All = new TreeSet<Class<?>>(new Comparator<Class<?>>() {
+
+			@Override
+			public int compare(Class<?> o1, Class<?> o2) {
+				if (o1.hashCode() > o2.hashCode())
+					return 1;
+
+				if (o1.hashCode() < o2.hashCode())
+					return -1;
+				return 0;
+			}
+		});
+		_All.addAll(Arrays.asList(cls));
+		configure();
+		return this;
 	}
 
 	private void configure() {
@@ -44,23 +67,19 @@ public class SystemConfiguration {
 		}
 	}
 
-	public SystemConfiguration all(Class<?>... cls) {
-		_Unset = false;
-		_All = new TreeSet<Class<?>>(new Comparator<Class<?>>() {
+	public boolean equals(Set<Class<?>> obj) {
+		return _All.equals(obj);
+	}
 
-			@Override
-			public int compare(Class<?> o1, Class<?> o2) {
-				if (o1.hashCode() > o2.hashCode())
-					return 1;
+	public boolean equals(SystemConfiguration obj) {
+		return _All.equals(obj.getConfiguration());
+	}
 
-				if (o1.hashCode() < o2.hashCode())
-					return -1;
-				return 0;
-			}
-		});
-		_All.addAll(Arrays.asList(cls));
-		configure();
-		return this;
+	public final List<BitSet> getConfiguration() {
+		if (_Unset) {
+			return null;
+		}
+		return _Configuration;
 	}
 
 	public SystemConfiguration or(Class<?>... cls) {
@@ -80,25 +99,6 @@ public class SystemConfiguration {
 		_Or.addAll(Arrays.asList(cls));
 		configure();
 		return this;
-	}
-
-	public final List<BitSet> getConfiguration() {
-		if (_Unset) {
-			return null;
-		}
-		return _Configuration;
-	}
-
-	public boolean equals(SystemConfiguration obj) {
-		return _All.equals(obj.getConfiguration());
-	}
-
-	public boolean equals(Set<Class<?>> obj) {
-		return _All.equals(obj);
-	}
-
-	public void addClass(Class<?>... cls) {
-		_All.addAll(Arrays.asList(cls));
 	}
 
 	public void removeClass(Class<?>... cls) {

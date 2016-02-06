@@ -1,24 +1,15 @@
 package com.ngeen.systems;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 
-import org.omg.CosNaming._NamingContextExtStub;
-import org.w3c.dom.css.Rect;
-
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -28,9 +19,8 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.utils.Align;
-import com.ngeen.component.*;
-import com.ngeen.debug.Debugger;
+import com.ngeen.component.ComponentCamera;
+import com.ngeen.component.ComponentPoint;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
@@ -41,18 +31,10 @@ import com.ngeen.entity.Entity;
  *
  */
 public class SystemOverlay extends SystemBase implements GestureListener, InputProcessor {
-	private boolean reload;
-	private ShapeRenderer _ShapeRenderer;
 	public static float _X1;
-	public static float _Y1;
 	public static float _X2;
+	public static float _Y1;
 	public static float _Y2;
-	private BoundingBox _Selection = new BoundingBox();
-	private Matrix4 _Comb;
-	private int _ModifyType = 0;
-	private boolean _DeleteSelected = false, _SelectAll = false, _WriteMode = false, _Shift = false, _Ctrl, _Alt;
-	private String _EntityName = "null";
-	private SpriteBatch _SpriteBatch;
 	private Set<Entity> _AllEntities = new TreeSet<Entity>(new Comparator<Entity>() {
 
 		@Override
@@ -60,6 +42,11 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 			return Integer.signum(o1.hashCode() - o2.hashCode());
 		}
 	});
+	private Matrix4 _Comb;
+	private boolean _DeleteSelected = false, _SelectAll = false, _WriteMode = false, _Shift = false, _Ctrl, _Alt;
+	private String _EntityName = "null";
+	private int _ModifyType = 0;
+	private OverlaySelector _OverlaySelector;
 	private Set<Entity> _Selected = new TreeSet<Entity>(new Comparator<Entity>() {
 
 		@Override
@@ -68,7 +55,10 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		}
 	});
 	private boolean _Selecting = false;
-	private OverlaySelector _OverlaySelector;
+	private BoundingBox _Selection = new BoundingBox();
+	private ShapeRenderer _ShapeRenderer;
+	private SpriteBatch _SpriteBatch;
+	private boolean reload;
 
 	@SuppressWarnings("unchecked")
 	public SystemOverlay(Ngeen ng, SystemConfiguration conf, SpriteBatch batch) {
@@ -94,46 +84,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 						EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
 	}
 
-	private void drawSelection() {
-		Entity ent = _Ng.EntityBuilder.getByName("~UICAMERA");
-		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
-		Matrix4 comb = cam.Camera.combined;
-		_ShapeRenderer.setProjectionMatrix(comb);
-		_ShapeRenderer.rect(_X1, EngineInfo.ScreenHeight - _Y1, _X2 - _X1, -_Y2 + _Y1);
-	}
-
-	private void MoveAll() {
-		for (Entity ent : _Selected) {
-			if (ent.getParent() != null && _Selected.contains(ent.getParent()))
-				continue;
-			float deltaX = Gdx.input.getDeltaX(), deltaY = Gdx.input.getDeltaY();
-			Vector3 modif = new Vector3(deltaX, deltaY, 0);
-			modif.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(
-					EngineInfo.Width / EngineInfo.ScreenWidth, EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
-			modif.y *= -1;
-			switch (_ModifyType) {
-			case 1:
-				Vector3 pos = new Vector3(ent.getComponent(ComponentPoint.class).getPosition());
-				pos.add(modif);
-				ent.getComponent(ComponentPoint.class).setPosition(pos);
-				break;
-			case 2:
-				Vector3 rot = new Vector3(ent.getComponent(ComponentPoint.class).getRotation());
-				rot.add(0, 0, (deltaX - deltaY));
-				ent.getComponent(ComponentPoint.class).setRotation(rot);
-				break;
-			case 3:
-				Vector3 sc = new Vector3(ent.getComponent(ComponentPoint.class).getScale());
-				modif.y *= -1;
-				sc.add(modif.scl(1 / 100.0f));
-				ent.getComponent(ComponentPoint.class).setScale(sc);
-				break;
-			}
-		}
-		_X1 = _X2;
-		_Y1 = _Y2;
-	}
-
 	void DeleteAll() {
 		for (Entity ent : _Selected) {
 			ent.remove();
@@ -142,73 +92,24 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		_DeleteSelected = false;
 	}
 
-	void SelectAll() {
-		_Selected.clear();
-		for (Entity ent : _Ng.EntityBuilder.getEntities()) {
-			if (ent.hasComponent(ComponentPoint.class) && !ent.hasComponent(ComponentCamera.class))
-				_Selected.add(ent);
-		}
-		_SelectAll = false;
+	private void drawSelection() {
+		Entity ent = _Ng.EntityBuilder.getByName("~UICAMERA");
+		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
+		Matrix4 comb = cam.Camera.combined;
+		_ShapeRenderer.setProjectionMatrix(comb);
+		_ShapeRenderer.rect(_X1, EngineInfo.ScreenHeight - _Y1, _X2 - _X1, -_Y2 + _Y1);
 	}
 
 	@Override
-	public void onBeforeUpdate() {
-		if (_SelectAll) {
-			SelectAll();
-		}
-		if (_DeleteSelected) {
-			DeleteAll();
-		}
-		_Comb = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class).Camera.combined;
-		_ShapeRenderer.begin(ShapeType.Line);
-		computeSelection();
-		if (_ModifyType != 0) {
-			MoveAll();
-			return;
-		}
-		if (_Selecting && !_Shift)
-			_Selected.clear();
-		drawSelection();
+	public boolean fling(float velocityX, float velocityY, int button) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
-	@Override
-	public void onUpdate(Entity ent) {
-		_AllEntities.add(ent);
-		if (_Selecting)
-			_OverlaySelector.Select(ent, _Selected, _Selection);
-
-		_OverlaySelector.Overlay(ent, _Comb, _Selected.contains(ent));
-	}
-
-	void resetState() {
-		reload = false;
-		_ModifyType = 0;
-		_DeleteSelected = false;
-		_SelectAll = false;
-		_WriteMode = false;
-		_EntityName = "null";
-	}
-
-	@Override
-	public void onAfterUpdate() {
-		_ShapeRenderer.end();
-
-		_SpriteBatch.begin();
-		_SpriteBatch.setProjectionMatrix(_Comb);
-		BitmapFont font = (BitmapFont) _Ng.Loader.getAsset("engine/fonts/impact.fnt").getData();
-		font.getData().setScale(0.2f);
-		// font.setColor(1, 1, 1, 0.5f);
-		for (Entity ent : _AllEntities) {
-			_SpriteBatch.setTransformMatrix(ent.getComponent(ComponentPoint.class).getMatrix());
-			font.draw((Batch) _SpriteBatch, ent.getName(), 0, 0);
-		}
-		_SpriteBatch.end();
-		_AllEntities.clear();
-
-		if (reload) {
-			resetState();
-			_Ng.XmlSave.Load();
-		}
+	public boolean isPrintableChar(char c) {
+		Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+		return (!Character.isISOControl(c)) && c != KeyEvent.CHAR_UNDEFINED && block != null
+				&& block != Character.UnicodeBlock.SPECIALS;
 	}
 
 	@Override
@@ -237,7 +138,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 			_DeleteSelected = true;
 		}
 		if (Input.Keys.F2 == keycode) {
-			if(_Selected.size() == 0){
+			if (_Selected.size() == 0) {
 				return false;
 			}
 			if (_WriteMode) {
@@ -284,6 +185,17 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	}
 
 	@Override
+	public boolean keyTyped(char character) {
+		if (_WriteMode) {
+			if (isPrintableChar(character)) {
+				_EntityName += character;
+				_Selected.iterator().next().setName(_EntityName);
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public boolean keyUp(int keycode) {
 		if (Input.Keys.SHIFT_LEFT == keycode || Input.Keys.SHIFT_RIGHT == keycode) {
 			_Shift = false;
@@ -297,20 +209,157 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		return false;
 	}
 
-	public boolean isPrintableChar(char c) {
-		Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
-		return (!Character.isISOControl(c)) && c != KeyEvent.CHAR_UNDEFINED && block != null
-				&& block != Character.UnicodeBlock.SPECIALS;
+	@Override
+	public boolean longPress(float x, float y) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public boolean keyTyped(char character) {
-		if (_WriteMode) {
-			if (isPrintableChar(character)) {
-				_EntityName += character;
-				_Selected.iterator().next().setName(_EntityName);
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	private void MoveAll() {
+		for (Entity ent : _Selected) {
+			if (ent.getParent() != null && _Selected.contains(ent.getParent()))
+				continue;
+			float deltaX = Gdx.input.getDeltaX(), deltaY = Gdx.input.getDeltaY();
+			Vector3 modif = new Vector3(deltaX, deltaY, 0);
+			modif.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(
+					EngineInfo.Width / EngineInfo.ScreenWidth, EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
+			modif.y *= -1;
+			switch (_ModifyType) {
+			case 1:
+				Vector3 pos = new Vector3(ent.getComponent(ComponentPoint.class).getPosition());
+				pos.add(modif);
+				ent.getComponent(ComponentPoint.class).setPosition(pos);
+				break;
+			case 2:
+				Vector3 rot = new Vector3(ent.getComponent(ComponentPoint.class).getRotation());
+				rot.add(0, 0, (deltaX - deltaY));
+				ent.getComponent(ComponentPoint.class).setRotation(rot);
+				break;
+			case 3:
+				Vector3 sc = new Vector3(ent.getComponent(ComponentPoint.class).getScale());
+				modif.y *= -1;
+				sc.add(modif.scl(1 / 100.0f));
+				ent.getComponent(ComponentPoint.class).setScale(sc);
+				break;
 			}
 		}
+		_X1 = _X2;
+		_Y1 = _Y2;
+	}
+
+	@Override
+	public void onAfterUpdate() {
+		_ShapeRenderer.end();
+
+		_SpriteBatch.begin();
+		_SpriteBatch.setProjectionMatrix(_Comb);
+		BitmapFont font = (BitmapFont) _Ng.Loader.getAsset("engine/fonts/impact.fnt").getData();
+		font.getData().setScale(0.2f);
+		// font.setColor(1, 1, 1, 0.5f);
+		for (Entity ent : _AllEntities) {
+			_SpriteBatch.setTransformMatrix(ent.getComponent(ComponentPoint.class).getMatrix());
+			font.draw(_SpriteBatch, ent.getName(), 0, 0);
+		}
+		_SpriteBatch.end();
+		_AllEntities.clear();
+
+		if (reload) {
+			resetState();
+			_Ng.XmlSave.Load();
+		}
+	}
+
+	@Override
+	public void onBeforeUpdate() {
+		if (_SelectAll) {
+			SelectAll();
+		}
+		if (_DeleteSelected) {
+			DeleteAll();
+		}
+		_Comb = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class).Camera.combined;
+		_ShapeRenderer.begin(ShapeType.Line);
+		computeSelection();
+		if (_ModifyType != 0) {
+			MoveAll();
+			return;
+		}
+		if (_Selecting && !_Shift)
+			_Selected.clear();
+		drawSelection();
+	}
+
+	@Override
+	public void onUpdate(Entity ent) {
+		_AllEntities.add(ent);
+		if (_Selecting)
+			_OverlaySelector.Select(ent, _Selected, _Selection);
+
+		_OverlaySelector.Overlay(ent, _Comb, _Selected.contains(ent));
+	}
+
+	@Override
+	public boolean pan(float x, float y, float deltaX, float deltaY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean panStop(float x, float y, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	void resetState() {
+		reload = false;
+		_ModifyType = 0;
+		_DeleteSelected = false;
+		_SelectAll = false;
+		_WriteMode = false;
+		_EntityName = "null";
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		ComponentCamera cam = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class);
+		float ratio = cam.Camera.viewportWidth / cam.Camera.viewportHeight;
+		cam.Camera.viewportWidth += ratio * amount * 20;
+		cam.Camera.viewportHeight += amount * 20;
+		EngineInfo.Width = cam.Camera.viewportWidth;
+		EngineInfo.Height = cam.Camera.viewportHeight;
+		cam.Camera.update();
+		return false;
+	}
+
+	void SelectAll() {
+		_Selected.clear();
+		for (Entity ent : _Ng.EntityBuilder.getEntities()) {
+			if (ent.hasComponent(ComponentPoint.class) && !ent.hasComponent(ComponentCamera.class))
+				_Selected.add(ent);
+		}
+		_SelectAll = false;
+	}
+
+	@Override
+	public boolean tap(float x, float y, int count, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(float x, float y, int pointer, int button) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -330,6 +379,14 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	}
 
 	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		_Selecting = true;
+		_X2 = screenX;
+		_Y2 = screenY;
+		return false;
+	}
+
+	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		if (button != Input.Buttons.LEFT) {
 			return false;
@@ -343,74 +400,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	}
 
 	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		_Selecting = true;
-		_X2 = screenX;
-		_Y2 = screenY;
-		return false;
-	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(int amount) {
-		ComponentCamera cam = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class);
-		float ratio = cam.Camera.viewportWidth / cam.Camera.viewportHeight;
-		cam.Camera.viewportWidth += ratio * amount * 20;
-		cam.Camera.viewportHeight += amount * 20;
-		EngineInfo.Width = cam.Camera.viewportWidth;
-		EngineInfo.Height = cam.Camera.viewportHeight;
-		cam.Camera.update();
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(float x, float y, int pointer, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean tap(float x, float y, int count, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean longPress(float x, float y) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean fling(float velocityX, float velocityY, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean panStop(float x, float y, int pointer, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean zoom(float initialDistance, float distance) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
 		// TODO Auto-generated method stub
 		return false;
 	}

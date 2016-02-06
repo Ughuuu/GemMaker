@@ -12,8 +12,8 @@ import com.ngeen.entity.Entity;
  *
  */
 public class SystemPhysics extends SystemBase {
-	public World world = new World(EngineInfo.Gravity, true);
 	public Box2DDebugRenderer debugRenderer;
+	public World world = new World(EngineInfo.Gravity, true);
 
 	public SystemPhysics(Ngeen ng, SystemConfiguration conf) {
 		super(ng, conf);

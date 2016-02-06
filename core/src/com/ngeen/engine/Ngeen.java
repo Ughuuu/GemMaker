@@ -1,7 +1,6 @@
 package com.ngeen.engine;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.ngeen.asset.Asset;
@@ -9,7 +8,6 @@ import com.ngeen.asset.AssetFactory;
 import com.ngeen.asset.MeshFactory;
 import com.ngeen.component.ComponentFactory;
 import com.ngeen.component.XmlComponent;
-import com.ngeen.debug.Debugger;
 import com.ngeen.entity.CollidableFactory;
 import com.ngeen.entity.Entity;
 import com.ngeen.entity.EntityFactory;
@@ -17,8 +15,9 @@ import com.ngeen.entity.XmlEntity;
 import com.ngeen.scene.SceneFactory;
 
 /**
- * Main engine class. Links all elements and holds entities.
- * <img src="img/Ngeen.png"/>
+ * Main engine class. Links all elements and holds entities. <img src=
+ * "https://raw.githubusercontent.com/Ughuuu/ngeen/online/core/doc/img/Ngeen.png"/>
+ * 
  * @author Dragos
  * @opt hide com.badlogic.*
  * @opt shape node
@@ -30,20 +29,47 @@ import com.ngeen.scene.SceneFactory;
  * @composed 1 has * SystemFactory
  * @composed 1 has * XmlComponent
  */
-public abstract class Ngeen extends ApplicationAdapter{
-	public AssetFactory Loader;
-	public EntityFactory EntityBuilder;
-	public MeshFactory _MeshBuilder;
-	public XmlEntity XmlSave;
-	public UIFactory UIBuilder;
-	public CollidableFactory CollidableBuilder;
-
+public abstract class Ngeen extends ApplicationAdapter {
 	protected ComponentFactory _ComponentBuilder;
+	public MeshFactory _MeshBuilder;
+	protected SystemFactory _SystemBuilder;
+	private XmlComponent _XmlComponent;
+	public CollidableFactory CollidableBuilder;
+	public EntityFactory EntityBuilder;
+
+	public AssetFactory Loader;
 
 	protected SceneFactory SceneBuilder;
-	protected SystemFactory _SystemBuilder;
+	public UIFactory UIBuilder;
 
-	private XmlComponent _XmlComponent;
+	public XmlEntity XmlSave;
+
+	public void changeScene(String newScene) {
+		SceneBuilder.changeScene(newScene);
+	}
+
+	@Override
+	public void create() {
+		init();
+	}
+
+	public <T> Asset<T> getAsset(String name) {
+		return Loader.getAsset(name);
+	}
+
+	public Class<?> getCurrentScene() {
+		return _SystemBuilder._SceneSystem.getScene();
+	}
+
+	public Entity getEntity(int id) {
+		return EntityBuilder.getById(id);
+	}
+
+	public Entity getEntity(String name) {
+		return EntityBuilder.getByName(name);
+	}
+
+	public abstract Class<?> getEntry();
 
 	public void init() {
 		Loader = new AssetFactory(this);
@@ -72,21 +98,9 @@ public abstract class Ngeen extends ApplicationAdapter{
 		XmlSave = new XmlEntity(this, _XmlComponent);
 	}
 
-	public void update(float delta) {
-		if (EngineInfo.Debug && EntityBuilder.getByName("~CAMERA") == null) {
-			EngineInfo.makeBasicEntities(this);
-		}
-		_SystemBuilder.updateSystems();
-	}
-
-	public void restart() {
+	public void remove() {
 		EntityBuilder.clear();
-		EngineInfo.makeBasicEntities(this);
-	}
-
-	@Override
-	public void create() {
-		init();
+		_ComponentBuilder.clear();
 	}
 
 	@Override
@@ -103,30 +117,15 @@ public abstract class Ngeen extends ApplicationAdapter{
 		UIBuilder.resize(w, h);
 	}
 
-	public void remove() {
+	public void restart() {
 		EntityBuilder.clear();
-		_ComponentBuilder.clear();
+		EngineInfo.makeBasicEntities(this);
 	}
 
-	public Class<?> getCurrentScene() {
-		return _SystemBuilder._SceneSystem.getScene();
+	public void update(float delta) {
+		if (EngineInfo.Debug && EntityBuilder.getByName("~CAMERA") == null) {
+			EngineInfo.makeBasicEntities(this);
+		}
+		_SystemBuilder.updateSystems();
 	}
-
-	public void changeScene(String newScene) {
-		SceneBuilder.changeScene(newScene);
-	}
-
-	public Entity getEntity(String name) {
-		return EntityBuilder.getByName(name);
-	}
-
-	public Entity getEntity(int id) {
-		return EntityBuilder.getById(id);
-	}
-
-	public <T> Asset<T> getAsset(String name) {
-		return Loader.getAsset(name);
-	}
-	
-	public abstract Class<?> getEntry();
 }

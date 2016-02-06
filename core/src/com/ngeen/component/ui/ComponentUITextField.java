@@ -1,13 +1,10 @@
 package com.ngeen.component.ui;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
-import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
@@ -29,6 +26,10 @@ public class ComponentUITextField extends ComponentUIWidget {
 	}
 
 	@Override
+	protected void Load(Element element) throws Exception {
+	}
+
+	@Override
 	public ComponentUITextField remove() {
 		getOwner().removeComponent(ComponentUIWidget.class);
 		_Owner.removeComponent(this.getClass(), Id);
@@ -43,9 +44,5 @@ public class ComponentUITextField extends ComponentUIWidget {
 		}
 		_Saved = true;
 		element.element("Component").attribute("_Type", this.getClass().getName()).pop();
-	}
-
-	@Override
-	protected void Load(Element element) throws Exception {
 	}
 }

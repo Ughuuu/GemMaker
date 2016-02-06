@@ -11,27 +11,11 @@ import com.badlogic.gdx.utils.Array;
 
 /**
  * This is a loader for glsl shaders.
+ * 
  * @opt hide com.badlogic.*
  * @hidden
  */
 public class ShaderLoader extends SynchronousAssetLoader<ShaderProgram, ShaderLoader.ShaderParameter> {
-
-	private static final String VERTEX_SHADER_EXTENSION = ".vert";
-	private static final String FRAGMENT_SHADER_EXTENSION = ".frag";
-
-	public ShaderLoader(final FileHandleResolver resolver) {
-		super(resolver);
-	}
-
-	public ShaderProgram load(AssetManager assetManager, String fileName, FileHandle file, ShaderParameter parameter) {
-		String shaderName = fileName = (fileName).substring(0, (fileName).length() - 5);
-		final ShaderProgram shader = new ShaderProgram(resolve(shaderName + VERTEX_SHADER_EXTENSION),
-				resolve(shaderName + FRAGMENT_SHADER_EXTENSION));
-		if (shader.isCompiled() == false) {
-			throw new IllegalStateException(shader.getLog());
-		}
-		return shader;
-	}
 
 	/**
 	 * @opt hide com.badlogic.*
@@ -40,10 +24,28 @@ public class ShaderLoader extends SynchronousAssetLoader<ShaderProgram, ShaderLo
 	static public class ShaderParameter extends AssetLoaderParameters<ShaderProgram> {
 		public ShaderProgram prog;
 	}
+	private static final String FRAGMENT_SHADER_EXTENSION = ".frag";
+
+	private static final String VERTEX_SHADER_EXTENSION = ".vert";
+
+	public ShaderLoader(final FileHandleResolver resolver) {
+		super(resolver);
+	}
 
 	@Override
 	public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, ShaderParameter parameter) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public ShaderProgram load(AssetManager assetManager, String fileName, FileHandle file, ShaderParameter parameter) {
+		String shaderName = fileName = (fileName).substring(0, (fileName).length() - 5);
+		final ShaderProgram shader = new ShaderProgram(resolve(shaderName + VERTEX_SHADER_EXTENSION),
+				resolve(shaderName + FRAGMENT_SHADER_EXTENSION));
+		if (shader.isCompiled() == false) {
+			throw new IllegalStateException(shader.getLog());
+		}
+		return shader;
 	}
 }

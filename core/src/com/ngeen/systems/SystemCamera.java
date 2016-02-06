@@ -10,17 +10,17 @@ import com.ngeen.entity.Entity;
  * @author Dragos
  *
  */
-public class SystemCamera extends SystemBase{
+public class SystemCamera extends SystemBase {
 
 	public SystemCamera(Ngeen ng, SystemConfiguration conf) {
 		super(ng, conf);
 	}
-	
+
 	@Override
-	public void onUpdate(Entity ent){
+	public void onUpdate(Entity ent) {
 		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
 		ComponentPoint pos = ent.getComponent(ComponentPoint.class);
-		
+
 		cam.Camera.position.set(pos.getPosition());
 		cam.Camera.view.set(pos.getMatrix());
 		cam.Camera.update();

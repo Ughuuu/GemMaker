@@ -45,13 +45,18 @@ import com.ngeen.component.ui.ComponentUIWindow;
 import com.ngeen.entity.Entity;
 
 /**
- * @hidden
- * Information data about engine.
+ * @hidden Information data about engine.
  * 
  * @author Dragos
  *
  */
 public class EngineInfo {
+
+	public static boolean Applet = false;
+
+	public static Color BackgroundColor = new Color(.6f, .2f, .1f, 1);
+
+	public final static int ComponentCache = 100;
 
 	public final static Map<Class<?>, Integer> ComponentIndexMap = new HashMap<Class<?>, Integer>() {
 		{
@@ -97,6 +102,38 @@ public class EngineInfo {
 		}
 	};
 
+	/**
+	 * If set to true, program will output a lot of stuff and have debug renders
+	 * set up.
+	 */
+	public static final boolean Debug = true;
+
+	public final static int EntitiesCache = 1;
+	/**
+	 * Mathematical constant. Very small float number.
+	 */
+	public static final float Epsilon = 1e-10f;
+
+	/**
+	 * Frames per second.
+	 */
+	public static final float Fps = 60;
+
+	/**
+	 * Game Speed.
+	 */
+	public static float GameSpeed = 1;
+
+	/**
+	 * Gravity. To be used in Box2D.
+	 */
+	public static Vector2 Gravity = new Vector2(0, -1f);
+
+	/**
+	 * Screen Height.
+	 */
+	public static float Height = 600;
+
 	public final static Map<Integer, Class<?>> IndexComponentMap = new HashMap<Integer, Class<?>>() {
 		{
 			for (Map.Entry<Class<?>, Integer> entry : ComponentIndexMap.entrySet()) {
@@ -105,59 +142,10 @@ public class EngineInfo {
 		}
 	};
 
-	public final static int TotalComponents = ComponentIndexMap.size();
-
-	public final static int EntitiesCache = 1;
-
-	public final static int ComponentCache = 100;
-
-	public static Color BackgroundColor = new Color(.6f, .2f, .1f, 1);
 	/**
-	 * Screen Width.
+	 * MeterPerPixel. Used for Box2d. 1/PixelPerMeter.
 	 */
-	public static float Width = 1024;
-
-	/**
-	 * Screen Height.
-	 */
-	public static float Height = 600;
-
-	public static float ScreenWidth;
-
-	public static float ScreenHeight;
-
-	/**
-	 * Mathematical constant. Very small float number.
-	 */
-	public static final float Epsilon = 1e-10f;
-
-	/**
-	 * Value goes from 0 to 1, where 0 is mute and 1 is normal.
-	 */
-	public static float Volume = 1;
-
-	/**
-	 * If set to true, program will output a lot of stuff and have debug renders
-	 * set up.
-	 */
-	public static final boolean Debug = true;
-
-	public static boolean Applet = false;
-
-	/**
-	 * Gravity. To be used in Box2D.
-	 */
-	public static Vector2 Gravity = new Vector2(0, -1f);
-
-	/**
-	 * Game Speed.
-	 */
-	public static float GameSpeed = 1;
-
-	/**
-	 * Frames per second.
-	 */
-	public static final float Fps = 60;
+	public static final float MeterPerPixel = 1.f / 100;
 
 	/**
 	 * Milliseconds passed for each iteration.
@@ -169,10 +157,21 @@ public class EngineInfo {
 	 */
 	public static final float PixelPerMeter = 100;
 
+	public static float ScreenHeight;
+
+	public static float ScreenWidth;
+
+	public final static int TotalComponents = ComponentIndexMap.size();
+
 	/**
-	 * MeterPerPixel. Used for Box1d.
+	 * Value goes from 0 to 1, where 0 is mute and 1 is normal.
 	 */
-	public static final float MeterPerPixel = 1.f / PixelPerMeter;
+	public static float Volume = 1;
+
+	/**
+	 * Screen Width.
+	 */
+	public static float Width = 1024;
 
 	protected static void makeBasicEntities(Ngeen ng) {
 		ScreenWidth = Gdx.graphics.getWidth();
@@ -180,12 +179,12 @@ public class EngineInfo {
 
 		Width = Height / ScreenHeight * ScreenWidth;
 
-		if(ng == null || ng.EntityBuilder == null)
+		if (ng == null || ng.EntityBuilder == null)
 			return;
-		
-		if(ng.EntityBuilder.getByName("~CAMERA")!=null)
+
+		if (ng.EntityBuilder.getByName("~CAMERA") != null)
 			return;
-		
+
 		Entity camera = ng.EntityBuilder.makeEntity("~CAMERA");
 		Entity uiCamera = ng.EntityBuilder.makeEntity("~UICAMERA");
 

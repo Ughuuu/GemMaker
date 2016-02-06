@@ -1,10 +1,6 @@
 package com.ngeen.scene;
 
-import java.io.File;
-
-import com.ngeen.component.DynaCode;
 import com.ngeen.debug.Debugger;
-import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.systems.SystemScene;
 
@@ -22,20 +18,20 @@ public class SceneFactory {
 		this._SceneSystem = _SceneSystem;
 	}
 
+	public void changeScene(String name) {
+		_SceneSystem.setScene(makeScene(name));
+	}
+
 	public Scene makeScene(String name) {
 		try {
 			Class<?> scene = Class.forName(name);
 			Scene scn = (Scene) scene.newInstance();
-			((Scene) scn).addNgeen(_Ng);
-			((Scene) scn).addSceneFactory(this);
+			scn.addNgeen(_Ng);
+			scn.addSceneFactory(this);
 			return scn;
 		} catch (Exception e) {
 			Debugger.log(e.toString());
 		}
 		return null;
-	}
-
-	public void changeScene(String name) {
-		_SceneSystem.setScene(makeScene(name));
 	}
 }

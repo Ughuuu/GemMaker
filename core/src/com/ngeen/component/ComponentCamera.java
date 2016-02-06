@@ -1,15 +1,8 @@
 package com.ngeen.component;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.engine.EngineInfo;
@@ -24,12 +17,12 @@ import com.ngeen.entity.Entity;
  */
 public class ComponentCamera extends ComponentBase {
 
-	public Camera Camera;
 	private float _Fov = -1;
+	public Camera Camera;
 
-	public ComponentCamera(Ngeen ng, Entity ent) {		
+	public ComponentCamera(Ngeen ng, Entity ent) {
 		super(ng, ent);
-		createCamera(EngineInfo.Width,EngineInfo.Height);
+		createCamera(EngineInfo.Width, EngineInfo.Height);
 	}
 
 	/**
@@ -56,29 +49,23 @@ public class ComponentCamera extends ComponentBase {
 		Camera = new PerspectiveCamera(fov, width, height);
 		return this;
 	}
-	
-	@Override
-	protected void Save(XmlWriter element) throws Exception{
-		element.element("Component")
-				.attribute("_Type", _Type.getName())
-				.element("Fov").attribute("Float", _Fov)
-				.pop()
-				.element("ViewportWidth").attribute("Float", Camera.viewportWidth)
-				.pop()
-				.element("ViewportHeight").attribute("Float", Camera.viewportHeight)
-				.pop()
-		       .pop();
-	}
 
 	@Override
-	protected void Load(XmlReader.Element element) throws Exception{
+	protected void Load(XmlReader.Element element) throws Exception {
 		_Fov = element.getChildByName("Fov").getFloat("Float");
 		float Width = element.getChildByName("ViewportWidth").getFloat("Float");
 		float Height = element.getChildByName("ViewportHeight").getFloat("Float");
-		if(_Fov < 0){
-			createCamera(Width,Height);
-		}else{
-			createCamera(Width,Height, _Fov);			
+		if (_Fov < 0) {
+			createCamera(Width, Height);
+		} else {
+			createCamera(Width, Height, _Fov);
 		}
+	}
+
+	@Override
+	protected void Save(XmlWriter element) throws Exception {
+		element.element("Component").attribute("_Type", _Type.getName()).element("Fov").attribute("Float", _Fov).pop()
+				.element("ViewportWidth").attribute("Float", Camera.viewportWidth).pop().element("ViewportHeight")
+				.attribute("Float", Camera.viewportHeight).pop().pop();
 	}
 }

@@ -7,9 +7,9 @@ import com.ngeen.component.ComponentBase;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-public abstract class ComponentUIWidget extends ComponentBase{
+public abstract class ComponentUIWidget extends ComponentBase {
 	protected Widget _Widget;
-	
+
 	public ComponentUIWidget(Ngeen ng, Entity ent) {
 		super(ng, ent);
 		// TODO Auto-generated constructor stub
@@ -18,17 +18,17 @@ public abstract class ComponentUIWidget extends ComponentBase{
 	public void act(float act) {
 		_Widget.act(act);
 	}
-	
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	protected void Load(Element element) throws Exception {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	protected void Save(XmlWriter element) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 }

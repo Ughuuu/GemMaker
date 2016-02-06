@@ -11,27 +11,28 @@ import com.ngeen.engine.TypeObservable;
 import com.ngeen.entity.Entity;
 
 /**
- * <img src="img/ComponentFactory.png"/>
+ * <img src=
+ * "https://raw.githubusercontent.com/Ughuuu/ngeen/online/core/doc/img/ComponentFactory.png"/>
+ * 
  * @author Dragos
  * @opt shape node
  * @composed 1 has * ComponentBase
  */
-public class ComponentFactory extends TypeObservable<ComponentBase>{
-	private final Ngeen _Ng;
+public class ComponentFactory extends TypeObservable<ComponentBase> {
 	// list not array because can't instantiate array of generic:(
 	private Map<Class<?>, List<ComponentBase>> _ComponentCache;
 	private Map<Class<?>, Integer> _ComponentCacheIndex;
+	private final Ngeen _Ng;
 
 	public ComponentFactory(Ngeen ng) {
 		_Ng = ng;
 		_ComponentCache = new HashMap<Class<?>, List<ComponentBase>>();
 		_ComponentCacheIndex = new HashMap<Class<?>, Integer>();
 	}
-	
-	public void insertSuperComponent(ComponentBase component){
-		//don't track these, as they are already accounted for.
-		//but do track them
-		//NotifyAdd(component);
+
+	public void clear() {
+		_ComponentCache.clear();
+		_ComponentCacheIndex.clear();
 	}
 
 	public <T extends ComponentBase> T createComponent(Class<?> type, Entity ent) {
@@ -54,10 +55,16 @@ public class ComponentFactory extends TypeObservable<ComponentBase>{
 		return null;
 	}
 
+	public void insertSuperComponent(ComponentBase component) {
+		// don't track these, as they are already accounted for.
+		// but do track them
+		// NotifyAdd(component);
+	}
+
 	public <T extends ComponentBase> void removeComponent(Class<?> type, T component) {
 		Integer size = _ComponentCacheIndex.get(type);
 		List<ComponentBase> list = _ComponentCache.get(type);
-		//construct the cache
+		// construct the cache
 		if (list == null) {
 			list = new ArrayList<ComponentBase>(EngineInfo.ComponentCache);
 			for (int i = 0; i < EngineInfo.ComponentCache; i++) {
@@ -68,17 +75,12 @@ public class ComponentFactory extends TypeObservable<ComponentBase>{
 			_ComponentCacheIndex.put(type, size);
 			_ComponentCache.put(type, list);
 		}
-		//add in cache
+		// add in cache
 		if (size < EngineInfo.ComponentCache) {
 			_ComponentCacheIndex.put(type, size + 1);
 			list.set(size, component);
 		}
 		size++;
 		NotifyRemove(component);
-	}
-	
-	public void clear(){
-		_ComponentCache.clear();
-		_ComponentCacheIndex.clear();
 	}
 }
