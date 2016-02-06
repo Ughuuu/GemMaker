@@ -9,6 +9,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 
+/**
+ * This is a loader for glsl shaders.
+ * @opt hide com.badlogic.*
+ * @hidden
+ */
 public class ShaderLoader extends SynchronousAssetLoader<ShaderProgram, ShaderLoader.ShaderParameter> {
 
 	private static final String VERTEX_SHADER_EXTENSION = ".vert";
@@ -27,7 +32,11 @@ public class ShaderLoader extends SynchronousAssetLoader<ShaderProgram, ShaderLo
 		}
 		return shader;
 	}
-	
+
+	/**
+	 * @opt hide com.badlogic.*
+	 * @hidden
+	 */
 	static public class ShaderParameter extends AssetLoaderParameters<ShaderProgram> {
 		public ShaderProgram prog;
 	}

@@ -11,6 +11,11 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class CollidableFactory {
 	public static World world;
 	public static Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();

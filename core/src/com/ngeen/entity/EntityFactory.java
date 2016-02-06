@@ -25,6 +25,9 @@ import com.ngeen.engine.TypeObserver;
 import com.ngeen.systems.SystemBase;
 import com.ngeen.systems.SystemConfiguration;
 
+/**
+ * @composed 1 has * Entity
+ */
 public class EntityFactory extends TypeObservable<Entity>{
 	private Map<Integer, Entity> _EntityMap;
 	private Map<String, Integer> _EntityNameMap;
@@ -49,10 +52,14 @@ public class EntityFactory extends TypeObservable<Entity>{
 		_EmptySet = new TreeSet<Entity>();
 	}
 	
-	protected void Parented(Entity ent){
-		NotifyParented(ent);
+	protected void Parented(Entity ent, Entity parent){
+		NotifyParented(ent, parent);
 	}
 
+	public void Order(Entity entity, Entity entity2) {
+		NotifyReorder(entity, entity2);
+	}
+	
 	public Entity makeEntity(String name) {
 		if (_EntityNameMap.containsKey(name) == true) {
 			Debugger.log("Object already exists " + name + ".");

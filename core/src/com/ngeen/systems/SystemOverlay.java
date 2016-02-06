@@ -35,6 +35,11 @@ import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/**
+ * @composed 1 - 1 OverlaySelector
+ * @author Dragos
+ *
+ */
 public class SystemOverlay extends SystemBase implements GestureListener, InputProcessor {
 	private boolean reload;
 	private ShapeRenderer _ShapeRenderer;

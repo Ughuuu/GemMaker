@@ -15,12 +15,18 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.ngeen.asset.AssetFactory;
 import com.ngeen.component.ComponentScript;
 import com.ngeen.component.XmlComponent;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class XmlEntity {
 	private final XmlComponent _XmlComponent;
 	private final Ngeen _Ng;
@@ -35,6 +41,7 @@ public class XmlEntity {
 	public void Save() {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
+			scene = scene.replace('.', '/');
 			FileHandle handle = Gdx.files.local(path + scene + ".xml");
 			_SaveTime = (int) (TimeUtils.millis() / 1000);
 			handle.writeString(Dump(), false);
@@ -63,7 +70,7 @@ public class XmlEntity {
 			xml.pop();
 			return writer.toString();
 		} catch (Exception e) {
-			Debugger.log(e.toString());
+			e.printStackTrace();
 			// e.printStackTrace();
 		}
 		return "";
@@ -72,26 +79,34 @@ public class XmlEntity {
 	public void Load() {
 		try {
 			String scene = _Ng.getCurrentScene().getName();
+			scene = scene.replace('.', '/');
 			XmlReader xml = new XmlReader();
-			XmlReader.Element element = xml.parse(Gdx.files.local(path + scene + ".xml"));
+			XmlReader.Element element ;
+			if(EngineInfo.Debug && EngineInfo.Applet == false){
+				element = xml.parse(Gdx.files.local(path + scene + ".xml"));
+			}else{
+				FileHandle f = Gdx.files.internal(AssetFactory._PrePath + path + scene + ".xml");
+				System.out.println(f.file().getAbsolutePath());
+				element = xml.parse(f);
+			}
 			EngineInfo.Width = element.getFloat("Width");
 			EngineInfo.Height = element.getFloat("Height");
 			_Ng.restart();
 			for (Element el : element.getChildrenByName("Entity")) {
 				String name = el.get("Name");
+				if(!name.equals("~CAMERA") && !name.equals("~UICAMERA"))
 				_Ng.EntityBuilder.makeEntity(name).Load(el, _XmlComponent);
 			}
 			List<Entity> entities = _Ng.EntityBuilder.getEntities();
 			for (Entity ent : entities) {
-				ent.setParent(_Ng.getEntity(ent._ParentName));
+				ent.setParent(ent._ParentName);
 				if (ent.hasComponent(ComponentScript.class)) {
 					ent.getComponent(ComponentScript.class).setEnabled(true);
 				}
 			}
 			_Ng.resize((int) EngineInfo.ScreenWidth, (int) EngineInfo.ScreenHeight);
 		} catch (Exception e) {
-			Debugger.log(e.toString());
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -109,7 +124,7 @@ public class XmlEntity {
 			}
 			_SaveTime = time2;
 		} catch (Exception e) {
-			Debugger.log(e.toString());
+			//e.printStackTrace();
 		}
 	}
 }

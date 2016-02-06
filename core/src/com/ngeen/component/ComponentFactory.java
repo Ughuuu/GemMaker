@@ -10,6 +10,12 @@ import com.ngeen.engine.Ngeen;
 import com.ngeen.engine.TypeObservable;
 import com.ngeen.entity.Entity;
 
+/**
+ * <img src="img/ComponentFactory.png"/>
+ * @author Dragos
+ * @opt shape node
+ * @composed 1 has * ComponentBase
+ */
 public class ComponentFactory extends TypeObservable<ComponentBase>{
 	private final Ngeen _Ng;
 	// list not array because can't instantiate array of generic:(
@@ -25,7 +31,7 @@ public class ComponentFactory extends TypeObservable<ComponentBase>{
 	public void insertSuperComponent(ComponentBase component){
 		//don't track these, as they are already accounted for.
 		//but do track them
-		NotifyAdd(component);
+		//NotifyAdd(component);
 	}
 
 	public <T extends ComponentBase> T createComponent(Class<?> type, Entity ent) {

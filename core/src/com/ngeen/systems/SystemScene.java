@@ -12,12 +12,15 @@ import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 import com.ngeen.scene.Scene;
-import com.ngeen.scene.SceneInterface;
 
+/** 
+ * @composed 1 - 1 Scene
+ * @author Dragos
+ *
+ */
 public class SystemScene extends SystemBase implements GestureListener, InputProcessor {
-	private SceneInterface _SceneInterface;
 	private Scene _Scene;
-	private SceneInterface _RequestChange;
+	private Scene _RequestChange;
 	
 	public SystemScene(Ngeen ng, SystemConfiguration conf) {
 		super(ng, conf);
@@ -27,7 +30,7 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 		return _Scene.getClass();
 	}
 	
-	public void setScene(SceneInterface sc){
+	public void setScene(Scene sc){
 		if(sc!=null){
 			this._RequestChange = sc;
 		}
@@ -52,8 +55,7 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 		if(_RequestChange != null){
 			if(_Scene!=null)
 			_Scene.onExit();
-			_SceneInterface = _RequestChange;
-			_Scene = (Scene)_SceneInterface;
+			_Scene = _RequestChange;
 			_Ng.XmlSave.Load();
 			_RequestChange = null;
 			Debugger.log("Loaded scene " + _Scene);

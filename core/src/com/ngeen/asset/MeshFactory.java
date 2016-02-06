@@ -16,6 +16,12 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
 
+/**
+ * Not yet implemented.
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class MeshFactory {
 	private final Ngeen _Ng;
 	public MeshFactory(Ngeen ng){

@@ -23,6 +23,9 @@ import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 
+/**
+ * @composed 1 has * ComponentFactory
+ */
 public class Entity {
 	protected final Ngeen _Ng;
 	private final ComponentFactory _ComponentFactory;
@@ -216,7 +219,7 @@ public class Entity {
 		_ParentName = ent.Name;
 		Parent._Children.add(this);
 		this._Order = Parent._Children.size() - 1;
-		_Ng.EntityBuilder.Parented(this);
+		_Ng.EntityBuilder.Parented(this, ent);
 		return this;
 	}
 
@@ -252,6 +255,7 @@ public class Entity {
 
 	protected void setOrder(int newOrder) {
 		Collections.swap(_Children, _Order, newOrder);
+		_Ng.EntityBuilder.Order(this, _Children.get(_Order));
 		_Children.get(_Order)._Order = newOrder;
 		_Children.get(newOrder)._Order = _Order;
 	}
@@ -273,13 +277,15 @@ public class Entity {
 	}
 
 	public Entity detachParent() {
-		if (Parent != null)
+		if (Parent != null){
+			_Ng.EntityBuilder.Parented(this, Parent);
 			Parent._Children.remove(this);
-		Parent = null;
+		}
 		_ParentName = "";
 		_Order = -1;
 		if (Parent != null)
 			Parent.recountChildren();
+		Parent = null;
 		return this;
 	}
 
@@ -323,11 +329,15 @@ public class Entity {
 		_ParentName = element.get("Parent");
 		_Order = element.getInt("_Order");
 		for (Element el : element.getChildrenByName("Component")) {
+			try{
 			String type = el.get("_Type");
 
 			Class<?> cls = Class.forName(type);
 
 			_XmlComponent.Load(addComponentUnsafe(cls), el);
+			}catch(Exception exp){
+				Debugger.log(exp);
+			}
 		}
 	}
 

@@ -5,6 +5,11 @@ import com.ngeen.component.ComponentPoint;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class SystemCamera extends SystemBase{
 
 	public SystemCamera(Ngeen ng, SystemConfiguration conf) {

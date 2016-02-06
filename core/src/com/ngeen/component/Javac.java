@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 /**
+ * @hidden
  * A wrapper to ease the use of com.sun.tools.javac.Main.
  * 	
  * @author liyang

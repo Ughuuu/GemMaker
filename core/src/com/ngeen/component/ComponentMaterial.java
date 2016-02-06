@@ -8,8 +8,6 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.asset.Asset;
-import com.ngeen.asset.Pair;
-import com.ngeen.asset.ShaderData;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
@@ -44,13 +42,13 @@ public class ComponentMaterial extends ComponentBase {
 	protected void Save(XmlWriter element) throws Exception {
 		element.element("Component")
 		.attribute("_Type", _Type.getName())
-		.attribute("_ShaderName", _ShaderName)
+		.element("_ShaderName").attribute("String", _ShaderName).pop()
 		       .pop();
 	}
 
 	@Override
 	protected void Load(Element element) throws Exception {
-		_ShaderName = element.get("_ShaderName");
+		_ShaderName = element.getChildByName("_ShaderName").get("String");
 		setShader(_ShaderName);
 	}	
 }

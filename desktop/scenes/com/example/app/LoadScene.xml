@@ -1,0 +1,38 @@
+<com.example.app.LoadScene Width="1078.4211" Height="600.0">
+	<Entity Name="~CAMERA" Parent="null" _Order="-1">
+		<Component _Type="com.ngeen.component.ComponentPoint">
+			<Position.x Float="-30.000004"/>
+			<Position.y Float="41.8421"/>
+			<Position.z Float="0.0"/>
+			<Scale.x Float="1.0"/>
+			<Scale.y Float="1.0"/>
+			<Scale.z Float="1.0"/>
+			<Rotation.x Float="0.0"/>
+			<Rotation.y Float="0.0"/>
+			<Rotation.z Float="0.0"/>
+		</Component>
+		<Component _Type="com.ngeen.component.ComponentCamera">
+			<Fov Float="-1.0"/>
+			<ViewportWidth Float="1078.4211"/>
+			<ViewportHeight Float="600.0"/>
+		</Component>
+	</Entity>
+	<Entity Name="~UICAMERA" Parent="null" _Order="-1">
+		<Component _Type="com.ngeen.component.ComponentPoint">
+			<Position.x Float="683.0"/>
+			<Position.y Float="380.0"/>
+			<Position.z Float="0.0"/>
+			<Scale.x Float="1.0"/>
+			<Scale.y Float="1.0"/>
+			<Scale.z Float="1.0"/>
+			<Rotation.x Float="0.0"/>
+			<Rotation.y Float="0.0"/>
+			<Rotation.z Float="0.0"/>
+		</Component>
+		<Component _Type="com.ngeen.component.ComponentCamera">
+			<Fov Float="-1.0"/>
+			<ViewportWidth Float="1366.0"/>
+			<ViewportHeight Float="760.0"/>
+		</Component>
+	</Entity>
+</com.example.app.LoadScene>

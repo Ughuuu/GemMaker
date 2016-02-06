@@ -10,8 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ngeen.component.ComponentCamera;
-import com.ngeen.component.ComponentUIStage;
+import com.ngeen.component.ui.ComponentUIStage;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class UIFactory {
 	private final Ngeen _Ng;
 	private Viewport _Viewport;

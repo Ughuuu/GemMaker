@@ -7,6 +7,12 @@ import java.util.List;
 import com.ngeen.component.ComponentBase;
 import com.ngeen.entity.Entity;
 
+/**
+ * @composed n has * TypeObserver
+ * @author Dragos
+ *
+ * @param <T>
+ */
 public class TypeObservable<T> {
 	protected List<TypeObserver> _Observers = new ArrayList<TypeObserver>();
 	
@@ -32,9 +38,15 @@ public class TypeObservable<T> {
 		_Observers.addAll(Arrays.asList(entityObservers));
 	}
 	
-	protected void NotifyParented(Entity obj){
+	protected void NotifyParented(Entity obj, Entity parent){
 		for(TypeObserver observer : _Observers){
-			observer.Parented(obj);
+			observer.Parented(obj, parent);
+		}
+	}
+	
+	protected void NotifyReorder(Entity obj1, Entity obj2){
+		for(TypeObserver observer : _Observers){
+			observer.Reorder(obj1, obj2);
 		}
 	}
 }

@@ -9,6 +9,11 @@ import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/** 
+ * @composed 1 - 1 Script
+ * @author Dragos
+ *
+ */
 public class ComponentScript extends ComponentBase {
 	protected Script Program;
 	private String _ProgramName;
@@ -37,47 +42,54 @@ public class ComponentScript extends ComponentBase {
 
 	public ComponentScript setScript(String name) {
 		try {
-			if(EngineInfo.Debug){
+			if (EngineInfo.Debug) {
 				makeProxyScript(name);
-			}else{
-				Class<?> act = Class.forName(name);
-				makeScript(act);
+				Program.onInit();
+				return this;
 			}
+		} catch (Exception e) {
+			Debugger.log(e.getStackTrace());
+		}
+		try {
+			Class<?> act = Class.forName(name);
+			makeScript(act);
 			Program.onInit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return this;
 	}
-	
-	public ComponentScript setScript(Class<?> name){
+
+	public ComponentScript setScript(Class<?> name) {
 		try {
 			makeScript(name);
 			Program.onInit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return this;		
+		return this;
 	}
 
 	public Script getScript() {
 		return Program;
 	}
-	
-	public boolean isValid(){
-		if(Program!= null && Program.ng != null && Program.holder != null){
-			return true;			
+
+	public boolean isValid() {
+		if (Program != null && Program.ng != null && Program.holder != null) {
+			return true;
 		}
 		return false;
 	}
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName()).attribute("_ProgramName", _ProgramName).pop();
+		element.element("Component").attribute("_Type", _Type.getName()).element("_ProgramName")
+				.attribute("String", _ProgramName).pop().pop();
 	}
 
 	public ComponentScript setEnabled(boolean Enable) {
 		this.Enable = Enable;
+		if(Program != null)
 		Program.onInit();
 		return this;
 	}
@@ -85,17 +97,29 @@ public class ComponentScript extends ComponentBase {
 	@Override
 	protected void Load(Element element) throws Exception {
 		try {
-			_ProgramName = element.get("_ProgramName");
-			if(EngineInfo.Debug){
-				makeProxyScript(_ProgramName);
-			}else{
+			_ProgramName = element.getChildByName("_ProgramName").get("String");
+			boolean tryTwice = true;
+			try {
+				if (EngineInfo.Debug) {
+					makeProxyScript(_ProgramName);
+					tryTwice = false;
+				}
+			} catch (Exception e) {
+				Debugger.log(e.toString());
+			}
+			try {
+				if(tryTwice){
 				Class<?> act = Class.forName(_ProgramName);
 				makeScript(act);
+				}
+			} catch (Exception e) {
+				Debugger.log(e.toString());
+				//e.printStackTrace();
 			}
 			Enable = false;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Debugger.log(e.toString());
 		}
 	}
 }

@@ -61,17 +61,20 @@ public class ComponentCamera extends ComponentBase {
 	protected void Save(XmlWriter element) throws Exception{
 		element.element("Component")
 				.attribute("_Type", _Type.getName())
-				.attribute("Fov", _Fov)
-		       .attribute("ViewportWidth", Camera.viewportWidth)
-		       .attribute("ViewportHeight", Camera.viewportHeight)
+				.element("Fov").attribute("Float", _Fov)
+				.pop()
+				.element("ViewportWidth").attribute("Float", Camera.viewportWidth)
+				.pop()
+				.element("ViewportHeight").attribute("Float", Camera.viewportHeight)
+				.pop()
 		       .pop();
 	}
 
 	@Override
 	protected void Load(XmlReader.Element element) throws Exception{
-		_Fov = element.getFloat("Fov");
-		float Width = element.getFloat("ViewportWidth");
-		float Height = element.getFloat("ViewportHeight");
+		_Fov = element.getChildByName("Fov").getFloat("Float");
+		float Width = element.getChildByName("ViewportWidth").getFloat("Float");
+		float Height = element.getChildByName("ViewportHeight").getFloat("Float");
 		if(_Fov < 0){
 			createCamera(Width,Height);
 		}else{

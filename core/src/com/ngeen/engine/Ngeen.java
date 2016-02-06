@@ -1,6 +1,7 @@
 package com.ngeen.engine;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.ngeen.asset.Asset;
@@ -8,6 +9,8 @@ import com.ngeen.asset.AssetFactory;
 import com.ngeen.asset.MeshFactory;
 import com.ngeen.component.ComponentFactory;
 import com.ngeen.component.XmlComponent;
+import com.ngeen.debug.Debugger;
+import com.ngeen.entity.CollidableFactory;
 import com.ngeen.entity.Entity;
 import com.ngeen.entity.EntityFactory;
 import com.ngeen.entity.XmlEntity;
@@ -15,16 +18,25 @@ import com.ngeen.scene.SceneFactory;
 
 /**
  * Main engine class. Links all elements and holds entities.
- * 
+ * <img src="img/Ngeen.png"/>
  * @author Dragos
- *
+ * @opt hide com.badlogic.*
+ * @opt shape node
+ * @composed 1 has * AssetFactory
+ * @composed 1 has * EntityFactory
+ * @composed 1 has * MeshFactory
+ * @composed 1 has * ComponentFactory
+ * @composed 1 has * SceneFactory
+ * @composed 1 has * SystemFactory
+ * @composed 1 has * XmlComponent
  */
-public class Ngeen extends ApplicationAdapter {
+public abstract class Ngeen extends ApplicationAdapter{
 	public AssetFactory Loader;
 	public EntityFactory EntityBuilder;
 	public MeshFactory _MeshBuilder;
 	public XmlEntity XmlSave;
 	public UIFactory UIBuilder;
+	public CollidableFactory CollidableBuilder;
 
 	protected ComponentFactory _ComponentBuilder;
 
@@ -45,7 +57,7 @@ public class Ngeen extends ApplicationAdapter {
 		_SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);
 
 		SceneBuilder = new SceneFactory(this, _SystemBuilder._SceneSystem);
-		SceneBuilder.changeScene("LoadScene");
+		SceneBuilder.changeScene(getEntry().getName());
 
 		EngineInfo.makeBasicEntities(this);
 		EngineInfo.makeOptionalEntities(this);
@@ -75,7 +87,6 @@ public class Ngeen extends ApplicationAdapter {
 	@Override
 	public void create() {
 		init();
-		Loader.scoutFiles();
 	}
 
 	@Override
@@ -116,4 +127,6 @@ public class Ngeen extends ApplicationAdapter {
 	public <T> Asset<T> getAsset(String name) {
 		return Loader.getAsset(name);
 	}
+	
+	public abstract Class<?> getEntry();
 }

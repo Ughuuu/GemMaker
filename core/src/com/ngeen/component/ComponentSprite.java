@@ -50,14 +50,14 @@ public class ComponentSprite extends ComponentBase{
 	protected void Save(XmlWriter element) throws Exception {
 		element.element("Component")
 				.attribute("_Type", _Type.getName())
-				.attribute("_TextureAsset", _TextureAsset)
+				.element("_TextureAsset").attribute("String", _TextureAsset).pop()
 		       .pop();
 	}
 
 	@Override
 	protected void Load(Element element) throws Exception {
 		spr = new Sprite();
-		_TextureAsset = element.get("_TextureAsset");
+		_TextureAsset = element.getChildByName("_TextureAsset").get("String");
 		setTexture(_TextureAsset);
 	}
 }

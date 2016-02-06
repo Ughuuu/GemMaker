@@ -8,6 +8,11 @@ import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.systems.SystemScene;
 
+/**
+ * @composed 1 - 1 Scene
+ * @author Dragos
+ *
+ */
 public class SceneFactory {
 	private final Ngeen _Ng;
 	private final SystemScene _SceneSystem;
@@ -17,10 +22,10 @@ public class SceneFactory {
 		this._SceneSystem = _SceneSystem;
 	}
 
-	public SceneInterface makeScene(String name) {
+	public Scene makeScene(String name) {
 		try {
-			Class<?> scene = Class.forName("com.ngeen.scene." + name);
-			SceneInterface scn = (SceneInterface) scene.newInstance();
+			Class<?> scene = Class.forName(name);
+			Scene scn = (Scene) scene.newInstance();
 			((Scene) scn).addNgeen(_Ng);
 			((Scene) scn).addSceneFactory(this);
 			return scn;

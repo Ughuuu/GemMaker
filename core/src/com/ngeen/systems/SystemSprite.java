@@ -13,6 +13,11 @@ import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class SystemSprite extends SystemBase {
 	private Matrix4 _CameraView;
 	protected SpriteBatch _SpriteBatch;

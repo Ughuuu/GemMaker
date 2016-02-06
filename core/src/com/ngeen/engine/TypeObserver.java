@@ -11,5 +11,7 @@ public interface TypeObserver {
 	
 	public void ChangedComponent(ComponentBase obj);
 	
-	public void Parented(Entity ent);
+	public void Parented(Entity ent, Entity parent);
+
+	public void Reorder(Entity entity, Entity entity2);
 }

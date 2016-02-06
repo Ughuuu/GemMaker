@@ -4,6 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/**
+ * @author Dragos
+ *
+ */
 public class Scene {
 	protected Ngeen ng;
 	private SceneFactory _SceneFactory;

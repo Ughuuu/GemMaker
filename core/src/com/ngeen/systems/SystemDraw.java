@@ -12,6 +12,11 @@ import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class SystemDraw extends SystemBase {
 	Matrix4 cam;
 	

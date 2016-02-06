@@ -6,6 +6,11 @@ import com.ngeen.component.ComponentMaterial;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/** 
+ * @composed 1 - 1 SystemConfiguration
+ * @author Dragos
+ *
+ */
 public abstract class SystemBase {
 	protected boolean Enable;
 	protected SystemConfiguration _Config = null;

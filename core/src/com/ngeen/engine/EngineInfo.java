@@ -7,27 +7,45 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Tree;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.ngeen.component.*;
-import com.ngeen.component.ui.layout.ComponentUIContainer;
-import com.ngeen.component.ui.layout.ComponentUIHorizontalGroup;
-import com.ngeen.component.ui.layout.ComponentUIScrollPane;
-import com.ngeen.component.ui.layout.ComponentUISplitPane;
-import com.ngeen.component.ui.layout.ComponentUIStack;
-import com.ngeen.component.ui.layout.ComponentUITable;
-import com.ngeen.component.ui.layout.ComponentUITree;
-import com.ngeen.component.ui.layout.ComponentUIVerticalGroup;
-import com.ngeen.component.ui.widget.*;
+import com.ngeen.component.ComponentCamera;
+import com.ngeen.component.ComponentMaterial;
+import com.ngeen.component.ComponentMesh;
+import com.ngeen.component.ComponentPoint;
+import com.ngeen.component.ComponentRigid;
+import com.ngeen.component.ComponentScript;
+import com.ngeen.component.ComponentSprite;
+import com.ngeen.component.ComponentVariable;
+import com.ngeen.component.ui.ComponentUIButton;
+import com.ngeen.component.ui.ComponentUIButtonGroup;
+import com.ngeen.component.ui.ComponentUICheckBox;
+import com.ngeen.component.ui.ComponentUIContainer;
+import com.ngeen.component.ui.ComponentUIDialog;
+import com.ngeen.component.ui.ComponentUIHorizontalGroup;
+import com.ngeen.component.ui.ComponentUIImage;
+import com.ngeen.component.ui.ComponentUIImageButton;
+import com.ngeen.component.ui.ComponentUILabel;
+import com.ngeen.component.ui.ComponentUILayout;
+import com.ngeen.component.ui.ComponentUIList;
+import com.ngeen.component.ui.ComponentUIProgressBar;
+import com.ngeen.component.ui.ComponentUIScrollPane;
+import com.ngeen.component.ui.ComponentUISelectBox;
+import com.ngeen.component.ui.ComponentUISlider;
+import com.ngeen.component.ui.ComponentUISplitPane;
+import com.ngeen.component.ui.ComponentUIStack;
+import com.ngeen.component.ui.ComponentUIStage;
+import com.ngeen.component.ui.ComponentUITable;
+import com.ngeen.component.ui.ComponentUITextArea;
+import com.ngeen.component.ui.ComponentUITextButton;
+import com.ngeen.component.ui.ComponentUITextField;
+import com.ngeen.component.ui.ComponentUITouchpad;
+import com.ngeen.component.ui.ComponentUITree;
+import com.ngeen.component.ui.ComponentUIVerticalGroup;
+import com.ngeen.component.ui.ComponentUIWidget;
+import com.ngeen.component.ui.ComponentUIWindow;
 import com.ngeen.entity.Entity;
 
 /**
+ * @hidden
  * Information data about engine.
  * 
  * @author Dragos
@@ -37,7 +55,7 @@ public class EngineInfo {
 
 	public final static Map<Class<?>, Integer> ComponentIndexMap = new HashMap<Class<?>, Integer>() {
 		{
-			int i=0;
+			int i = 0;
 			put(ComponentCamera.class, i++);
 			put(ComponentMaterial.class, i++);
 			put(ComponentMesh.class, i++);
@@ -45,11 +63,11 @@ public class EngineInfo {
 			put(ComponentRigid.class, i++);
 			put(ComponentScript.class, i++);
 			put(ComponentSprite.class, i++);
-			put(ComponentUILayout.class, i++);
-			put(ComponentUIStage.class, i++);
-			put(ComponentUIWidget.class, i++);
 			put(ComponentVariable.class, i++);
-			
+
+			put(ComponentUIStage.class, i++);
+			put(ComponentUILayout.class, i++);
+			put(ComponentUIWidget.class, i++);
 			put(ComponentUIContainer.class, i++);
 			put(ComponentUIHorizontalGroup.class, i++);
 			put(ComponentUIScrollPane.class, i++);
@@ -75,7 +93,7 @@ public class EngineInfo {
 			put(ComponentUITextField.class, i++);
 			put(ComponentUITouchpad.class, i++);
 			put(ComponentUIWindow.class, i++);
-			
+
 		}
 	};
 
@@ -124,6 +142,8 @@ public class EngineInfo {
 	 */
 	public static final boolean Debug = true;
 
+	public static boolean Applet = false;
+
 	/**
 	 * Gravity. To be used in Box2D.
 	 */
@@ -160,6 +180,12 @@ public class EngineInfo {
 
 		Width = Height / ScreenHeight * ScreenWidth;
 
+		if(ng == null || ng.EntityBuilder == null)
+			return;
+		
+		if(ng.EntityBuilder.getByName("~CAMERA")!=null)
+			return;
+		
 		Entity camera = ng.EntityBuilder.makeEntity("~CAMERA");
 		Entity uiCamera = ng.EntityBuilder.makeEntity("~UICAMERA");
 
@@ -175,7 +201,7 @@ public class EngineInfo {
 	}
 
 	protected static void makeOptionalEntities(Ngeen ng) {
-		if(Debug){
+		if (Debug) {
 			ng.Loader.enqueFolder("engine/");
 			ng.Loader.addFolder("engine/");
 			ng.Loader.finish();

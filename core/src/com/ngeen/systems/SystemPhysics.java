@@ -6,6 +6,11 @@ import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class SystemPhysics extends SystemBase {
 	public World world = new World(EngineInfo.Gravity, true);
 	public Box2DDebugRenderer debugRenderer;

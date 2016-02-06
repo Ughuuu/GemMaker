@@ -21,7 +21,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 /**
- * 
+ * @hidden
  * @author gbenmansour
  *
  */
@@ -90,7 +90,7 @@ public final class DynaCode {
 			SourceDir src = new SourceDir(srcDir);
 			sourceDirs.add(src);
 
-			info("Add source dir " + srcDir);
+			//info("Add source dir " + srcDir);
 		}
 
 		return true;
@@ -117,7 +117,7 @@ public final class DynaCode {
 			String resource = className.replace('.', '/') + ".java";
 			SourceDir src = locateResource(resource);
 			if (src == null) {
-				throw new ClassNotFoundException("DynaCode class not found " + className);
+				throw new ClassNotFoundException("Class not found " + className);
 			}
 
 			synchronized (this) {
@@ -174,10 +174,8 @@ public final class DynaCode {
 	 * implementation. The dynamic implementation may change at run-time, and
 	 * the proxy will always delegates to the up-to-date implementation.
 	 * 
-	 * @param interfaceClass
-	 *            the access interface
-	 * @param implClassName
-	 *            the backend dynamic implementation
+	 * @param className the access interface
+	 * @param implClassName the backend dynamic implementation
 	 * @return
 	 * @throws RuntimeException
 	 *             if an instance cannot be created, because of class not found
@@ -207,7 +205,7 @@ public final class DynaCode {
 			this.srcDir = srcDir;
 
 			String subdir = srcDir.getAbsolutePath().replace(':', '_').replace('/', '_').replace('\\', '_');
-			this.binDir = new File(System.getProperty("java.io.tmpdir"), "dynacode/" + subdir);
+			this.binDir = new File(System.getProperty("java.io.tmpdir"), "scripts/" + subdir);
 			this.binDir.mkdirs();
 
 			// prepare compiler
@@ -280,7 +278,7 @@ public final class DynaCode {
 				lastModified = srcFile.lastModified();
 
 			} catch (ClassNotFoundException e) {
-				throw new RuntimeException("Failed to load DynaCode class " + srcFile.getAbsolutePath());
+				throw new RuntimeException("Failed to load class " + srcFile.getAbsolutePath());
 			}
 
 			info("Init " + clazz);
@@ -309,7 +307,7 @@ public final class DynaCode {
 			try {
 				return clz.newInstance();
 			} catch (Exception e) {
-				throw new RuntimeException("Failed to new instance of DynaCode class " + clz.getName(), e);
+				throw new RuntimeException("Failed to new instance of class " + clz.getName(), e);
 			}
 		}
 
@@ -364,7 +362,7 @@ public final class DynaCode {
 	 * Log a message.
 	 */
 	private static void info(String msg) {
-		System.out.println("[DynaCode] " + msg);
+		System.out.println(msg);
 	}
 
 }

@@ -20,11 +20,25 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ngeen.debug.Debugger;
+import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
-import com.ngeen.engine.TypeObservable;
-import com.ngeen.engine.TypeObserver;
-import com.ngeen.entity.Entity;
 
+/**
+ * This method has all the necessary assets to a game. It can hold
+ * types like _Types = { { "png", "jpg", "jpeg", "gif" }, { "pack", "atlas" }, { "fnt" },
+ *			{ "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { "vert" } }
+ *	In order to load all files in all folders located at the data folder, relative to your
+ * project classpath, use the function {@link #scoutFiles() scoutFiles}
+ * 
+ * Usualy, files are loaded when the scene loads, searching for the folder with the name
+ * of your scene.
+ * 
+ * If you do wish to load files on your own, use finish() to do synchronous loading(call it
+ * and the loading will be done when the function returns, or asynchronous loading with the
+ * function done() (call it multiple times, returns true if loading is finished).
+ * @composed 1 has * Asset
+ * @author Dragos
+ */
 public class AssetFactory{
 	private final Ngeen _Ng;
 
@@ -53,7 +67,7 @@ public class AssetFactory{
 
 	private Map<String, Integer> _AssetNameMap;
 
-	private String _PrePath;
+	public static String _PrePath;
 
 	/**
 	 * Map from Stage Name Folder(Ex. LoadStage, GameStage, etc.) in data to All
@@ -70,7 +84,7 @@ public class AssetFactory{
 		_AssetNameMap = new HashMap<String, Integer>();
 		_UpdateFolders = new ArrayList<String>();
 
-		if (Gdx.app.getType() == ApplicationType.Android) {
+		if (Gdx.app.getType() == ApplicationType.Android || EngineInfo.Applet == true) {
 			_PrePath = "data/";
 		} else {
 			_PrePath = "./bin/data/";
@@ -223,7 +237,7 @@ public class AssetFactory{
 	/**
 	 * Has to be called to keep the loading going.
 	 * 
-	 * @return
+	 * @return true if loading is finished.
 	 */
 	public boolean done() {
 		boolean loading = _Manager.update();

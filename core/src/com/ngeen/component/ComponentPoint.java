@@ -26,8 +26,8 @@ public class ComponentPoint extends ComponentBase {
 	}
 
 	private void Recalculate() {
-		comb = comb.idt().translate(Position).scl(Scale)
-				.rotate(new Quaternion().setEulerAngles(Rotation.x, Rotation.y, Rotation.z));
+		Quaternion q = new Quaternion().setEulerAngles(Rotation.x, Rotation.y, Rotation.z);
+		comb.set(Position.x, Position.y, Position.z, q.x, q.y, q.z, q.w, Scale.x, Scale.y, Scale.z);
 		Update = true;
 	}
 
@@ -92,23 +92,29 @@ public class ComponentPoint extends ComponentBase {
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName()).attribute("Position.x", Position.x)
-				.attribute("Position.y", Position.y).attribute("Position.z", Position.z).attribute("Scale.x", Scale.x)
-				.attribute("Scale.y", Scale.y).attribute("Scale.z", Scale.z).attribute("Rotation.x", Rotation.x)
-				.attribute("Rotation.y", Rotation.y).attribute("Rotation.z", Rotation.z).pop();
+		element.element("Component").attribute("_Type", _Type.getName())
+		.element("Position.x").attribute("Float", Position.x).pop()
+		.element("Position.y").attribute("Float", Position.y).pop()
+		.element("Position.z").attribute("Float", Position.z).pop()
+		.element("Scale.x").attribute("Float", Scale.x).pop()
+		.element("Scale.y").attribute("Float", Scale.y).pop()
+		.element("Scale.z").attribute("Float", Scale.z).pop()
+		.element("Rotation.x").attribute("Float", Rotation.x).pop()
+		.element("Rotation.y").attribute("Float", Rotation.y).pop()
+		.element("Rotation.z").attribute("Float", Rotation.z).pop().pop();
 	}
 
 	@Override
 	protected void Load(Element element) throws Exception {
-		Position.x = element.getFloat("Position.x");
-		Position.y = element.getFloat("Position.y");
-		Position.z = element.getFloat("Position.z");
-		Scale.x = element.getFloat("Scale.x");
-		Scale.y = element.getFloat("Scale.y");
-		Scale.z = element.getFloat("Scale.z");
-		Rotation.x = element.getFloat("Rotation.x");
-		Rotation.y = element.getFloat("Rotation.y");
-		Rotation.z = element.getFloat("Rotation.z");
+		Position.x = element.getChildByName("Position.x").getFloat("Float");
+		Position.y = element.getChildByName("Position.y").getFloat("Float");
+		Position.z = element.getChildByName("Position.z").getFloat("Float");
+		Scale.x = element.getChildByName("Scale.x").getFloat("Float");
+		Scale.y = element.getChildByName("Scale.y").getFloat("Float");
+		Scale.z = element.getChildByName("Scale.z").getFloat("Float");
+		Rotation.x = element.getChildByName("Rotation.x").getFloat("Float");
+		Rotation.y = element.getChildByName("Rotation.y").getFloat("Float");
+		Rotation.z = element.getChildByName("Rotation.z").getFloat("Float");
 		Recalculate();
 	}
 }

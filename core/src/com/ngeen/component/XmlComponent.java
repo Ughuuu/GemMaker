@@ -5,6 +5,11 @@ import java.io.StringWriter;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 
+/**
+ * @hidden
+ * @author Dragos
+ *
+ */
 public class XmlComponent {
 	public XmlComponent(){		
 	}

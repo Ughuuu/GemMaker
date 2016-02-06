@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="private" classpath="C:\Users\Dragos\.gradle\caches\modules-2\files-2.1\com.badlogicgames.gdx\gdx-ai\1.5.0\5f694a1d54a6e15884ac50b83b7927df771d69b0\gdx-ai-1.5.0.jar;E:\Workspace\ngeen\libs\tween-engine-api.jar;C:\Users\Dragos\.gradle\caches\modules-2\files-2.1\com.badlogicgames.gdx\gdx-box2d\1.6.2\b4406b97b35d7caf7111400ceebc8b92c8998168\gdx-box2d-1.6.2.jar;libs/tools.jar;E:\Workspace\ngeen\libs\tween-engine-api-sources.jar;C:\Users\Dragos\.gradle\caches\modules-2\files-2.1\com.badlogicgames.box2dlights\box2dlights\1.3\e829c3543ab5a6b3ff818615a8620024f6a14fe0\box2dlights-1.3.jar;C:\Users\Dragos\.gradle\caches\modules-2\files-2.1\com.badlogicgames.gdx\gdx\1.6.2\b70b1eb9da71076aa47ac8932b42358b00db84a0\gdx-1.6.2.jar;C:\Users\Dragos\.gradle\caches\modules-2\files-2.1\cglib\cglib-nodep\3.1\aa83efbd1aedc4f26bdf00e7ea78191483f2c9b3\cglib-nodep-3.1.jar" packagenames="com.example.app,com.ngeen.engine,com.ngeen.debug,com.ngeen.component,com.ngeen.systems,com.ngeen.entity,com.ngeen.scene,com.ngeen.asset,com.ngeen.component.ui" sourcepath="src">
+            <doclet name="org.umlgraph.doclet.UmlGraph" path="E:\Workspace\doxygen\lib\UmlGraph.jar;E:\Workspace\doxygen\lib\tools.jar"/>
+        </javadoc>
+    </target>
+</project>

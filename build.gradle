@@ -1,11 +1,13 @@
+
 buildscript {
     repositories {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenLocal()
+   		maven { url "http://localrepo:8081/artifactory/libs-release" }
         jcenter()
     }
     dependencies {
-    	classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:1.12.+'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:1.0.0'
         classpath 'org.robovm:robovm-gradle-plugin:1.0.0-beta-04'
@@ -18,7 +20,7 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = 'ngeen'
+        appName = 'example'
         gdxVersion = '1.6.2'
         roboVMVersion = '1.0.0-beta-04b'
         box2DLightsVersion = '1.3'
@@ -47,6 +49,46 @@ project(":desktop") {
     }
 }
 
+project(":android") {
+    apply plugin: "android"
+
+    configurations { natives }
+
+    dependencies {
+        compile project(":core")
+        compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
+        compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        compile fileTree(dir: '../libs', include: '*.jar')
+    }
+}
+
+project(":ios") {
+    apply plugin: "java"
+    apply plugin: "robovm"
+
+    configurations { natives }
+
+    dependencies {
+        compile project(":core")
+        compile "org.robovm:robovm-rt:${roboVMVersion}"
+        compile "org.robovm:robovm-cocoatouch:${roboVMVersion}"
+        compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+    }
+}
+
 project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
@@ -71,7 +113,6 @@ project(":html") {
 
 project(":core") {
     apply plugin: "java"
-    apply plugin: 'provided-base'
 
     configurations {
         provided
@@ -87,6 +128,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        testRuntime "cglib:cglib-nodep:3.1" // allows mocking of classes (in addition to interfaces)
         compile fileTree(dir: '../libs', include: '*.jar')
     }
 }
