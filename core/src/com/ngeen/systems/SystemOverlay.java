@@ -68,38 +68,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		_SpriteBatch = batch;
 	}
 
-	private void computeSelection() {
-		Entity ent = _Ng.EntityBuilder.getByName("~UICAMERA");
-		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
-
-		Entity ent2 = _Ng.EntityBuilder.getByName("~CAMERA");
-		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
-
-		Matrix4 comb = cam.Camera.combined;
-		_Selection = new BoundingBox(new Vector3(_X1, EngineInfo.ScreenHeight - _Y1, -10),
-				new Vector3(_X2, EngineInfo.ScreenHeight - _Y2, 10));
-		_Selection.mul(new Matrix4().translate(new Vector3(-cam.Camera.position.x, -cam.Camera.position.y, 0)));
-		_Selection
-				.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(EngineInfo.Width / EngineInfo.ScreenWidth,
-						EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
-	}
-
-	void DeleteAll() {
-		for (Entity ent : _Selected) {
-			ent.remove();
-		}
-		_Selected.clear();
-		_DeleteSelected = false;
-	}
-
-	private void drawSelection() {
-		Entity ent = _Ng.EntityBuilder.getByName("~UICAMERA");
-		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
-		Matrix4 comb = cam.Camera.combined;
-		_ShapeRenderer.setProjectionMatrix(comb);
-		_ShapeRenderer.rect(_X1, EngineInfo.ScreenHeight - _Y1, _X2 - _X1, -_Y2 + _Y1);
-	}
-
 	@Override
 	public boolean fling(float velocityX, float velocityY, int button) {
 		// TODO Auto-generated method stub
@@ -220,38 +188,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		return false;
 	}
 
-	private void MoveAll() {
-		for (Entity ent : _Selected) {
-			if (ent.getParent() != null && _Selected.contains(ent.getParent()))
-				continue;
-			float deltaX = Gdx.input.getDeltaX(), deltaY = Gdx.input.getDeltaY();
-			Vector3 modif = new Vector3(deltaX, deltaY, 0);
-			modif.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(
-					EngineInfo.Width / EngineInfo.ScreenWidth, EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
-			modif.y *= -1;
-			switch (_ModifyType) {
-			case 1:
-				Vector3 pos = new Vector3(ent.getComponent(ComponentPoint.class).getPosition());
-				pos.add(modif);
-				ent.getComponent(ComponentPoint.class).setPosition(pos);
-				break;
-			case 2:
-				Vector3 rot = new Vector3(ent.getComponent(ComponentPoint.class).getRotation());
-				rot.add(0, 0, (deltaX - deltaY));
-				ent.getComponent(ComponentPoint.class).setRotation(rot);
-				break;
-			case 3:
-				Vector3 sc = new Vector3(ent.getComponent(ComponentPoint.class).getScale());
-				modif.y *= -1;
-				sc.add(modif.scl(1 / 100.0f));
-				ent.getComponent(ComponentPoint.class).setScale(sc);
-				break;
-			}
-		}
-		_X1 = _X2;
-		_Y1 = _Y2;
-	}
-
 	@Override
 	public void onAfterUpdate() {
 		_ShapeRenderer.end();
@@ -321,15 +257,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		return false;
 	}
 
-	void resetState() {
-		reload = false;
-		_ModifyType = 0;
-		_DeleteSelected = false;
-		_SelectAll = false;
-		_WriteMode = false;
-		_EntityName = "null";
-	}
-
 	@Override
 	public boolean scrolled(int amount) {
 		ComponentCamera cam = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class);
@@ -340,15 +267,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		EngineInfo.Height = cam.Camera.viewportHeight;
 		cam.Camera.update();
 		return false;
-	}
-
-	void SelectAll() {
-		_Selected.clear();
-		for (Entity ent : _Ng.EntityBuilder.getEntities()) {
-			if (ent.hasComponent(ComponentPoint.class) && !ent.hasComponent(ComponentCamera.class))
-				_Selected.add(ent);
-		}
-		_SelectAll = false;
 	}
 
 	@Override
@@ -403,5 +321,87 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	public boolean zoom(float initialDistance, float distance) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	private void computeSelection() {
+		Entity ent = _Ng.EntityBuilder.getByName("~UICAMERA");
+		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
+
+		Entity ent2 = _Ng.EntityBuilder.getByName("~CAMERA");
+		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
+
+		Matrix4 comb = cam.Camera.combined;
+		_Selection = new BoundingBox(new Vector3(_X1, EngineInfo.ScreenHeight - _Y1, -10),
+				new Vector3(_X2, EngineInfo.ScreenHeight - _Y2, 10));
+		_Selection.mul(new Matrix4().translate(new Vector3(-cam.Camera.position.x, -cam.Camera.position.y, 0)));
+		_Selection
+				.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(EngineInfo.Width / EngineInfo.ScreenWidth,
+						EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
+	}
+
+	private void drawSelection() {
+		Entity ent = _Ng.EntityBuilder.getByName("~UICAMERA");
+		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
+		Matrix4 comb = cam.Camera.combined;
+		_ShapeRenderer.setProjectionMatrix(comb);
+		_ShapeRenderer.rect(_X1, EngineInfo.ScreenHeight - _Y1, _X2 - _X1, -_Y2 + _Y1);
+	}
+
+	private void MoveAll() {
+		for (Entity ent : _Selected) {
+			if (ent.getParent() != null && _Selected.contains(ent.getParent()))
+				continue;
+			float deltaX = Gdx.input.getDeltaX(), deltaY = Gdx.input.getDeltaY();
+			Vector3 modif = new Vector3(deltaX, deltaY, 0);
+			modif.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(
+					EngineInfo.Width / EngineInfo.ScreenWidth, EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
+			modif.y *= -1;
+			switch (_ModifyType) {
+			case 1:
+				Vector3 pos = new Vector3(ent.getComponent(ComponentPoint.class).getPosition());
+				pos.add(modif);
+				ent.getComponent(ComponentPoint.class).setPosition(pos);
+				break;
+			case 2:
+				Vector3 rot = new Vector3(ent.getComponent(ComponentPoint.class).getRotation());
+				rot.add(0, 0, (deltaX - deltaY));
+				ent.getComponent(ComponentPoint.class).setRotation(rot);
+				break;
+			case 3:
+				Vector3 sc = new Vector3(ent.getComponent(ComponentPoint.class).getScale());
+				modif.y *= -1;
+				sc.add(modif.scl(1 / 100.0f));
+				ent.getComponent(ComponentPoint.class).setScale(sc);
+				break;
+			}
+		}
+		_X1 = _X2;
+		_Y1 = _Y2;
+	}
+
+	void DeleteAll() {
+		for (Entity ent : _Selected) {
+			ent.remove();
+		}
+		_Selected.clear();
+		_DeleteSelected = false;
+	}
+
+	void resetState() {
+		reload = false;
+		_ModifyType = 0;
+		_DeleteSelected = false;
+		_SelectAll = false;
+		_WriteMode = false;
+		_EntityName = "null";
+	}
+
+	void SelectAll() {
+		_Selected.clear();
+		for (Entity ent : _Ng.EntityBuilder.getEntities()) {
+			if (ent.hasComponent(ComponentPoint.class) && !ent.hasComponent(ComponentCamera.class))
+				_Selected.add(ent);
+		}
+		_SelectAll = false;
 	}
 }

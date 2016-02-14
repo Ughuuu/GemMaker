@@ -24,16 +24,6 @@ public class OverlaySelector {
 		_Ng = ng;
 	}
 
-	boolean onCircle(Vector3 mouse, Vector3 point, float radius) {
-		Entity ent2 = _Ng.EntityBuilder.getByName("~CAMERA");
-		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
-		Vector3 proj = new Vector3(point).mul(cam2.Camera.view);
-		if (proj.sub(mouse).len() < radius) {
-			return true;
-		}
-		return false;
-	}
-
 	protected boolean OnEntity(Vector3 mouse, Entity ent) {
 		ComponentPoint point = ent.getComponent(ComponentPoint.class);
 		if (ent.hasComponent(ComponentSprite.class)) {
@@ -104,6 +94,16 @@ public class OverlaySelector {
 				_Selected.add(ent);
 			}
 		}
+	}
+
+	boolean onCircle(Vector3 mouse, Vector3 point, float radius) {
+		Entity ent2 = _Ng.EntityBuilder.getByName("~CAMERA");
+		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
+		Vector3 proj = new Vector3(point).mul(cam2.Camera.view);
+		if (proj.sub(mouse).len() < radius) {
+			return true;
+		}
+		return false;
 	}
 
 	boolean selectPoint(Entity ent, BoundingBox _Selection) {

@@ -27,10 +27,10 @@ public class Test extends Script {
 			Vector3 cnt = parent.getComponent(ComponentPoint.class).getPosition();
 			center = new Vector2(cnt.x, cnt.y);
 		}
-		/Vector3 pct = point.getPosition();
+		Vector3 pct = point.getPosition();
 		Vector2 v2 = new Vector2(pct.x, pct.y).sub(center);
 		float angle = v2.angle();
-		v2.setAngle(angle + 50 / v2.len());
+		v2.setAngle(angle + 100 / v2.len());
 		v2.add(center);
 		pct = new Vector3(v2.x, v2.y, 0);
 		point.setPosition(pct);

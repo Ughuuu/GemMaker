@@ -11,22 +11,13 @@ import com.ngeen.entity.Entity;
 
 public class ComponentUIImageButton extends ComponentUILayout {
 	private boolean _Saved = false;
+	private ImageButton _ImageButton;
 
 	public ComponentUIImageButton(Ngeen ng, Entity ent) {
 		super(ng, ent);
 		ImageButtonStyle style = new ImageButtonStyle();
-		Button but = new ImageButton(style);
-		_Layout = but;
+		_ImageButton = new ImageButton(style);
 		getOwner().addSuperComponent((ComponentUILayout) this);
-	}
-
-	@Override
-	public void act(float delta) {
-		_Layout.act(delta);
-	}
-
-	@Override
-	protected void Load(Element element) throws Exception {
 	}
 
 	@Override
@@ -37,6 +28,10 @@ public class ComponentUIImageButton extends ComponentUILayout {
 	}
 
 	@Override
+	protected void Load(Element element) throws Exception {
+	}
+
+	@Override
 	protected void Save(XmlWriter element) throws Exception {
 		if (_Saved) {
 			_Saved = false;
@@ -44,5 +39,29 @@ public class ComponentUIImageButton extends ComponentUILayout {
 		}
 		_Saved = true;
 		element.element("Component").attribute("_Type", this.getClass().getName()).pop();
+	}
+
+	@Override
+	protected WidgetGroup get() {
+		// TODO Auto-generated method stub
+		return _ImageButton;
+	}
+
+	@Override
+	protected void add(ComponentUIBase comp) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void del(ComponentUIBase comp) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void swap(ComponentUIBase a, ComponentUIBase b) {
+		// TODO Auto-generated method stub
+
 	}
 }

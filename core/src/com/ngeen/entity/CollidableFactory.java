@@ -18,8 +18,8 @@ import com.ngeen.engine.EngineInfo;
  */
 public class CollidableFactory {
 	public static Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-	private static float density = 0.5f, friction = 0.4f, restituition = 0.6f;
 	public static World world;
+	private static float density = 0.5f, friction = 0.4f, restituition = 0.6f;
 
 	public static void createShapeBox(Body body, float w, float h) {
 		PolygonShape shape = new PolygonShape();

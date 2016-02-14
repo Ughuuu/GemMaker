@@ -17,21 +17,14 @@ import com.ngeen.component.ui.ComponentUIStage;
  *
  */
 public class UIFactory {
-	protected final InputMultiplexer _InputMultiplexer = new InputMultiplexer();
 	private final Ngeen _Ng;
-	protected final SpriteBatch _SpriteBatch;
 	private Viewport _Viewport;
+	protected final InputMultiplexer _InputMultiplexer = new InputMultiplexer();
+	protected final SpriteBatch _SpriteBatch;
 
 	public UIFactory(Ngeen _Ng) {
 		this._Ng = _Ng;
 		_SpriteBatch = new SpriteBatch();
-	}
-
-	protected void createMultiplexer() {
-		Gdx.input.setInputProcessor(_InputMultiplexer);
-		_InputMultiplexer.addProcessor(new GestureDetector(_Ng._SystemBuilder._SceneSystem));
-		if (_Ng._SystemBuilder._OverlaySystem != null)
-			_InputMultiplexer.addProcessor(_Ng._SystemBuilder._OverlaySystem);
 	}
 
 	public void createStage(ComponentUIStage stage) {
@@ -40,6 +33,13 @@ public class UIFactory {
 			_Viewport = new ScreenViewport(cam);
 		}
 		stage.setStage(_Viewport, _SpriteBatch, _InputMultiplexer);
+	}
+
+	protected void createMultiplexer() {
+		Gdx.input.setInputProcessor(_InputMultiplexer);
+		_InputMultiplexer.addProcessor(new GestureDetector(_Ng._SystemBuilder._SceneSystem));
+		if (_Ng._SystemBuilder._OverlaySystem != null)
+			_InputMultiplexer.addProcessor(_Ng._SystemBuilder._OverlaySystem);
 	}
 
 	protected void resize(int w, int h) {

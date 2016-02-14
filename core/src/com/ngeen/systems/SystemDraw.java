@@ -25,11 +25,6 @@ public class SystemDraw extends SystemBase {
 		super(ng, conf);
 	}
 
-	private Matrix4 getModel(Entity ent) {
-		Matrix4 pos = ent.getComponent(ComponentPoint.class).getMatrix();
-		return pos;
-	}
-
 	@Override
 	public void onBeforeUpdate() {
 		Entity ent = _Ng.EntityBuilder.getByName("~CAMERA");
@@ -53,5 +48,10 @@ public class SystemDraw extends SystemBase {
 		prog.setUniformi("u_sampler0", 0);
 		mesh.bind(prog);
 		mesh.render(prog, GL20.GL_TRIANGLES);
+	}
+
+	private Matrix4 getModel(Entity ent) {
+		Matrix4 pos = ent.getComponent(ComponentPoint.class).getMatrix();
+		return pos;
 	}
 }

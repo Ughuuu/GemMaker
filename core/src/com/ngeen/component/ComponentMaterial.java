@@ -22,18 +22,6 @@ public class ComponentMaterial extends ComponentBase {
 		return _Shader.getData();
 	}
 
-	@Override
-	protected void Load(Element element) throws Exception {
-		_ShaderName = element.getChildByName("_ShaderName").get("String");
-		setShader(_ShaderName);
-	}
-
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName()).element("_ShaderName")
-				.attribute("String", _ShaderName).pop().pop();
-	}
-
 	public ComponentMaterial setShader(Asset<ShaderProgram> shader) {
 		_ShaderName = shader.getFolder() + shader.getPath();
 		_Shader = shader;
@@ -44,5 +32,17 @@ public class ComponentMaterial extends ComponentBase {
 		_ShaderName = shaderName;
 		_Shader = _Ng.Loader.getAsset(shaderName);
 		return this;
+	}
+
+	@Override
+	protected void Load(Element element) throws Exception {
+		_ShaderName = element.getChildByName("_ShaderName").get("String");
+		setShader(_ShaderName);
+	}
+
+	@Override
+	protected void Save(XmlWriter element) throws Exception {
+		element.element("Component").attribute("_Type", _Type.getName()).element("_ShaderName")
+				.attribute("String", _ShaderName).pop().pop();
 	}
 }

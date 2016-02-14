@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.component.ComponentBase;
 import com.ngeen.component.ComponentFactory;
 import com.ngeen.component.XmlComponent;
+import com.ngeen.component.ui.ComponentUIBase;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
@@ -29,8 +30,8 @@ public class Entity {
 	private final ComponentFactory _ComponentFactory;
 	private Map<Class<?>, Map<Integer, ComponentBase>> _ComponentMap;
 	private BitSet _Configuration = new BitSet(EngineInfo.TotalComponents);
-	protected final Ngeen _Ng;
 	private int _Order = -1;
+	protected final Ngeen _Ng;
 	protected String _ParentName = "null";
 	protected int Id;
 	protected String Name;
@@ -71,33 +72,7 @@ public class Entity {
 		return (T) component;
 	}
 
-	private ComponentBase addComponentUnsafe(Class<?> type) {
-		_Ng.EntityBuilder.treeRemoveObject(this);
-
-		if (_ComponentMap.containsKey(type)) {
-			_Ng.EntityBuilder.treeAddObject(this);
-			return _ComponentMap.get(type).entrySet().iterator().next().getValue();
-		}
-
-		ComponentBase component = _ComponentFactory.createComponent(type, this);
-
-		Map<Integer, ComponentBase> list = null;
-		if (_ComponentMap.containsKey(component.getClass()) == false) {
-			list = new HashMap<Integer, ComponentBase>();
-			_ComponentMap.put(component.getClass(), list);
-		} else {
-			list = _ComponentMap.get(component.getClass());
-		}
-		list.put(component.getId(), component);
-
-		_Configuration.set(EngineInfo.ComponentIndexMap.get(type));
-
-		_Ng.EntityBuilder.treeAddObject(this);
-
-		return component;
-	}
-
-	public <T extends ComponentBase> T addSuperComponent(ComponentBase component) {
+	protected <T extends ComponentBase> T addSuperComponent(ComponentBase component) {
 		Class<?> type = component.getClass().getSuperclass();
 		_Ng.EntityBuilder.treeRemoveObject(this);
 
@@ -149,14 +124,15 @@ public class Entity {
 
 	public Entity detachParent() {
 		if (Parent != null) {
-			_Ng.EntityBuilder.Parented(this, Parent);
 			Parent._Children.remove(this);
 		}
 		_ParentName = "";
 		_Order = -1;
 		if (Parent != null)
 			Parent.recountChildren();
+		Entity spare = Parent;
 		Parent = null;
+		_Ng.EntityBuilder.Parented(this, spare);
 		return this;
 	}
 
@@ -176,14 +152,6 @@ public class Entity {
 		if (componentMap == null)
 			return null;
 		return (T) componentMap.get(id);
-	}
-
-	protected List<ComponentBase> getComponents() {
-		List<ComponentBase> ret = new ArrayList<ComponentBase>();
-		for (Entry<Class<?>, Map<Integer, ComponentBase>> componentMap : _ComponentMap.entrySet()) {
-			ret.addAll(componentMap.getValue().values());
-		}
-		return ret;
 	}
 
 	public <T extends ComponentBase> List<T> getComponents(Class<T> type) {
@@ -213,13 +181,6 @@ public class Entity {
 		return ent;
 	}
 
-	private Entity getLastParentInternal() {
-		if (Parent == null) {
-			return this;
-		}
-		return Parent.getLastParentInternal();
-	}
-
 	public String getName() {
 		return Name;
 	}
@@ -238,34 +199,6 @@ public class Entity {
 
 	public boolean hasParent() {
 		return Parent != null;
-	}
-
-	protected void Load(Element element, XmlComponent _XmlComponent) throws Exception {
-		_ParentName = element.get("Parent");
-		_Order = element.getInt("_Order");
-		for (Element el : element.getChildrenByName("Component")) {
-			try {
-				String type = el.get("_Type");
-
-				Class<?> cls = Class.forName(type);
-
-				_XmlComponent.Load(addComponentUnsafe(cls), el);
-			} catch (Exception exp) {
-				Debugger.log(exp);
-			}
-		}
-	}
-
-	private void recountChildren() {
-		int prev = -1;
-		for (int i = 0, j = 0; i < _Children.size(); i++, j++) {
-			Entity ent = _Children.get(i);
-			int act = ent._Order;
-			if (act - prev != -1) {
-				ent._Order--;
-			}
-			prev = act;
-		}
 	}
 
 	public void remove() {
@@ -311,34 +244,18 @@ public class Entity {
 		_Ng.EntityBuilder.treeAddObject(this);
 	}
 
-	protected void reset(String name) {
-		Id = _Unique_id++;
-		this.Name = name;
-	}
-
-	protected void Save(XmlWriter element, XmlComponent _XmlComponent) throws Exception {
-		element.element("Entity").attribute("Name", Name).attribute("Parent", _ParentName).attribute("_Order", _Order);
-		for (Map.Entry<Class<?>, Map<Integer, ComponentBase>> ComponentsIndexMap : _ComponentMap.entrySet()) {
-			for (Map.Entry<Integer, ComponentBase> Components : ComponentsIndexMap.getValue().entrySet()) {
-				_XmlComponent.Save(Components.getValue(), element);
-			}
-		}
-		element.pop();
-	}
-
 	public Entity setName(String name) {
 		if (name.length() == 0) {
 			name = "~";
 		}
 		_Ng.EntityBuilder.setEntityName(this.Name, name);
+		List<ComponentBase> comps = getComponents();
+		for(ComponentBase comp : comps){
+			if(comp instanceof ComponentUIBase){
+				_ComponentFactory.changeName((ComponentUIBase)comp, name);
+			}
+		}
 		return this;
-	}
-
-	protected void setOrder(int newOrder) {
-		Collections.swap(_Children, _Order, newOrder);
-		_Ng.EntityBuilder.Order(this, _Children.get(_Order));
-		_Children.get(_Order)._Order = newOrder;
-		_Children.get(newOrder)._Order = _Order;
 	}
 
 	public Entity setParent(Entity ent) {
@@ -355,5 +272,99 @@ public class Entity {
 	public Entity setParent(String name) {
 		Entity ent = _Ng.EntityBuilder.getByName(name);
 		return setParent(ent);
+	}
+
+	private ComponentBase addComponentUnsafe(Class<?> type) {
+		_Ng.EntityBuilder.treeRemoveObject(this);
+
+		if (_ComponentMap.containsKey(type)) {
+			_Ng.EntityBuilder.treeAddObject(this);
+			return _ComponentMap.get(type).entrySet().iterator().next().getValue();
+		}
+
+		ComponentBase component = _ComponentFactory.createComponent(type, this);
+
+		Map<Integer, ComponentBase> list = null;
+		if (_ComponentMap.containsKey(component.getClass()) == false) {
+			list = new HashMap<Integer, ComponentBase>();
+			_ComponentMap.put(component.getClass(), list);
+		} else {
+			list = _ComponentMap.get(component.getClass());
+		}
+		list.put(component.getId(), component);
+
+		_Configuration.set(EngineInfo.ComponentIndexMap.get(type));
+
+		_Ng.EntityBuilder.treeAddObject(this);
+
+		return component;
+	}
+
+	private Entity getLastParentInternal() {
+		if (Parent == null) {
+			return this;
+		}
+		return Parent.getLastParentInternal();
+	}
+
+	private void recountChildren() {
+		int prev = -1;
+		for (int i = 0, j = 0; i < _Children.size(); i++, j++) {
+			Entity ent = _Children.get(i);
+			int act = ent._Order;
+			if (act - prev != -1) {
+				ent._Order--;
+			}
+			prev = act;
+		}
+	}
+
+	protected List<ComponentBase> getComponents() {
+		List<ComponentBase> ret = new ArrayList<ComponentBase>();
+		for (Entry<Class<?>, Map<Integer, ComponentBase>> componentMap : _ComponentMap.entrySet()) {
+			ret.addAll(componentMap.getValue().values());
+		}
+		return ret;
+	}
+
+	protected void Load(Element element, XmlComponent _XmlComponent) throws Exception {
+		_ParentName = element.get("Parent");
+		_Order = element.getInt("_Order");
+		for (Element el : element.getChildrenByName("Component")) {
+			try {
+				String type = el.get("_Type");
+
+				Class<?> cls = Class.forName(type);
+
+				_XmlComponent.Load(addComponentUnsafe(cls), el);
+			} catch (Exception exp) {
+				Debugger.log(exp);
+			}
+		}
+	}
+
+	protected void reset(String name) {
+		Id = _Unique_id++;
+		this.Name = name;
+	}
+
+	protected void Save(XmlWriter element, XmlComponent _XmlComponent) throws Exception {
+		element.element("Entity").attribute("Name", Name).attribute("Parent", _ParentName).attribute("_Order", _Order);
+		for (Map.Entry<Class<?>, Map<Integer, ComponentBase>> ComponentsIndexMap : _ComponentMap.entrySet()) {
+			for (Map.Entry<Integer, ComponentBase> Components : ComponentsIndexMap.getValue().entrySet()) {
+				_XmlComponent.Save(Components.getValue(), element);
+			}
+		}
+		element.pop();
+	}
+
+	protected void setOrder(int newOrder) {
+		//if the order is right, do nothing. Reduces number of operations.
+		if(_Order == newOrder)
+			return;
+		Collections.swap(_Children, _Order, newOrder);
+		_Ng.EntityBuilder.Order(this, _Children.get(_Order));
+		_Children.get(_Order)._Order = newOrder;
+		_Children.get(newOrder)._Order = _Order;
 	}
 }

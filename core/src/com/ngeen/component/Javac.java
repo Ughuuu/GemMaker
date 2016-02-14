@@ -31,45 +31,6 @@ public final class Javac {
 		this.outputdir = outputdir;
 	}
 
-	private String[] buildJavacArgs(String srcFiles[]) {
-		ArrayList args = new ArrayList();
-
-		if (classpath != null) {
-			args.add("-classpath");
-			args.add(classpath);
-		}
-		if (outputdir != null) {
-			args.add("-d");
-			args.add(outputdir);
-		}
-		if (sourcepath != null) {
-			args.add("-sourcepath");
-			args.add(sourcepath);
-		}
-		if (bootclasspath != null) {
-			args.add("-bootclasspath");
-			args.add(bootclasspath);
-		}
-		if (extdirs != null) {
-			args.add("-extdirs");
-			args.add(extdirs);
-		}
-		if (encoding != null) {
-			args.add("-encoding");
-			args.add(encoding);
-		}
-		if (target != null) {
-			args.add("-target");
-			args.add(target);
-		}
-
-		for (int i = 0; i < srcFiles.length; i++) {
-			args.add(srcFiles[i]);
-		}
-
-		return (String[]) args.toArray(new String[args.size()]);
-	}
-
 	public String compile(File srcFiles[]) {
 		String paths[] = new String[srcFiles.length];
 		for (int i = 0; i < paths.length; i++) {
@@ -149,6 +110,45 @@ public final class Javac {
 
 	public void setTarget(String target) {
 		this.target = target;
+	}
+
+	private String[] buildJavacArgs(String srcFiles[]) {
+		ArrayList args = new ArrayList();
+
+		if (classpath != null) {
+			args.add("-classpath");
+			args.add(classpath);
+		}
+		if (outputdir != null) {
+			args.add("-d");
+			args.add(outputdir);
+		}
+		if (sourcepath != null) {
+			args.add("-sourcepath");
+			args.add(sourcepath);
+		}
+		if (bootclasspath != null) {
+			args.add("-bootclasspath");
+			args.add(bootclasspath);
+		}
+		if (extdirs != null) {
+			args.add("-extdirs");
+			args.add(extdirs);
+		}
+		if (encoding != null) {
+			args.add("-encoding");
+			args.add(encoding);
+		}
+		if (target != null) {
+			args.add("-target");
+			args.add(target);
+		}
+
+		for (int i = 0; i < srcFiles.length; i++) {
+			args.add(srcFiles[i]);
+		}
+
+		return (String[]) args.toArray(new String[args.size()]);
 	}
 
 }

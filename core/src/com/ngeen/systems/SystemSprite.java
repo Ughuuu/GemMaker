@@ -24,11 +24,6 @@ public class SystemSprite extends SystemBase {
 		_SpriteBatch = batch;
 	}
 
-	private Matrix4 getModel(Entity ent) {
-		Matrix4 pos = ent.getComponent(ComponentPoint.class).getMatrix();
-		return pos;
-	}
-
 	@Override
 	public void onAfterUpdate() {
 		_SpriteBatch.end();
@@ -61,5 +56,10 @@ public class SystemSprite extends SystemBase {
 			spr.setRotation(pos.getRotation().z);
 		}
 		spr.draw(_SpriteBatch);
+	}
+
+	private Matrix4 getModel(Entity ent) {
+		Matrix4 pos = ent.getComponent(ComponentPoint.class).getMatrix();
+		return pos;
 	}
 }

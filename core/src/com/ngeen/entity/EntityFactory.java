@@ -60,10 +60,6 @@ public class EntityFactory extends TypeObservable<Entity> {
 		}
 	}
 
-	private void cacheComponents(Entity ent) {
-		ent.clearComponents();
-	}
-
 	public void clear() {
 		for (Entry<Integer, Entity> entity : _EntityMap.entrySet()) {
 			// NotifyRemove((entity.getValue()));
@@ -169,12 +165,13 @@ public class EntityFactory extends TypeObservable<Entity> {
 		return ret;
 	}
 
+	/**
+	 * After the reodering happened.
+	 * @param entity
+	 * @param entity2
+	 */
 	public void Order(Entity entity, Entity entity2) {
 		NotifyReorder(entity, entity2);
-	}
-
-	protected void Parented(Entity ent, Entity parent) {
-		NotifyParented(ent, parent);
 	}
 
 	public void removeEntity(Entity ent) {
@@ -224,6 +221,14 @@ public class EntityFactory extends TypeObservable<Entity> {
 		Entity ent = _EntityMap.get(id);
 		ent.Name = newName;
 		_EntityNameMap.put(newName, id);
+	}
+
+	private void cacheComponents(Entity ent) {
+		ent.clearComponents();
+	}
+
+	protected void Parented(Entity ent, Entity parent) {
+		NotifyParented(ent, parent);
 	}
 
 	protected void treeAddObject(Entity e) {

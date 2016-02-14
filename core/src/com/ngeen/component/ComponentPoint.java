@@ -11,9 +11,8 @@ import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
 public class ComponentPoint extends ComponentBase {
-	Matrix4 comb = new Matrix4();
 	private final Vector3 Position, Scale, Rotation;
-	public boolean Update = false;
+	Matrix4 comb = new Matrix4();
 
 	public ComponentPoint(Ngeen ng, Entity ent) {
 		super(ng, ent);
@@ -43,37 +42,6 @@ public class ComponentPoint extends ComponentBase {
 		return Scale.x;
 	}
 
-	@Override
-	protected void Load(Element element) throws Exception {
-		Position.x = element.getChildByName("Position.x").getFloat("Float");
-		Position.y = element.getChildByName("Position.y").getFloat("Float");
-		Position.z = element.getChildByName("Position.z").getFloat("Float");
-		Scale.x = element.getChildByName("Scale.x").getFloat("Float");
-		Scale.y = element.getChildByName("Scale.y").getFloat("Float");
-		Scale.z = element.getChildByName("Scale.z").getFloat("Float");
-		Rotation.x = element.getChildByName("Rotation.x").getFloat("Float");
-		Rotation.y = element.getChildByName("Rotation.y").getFloat("Float");
-		Rotation.z = element.getChildByName("Rotation.z").getFloat("Float");
-		Recalculate();
-	}
-
-	private void Recalculate() {
-		Quaternion q = new Quaternion().setEulerAngles(Rotation.x, Rotation.y, Rotation.z);
-		comb.set(Position.x, Position.y, Position.z, q.x, q.y, q.z, q.w, Scale.x, Scale.y, Scale.z);
-		Update = true;
-	}
-
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName()).element("Position.x")
-				.attribute("Float", Position.x).pop().element("Position.y").attribute("Float", Position.y).pop()
-				.element("Position.z").attribute("Float", Position.z).pop().element("Scale.x")
-				.attribute("Float", Scale.x).pop().element("Scale.y").attribute("Float", Scale.y).pop()
-				.element("Scale.z").attribute("Float", Scale.z).pop().element("Rotation.x")
-				.attribute("Float", Rotation.x).pop().element("Rotation.y").attribute("Float", Rotation.y).pop()
-				.element("Rotation.z").attribute("Float", Rotation.z).pop().pop();
-	}
-
 	public ComponentPoint setPosition(Vector3 position) {
 		updateChildren(new Vector3(position).sub(Position), new Vector3(), new Vector3());
 		Position.set(position);
@@ -101,6 +69,37 @@ public class ComponentPoint extends ComponentBase {
 		Scale.set(scale);
 		Recalculate();
 		return this;
+	}
+
+	private void Recalculate() {
+		Quaternion q = new Quaternion().setEulerAngles(Rotation.x, Rotation.y, Rotation.z);
+		comb.set(Position.x, Position.y, Position.z, q.x, q.y, q.z, q.w, Scale.x, Scale.y, Scale.z);
+		//_Owner.
+	}
+
+	@Override
+	protected void Load(Element element) throws Exception {
+		Position.x = element.getChildByName("Position.x").getFloat("Float");
+		Position.y = element.getChildByName("Position.y").getFloat("Float");
+		Position.z = element.getChildByName("Position.z").getFloat("Float");
+		Scale.x = element.getChildByName("Scale.x").getFloat("Float");
+		Scale.y = element.getChildByName("Scale.y").getFloat("Float");
+		Scale.z = element.getChildByName("Scale.z").getFloat("Float");
+		Rotation.x = element.getChildByName("Rotation.x").getFloat("Float");
+		Rotation.y = element.getChildByName("Rotation.y").getFloat("Float");
+		Rotation.z = element.getChildByName("Rotation.z").getFloat("Float");
+		Recalculate();
+	}
+
+	@Override
+	protected void Save(XmlWriter element) throws Exception {
+		element.element("Component").attribute("_Type", _Type.getName()).element("Position.x")
+				.attribute("Float", Position.x).pop().element("Position.y").attribute("Float", Position.y).pop()
+				.element("Position.z").attribute("Float", Position.z).pop().element("Scale.x")
+				.attribute("Float", Scale.x).pop().element("Scale.y").attribute("Float", Scale.y).pop()
+				.element("Scale.z").attribute("Float", Scale.z).pop().element("Rotation.x")
+				.attribute("Float", Rotation.x).pop().element("Rotation.y").attribute("Float", Rotation.y).pop()
+				.element("Rotation.z").attribute("Float", Rotation.z).pop().pop();
 	}
 
 	protected void updateChildren(Vector3 pos, Vector3 rot, Vector3 sc) {

@@ -66,14 +66,10 @@ public abstract class ComponentBase {
 		return _Type;
 	}
 
-	protected abstract void Load(XmlReader.Element element) throws Exception;
-
 	public <T extends ComponentBase> T remove() {
 		_Owner.removeComponent(this.getClass(), Id);
 		return (T) this;
 	}
-
-	protected abstract void Save(XmlWriter element) throws Exception;
 
 	/**
 	 * Set this component to enabled or disabled.
@@ -85,6 +81,10 @@ public abstract class ComponentBase {
 		this.Enable = Enable;
 		return (T) this;
 	}
+
+	protected abstract void Load(XmlReader.Element element) throws Exception;
+
+	protected abstract void Save(XmlWriter element) throws Exception;
 
 	protected <T extends ComponentBase> T setOwner(Entity ent) {
 		_Owner = ent;

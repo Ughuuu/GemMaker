@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ngeen.component.ui.ComponentUIBase;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.engine.TypeObservable;
@@ -35,6 +36,10 @@ public class ComponentFactory extends TypeObservable<ComponentBase> {
 		_ComponentCacheIndex.clear();
 	}
 
+	public void changeName(ComponentUIBase comp, String name){
+		
+	}
+	
 	public <T extends ComponentBase> T createComponent(Class<?> type, Entity ent) {
 		try {
 			T el = null;

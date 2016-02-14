@@ -26,6 +26,28 @@ public class MeshFactory {
 		_Ng = ng;
 	}
 
+	public Mesh makeMesh(ShaderProgram prog, int verts, int indices) {
+		if (prog == null)
+			return null;
+		String[] atr = prog.getAttributes();
+		Debugger.log(atr.length);
+		Set<VertexAttribute> attributes = new TreeSet<VertexAttribute>(new Comparator<VertexAttribute>() {
+			@Override
+			public int compare(VertexAttribute o1, VertexAttribute o2) {
+				return Integer.signum(getUsage(o1.alias) - getUsage(o2.alias));
+			}
+		});
+		for (int i = 0; i < atr.length; i++) {
+			String name = atr[i];
+			int loc = prog.getAttributeLocation(name);
+			int type = prog.getAttributeType(name);
+			int size = prog.getAttributeSize(name);
+			VertexAttribute attr = new VertexAttribute(getUsage(name), getComponents(type), name);
+			attributes.add(attr);
+		}
+		return new Mesh(true, verts, indices, attributes.toArray(new VertexAttribute[0]));
+	}
+
 	private int getComponents(int type) {
 		if (type == GL20.GL_FLOAT)
 			return 1;
@@ -68,27 +90,5 @@ public class MeshFactory {
 		}
 		Debugger.log("Unknown attribute, " + name);
 		return -1;
-	}
-
-	public Mesh makeMesh(ShaderProgram prog, int verts, int indices) {
-		if (prog == null)
-			return null;
-		String[] atr = prog.getAttributes();
-		Debugger.log(atr.length);
-		Set<VertexAttribute> attributes = new TreeSet<VertexAttribute>(new Comparator<VertexAttribute>() {
-			@Override
-			public int compare(VertexAttribute o1, VertexAttribute o2) {
-				return Integer.signum(getUsage(o1.alias) - getUsage(o2.alias));
-			}
-		});
-		for (int i = 0; i < atr.length; i++) {
-			String name = atr[i];
-			int loc = prog.getAttributeLocation(name);
-			int type = prog.getAttributeType(name);
-			int size = prog.getAttributeSize(name);
-			VertexAttribute attr = new VertexAttribute(getUsage(name), getComponents(type), name);
-			attributes.add(attr);
-		}
-		return new Mesh(true, verts, indices, attributes.toArray(new VertexAttribute[0]));
 	}
 }

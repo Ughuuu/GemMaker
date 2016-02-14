@@ -17,6 +17,11 @@ import com.ngeen.scene.Scene;
 public class TestScene extends Scene {
 	Entity ent;
 
+	@Override
+	public void onInit() {
+		// doStuff();
+	}
+
 	void doStuff() {
 		// startTestSuite();
 
@@ -38,11 +43,6 @@ public class TestScene extends Scene {
 		widget.addComponent(ComponentPoint.class).setPosition(new Vector3(100, 0, 0));
 		widget.addComponent(ComponentUILabel.class);
 		widget.setParent("Table");
-	}
-
-	@Override
-	public void onInit() {
-		// doStuff();
 	}
 
 	void startTestSuite() {

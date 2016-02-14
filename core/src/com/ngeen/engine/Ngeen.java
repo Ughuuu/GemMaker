@@ -30,19 +30,19 @@ import com.ngeen.scene.SceneFactory;
  * @composed 1 has * XmlComponent
  */
 public abstract class Ngeen extends ApplicationAdapter {
-	protected ComponentFactory _ComponentBuilder;
-	public MeshFactory _MeshBuilder;
-	protected SystemFactory _SystemBuilder;
-	private XmlComponent _XmlComponent;
-	public CollidableFactory CollidableBuilder;
-	public EntityFactory EntityBuilder;
+	private MeshFactory _MeshBuilder;
+	private CollidableFactory CollidableBuilder;
+	private EntityFactory EntityBuilder;
+	private AssetFactory Loader;
+	private UIFactory UIBuilder;
+	private XmlEntity XmlSave;
 
-	public AssetFactory Loader;
+	private XmlComponent _XmlComponent;
+
+	protected ComponentFactory _ComponentBuilder;
+	protected SystemFactory _SystemBuilder;
 
 	protected SceneFactory SceneBuilder;
-	public UIFactory UIBuilder;
-
-	public XmlEntity XmlSave;
 
 	public void changeScene(String newScene) {
 		SceneBuilder.changeScene(newScene);

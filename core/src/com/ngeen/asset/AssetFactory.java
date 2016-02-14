@@ -93,19 +93,6 @@ public class AssetFactory {
 		}
 	}
 
-	private void addAssets(String folder) {
-		for (int i = 0; i < _Types.length; i++) {
-			List<String> names = _Folders.get(folder + i);
-			if (names != null) {
-				for (String name : names) {
-					Asset addNew = new Asset(_Ng, name, _Manager.get(_PrePath + folder + name), i, folder);
-					_AssetMap.put(addNew.getId(), addNew);
-					_AssetNameMap.put(addNew.getFolder() + addNew.getPath(), addNew.getId());
-				}
-			}
-		}
-	}
-
 	/**
 	 * Loads a folder previously enqued.
 	 * 
@@ -122,25 +109,6 @@ public class AssetFactory {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Check if given file is of specific given type. This is done only when
-	 * specified. Will not be done in Release mode.
-	 * 
-	 * @param name
-	 *            Name of the file
-	 * @param i
-	 *            Index of _Types array of arrays.
-	 * @return If it is of specified type or not.
-	 */
-	private boolean checkExt(String name, int i) {
-		for (int j = 0; j < _Types[i].length; j++) {
-			if (name.compareTo(_Types[i][j]) == 0 || name.compareTo(_Types[i][j].toUpperCase()) == 0) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -188,39 +156,6 @@ public class AssetFactory {
 	}
 
 	/**
-	 * Adds folder to the map. Can be used to load or save later.
-	 * 
-	 * @param folder
-	 */
-	private void enqueFolder(String folder, String actualFolder) {
-		_UpdateFolders.add(folder);
-		FileHandle dirHandle = Gdx.files.internal(_PrePath + folder + actualFolder);
-
-		for (FileHandle entry : dirHandle.list()) {
-			String name = entry.name();
-			String extension = entry.extension();
-
-			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(folder, actualFolder + name + "/");
-			} else {
-				int extensionKey = getExt(extension);
-				if (extensionKey == -1) {
-					continue;
-				}
-				List<String> list = null;
-				if (_Folders.containsKey(folder + extensionKey) == false) {
-					list = new ArrayList<String>();
-					_Folders.put(folder + extensionKey, list);
-				} else {
-					list = _Folders.get(folder + extensionKey);
-				}
-				loadAsset(_PrePath + folder + actualFolder + name, extensionKey);
-				list.add(actualFolder + name);
-			}
-		}
-	}
-
-	/**
 	 * Has to be called to keep the loading going.
 	 * 
 	 * @return
@@ -263,21 +198,6 @@ public class AssetFactory {
 	}
 
 	/**
-	 * Get the coresponding index for the given file extension.
-	 * 
-	 * @param name
-	 *            File extension.
-	 * @return Coresponding index in data types table.
-	 */
-	private int getExt(String name) {
-		for (int i = 0; i < _Types.length; i++) {
-			if (checkExt(name, i) == true)
-				return i;
-		}
-		return -1;
-	}
-
-	/**
 	 * Set of String because we might have doubles.
 	 * 
 	 * @param folder
@@ -294,10 +214,6 @@ public class AssetFactory {
 
 	public float getPercentage() {
 		return _Manager.getProgress();
-	}
-
-	private void loadAsset(String path, int resType) {
-		_Manager.load(path, _ClassType[resType]);
 	}
 
 	public void scoutFiles() {
@@ -335,5 +251,89 @@ public class AssetFactory {
 		} catch (Exception e) {
 			Debugger.println(path + " is not loaded.");// Known bug. Sorry.
 		}
+	}
+
+	private void addAssets(String folder) {
+		for (int i = 0; i < _Types.length; i++) {
+			List<String> names = _Folders.get(folder + i);
+			if (names != null) {
+				for (String name : names) {
+					Asset addNew = new Asset(_Ng, name, _Manager.get(_PrePath + folder + name), i, folder);
+					_AssetMap.put(addNew.getId(), addNew);
+					_AssetNameMap.put(addNew.getFolder() + addNew.getPath(), addNew.getId());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if given file is of specific given type. This is done only when
+	 * specified. Will not be done in Release mode.
+	 * 
+	 * @param name
+	 *            Name of the file
+	 * @param i
+	 *            Index of _Types array of arrays.
+	 * @return If it is of specified type or not.
+	 */
+	private boolean checkExt(String name, int i) {
+		for (int j = 0; j < _Types[i].length; j++) {
+			if (name.compareTo(_Types[i][j]) == 0 || name.compareTo(_Types[i][j].toUpperCase()) == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Adds folder to the map. Can be used to load or save later.
+	 * 
+	 * @param folder
+	 */
+	private void enqueFolder(String folder, String actualFolder) {
+		_UpdateFolders.add(folder);
+		FileHandle dirHandle = Gdx.files.internal(_PrePath + folder + actualFolder);
+
+		for (FileHandle entry : dirHandle.list()) {
+			String name = entry.name();
+			String extension = entry.extension();
+
+			if (entry.isDirectory()) {// this has to be a class name.
+				enqueFolder(folder, actualFolder + name + "/");
+			} else {
+				int extensionKey = getExt(extension);
+				if (extensionKey == -1) {
+					continue;
+				}
+				List<String> list = null;
+				if (_Folders.containsKey(folder + extensionKey) == false) {
+					list = new ArrayList<String>();
+					_Folders.put(folder + extensionKey, list);
+				} else {
+					list = _Folders.get(folder + extensionKey);
+				}
+				loadAsset(_PrePath + folder + actualFolder + name, extensionKey);
+				list.add(actualFolder + name);
+			}
+		}
+	}
+
+	/**
+	 * Get the coresponding index for the given file extension.
+	 * 
+	 * @param name
+	 *            File extension.
+	 * @return Coresponding index in data types table.
+	 */
+	private int getExt(String name) {
+		for (int i = 0; i < _Types.length; i++) {
+			if (checkExt(name, i) == true)
+				return i;
+		}
+		return -1;
+	}
+
+	private void loadAsset(String path, int resType) {
+		_Manager.load(path, _ClassType[resType]);
 	}
 }

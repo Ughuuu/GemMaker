@@ -29,19 +29,6 @@ public class ComponentSprite extends ComponentBase {
 		return spr.getTexture();
 	}
 
-	@Override
-	protected void Load(Element element) throws Exception {
-		spr = new Sprite();
-		_TextureAsset = element.getChildByName("_TextureAsset").get("String");
-		setTexture(_TextureAsset);
-	}
-
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName()).element("_TextureAsset")
-				.attribute("String", _TextureAsset).pop().pop();
-	}
-
 	public void setColor(Color col) {
 		spr.setColor(col);
 	}
@@ -56,5 +43,18 @@ public class ComponentSprite extends ComponentBase {
 		_TextureAsset = tex;
 		spr = new Sprite((Texture) _Ng.Loader.getAsset(tex).getData());
 		return this;
+	}
+
+	@Override
+	protected void Load(Element element) throws Exception {
+		spr = new Sprite();
+		_TextureAsset = element.getChildByName("_TextureAsset").get("String");
+		setTexture(_TextureAsset);
+	}
+
+	@Override
+	protected void Save(XmlWriter element) throws Exception {
+		element.element("Component").attribute("_Type", _Type.getName()).element("_TextureAsset")
+				.attribute("String", _TextureAsset).pop().pop();
 	}
 }

@@ -2,6 +2,7 @@ package com.ngeen.component.ui;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 import com.badlogic.gdx.scenes.scene2d.ui.Tree.TreeStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.engine.Ngeen;
@@ -9,21 +10,13 @@ import com.ngeen.entity.Entity;
 
 public class ComponentUITree extends ComponentUILayout {
 	private boolean _Saved = false;
-
+	private Tree _Tree;
+	
 	public ComponentUITree(Ngeen ng, Entity ent) {
 		super(ng, ent);
 		TreeStyle style = new TreeStyle();
-		_Layout = new Tree(style);
+		_Tree = new Tree(style);
 		getOwner().addSuperComponent((ComponentUILayout) this);
-	}
-
-	@Override
-	public void act(float delta) {
-		_Layout.act(delta);
-	}
-
-	@Override
-	protected void Load(Element element) throws Exception {
 	}
 
 	@Override
@@ -34,6 +27,10 @@ public class ComponentUITree extends ComponentUILayout {
 	}
 
 	@Override
+	protected void Load(Element element) throws Exception {
+	}
+
+	@Override
 	protected void Save(XmlWriter element) throws Exception {
 		if (_Saved) {
 			_Saved = false;
@@ -41,5 +38,10 @@ public class ComponentUITree extends ComponentUILayout {
 		}
 		_Saved = true;
 		element.element("Component").attribute("_Type", this.getClass().getName()).pop();
+	}
+
+	@Override
+	protected WidgetGroup get() {
+		return _Tree;
 	}
 }

@@ -32,22 +32,22 @@ import com.ngeen.systems.SystemStage;
  */
 public class SystemFactory {
 	private SystemConfiguration _CameraConfiguration;
-	protected final ComponentFactory _ComponentBuilder;
-
 	private SystemConfiguration _ConfigurationStage;
+
 	private SystemConfiguration _ConfigurationTable;
 	private SystemConfiguration _ConfigurationWidget;
 	private SystemConfiguration _DrawingConfiguration;
+	private SystemConfiguration _PointConfiguration;
+	private SystemConfiguration _RigidConfiguration;
+	private SystemConfiguration _ScriptConfiguration;
+	private SystemConfiguration _SpriteConfiguration;
+
+	protected final ComponentFactory _ComponentBuilder;
 	protected SystemDraw _DrawingSystem;
 	protected final Ngeen _Ng;
 	protected SystemOverlay _OverlaySystem;
-
 	protected SystemPhysics _PhysicsSystem;
-	private SystemConfiguration _PointConfiguration;
-	private SystemConfiguration _RigidConfiguration;
 	protected SystemScene _SceneSystem;
-	private SystemConfiguration _ScriptConfiguration;
-	private SystemConfiguration _SpriteConfiguration;
 	protected SystemSprite _SpriteSystem;
 	protected SystemStage _StageSystem;
 	protected SystemCamera _SystemCamera;
@@ -55,6 +55,19 @@ public class SystemFactory {
 	public SystemFactory(Ngeen ng, ComponentFactory _ComponentBuilder) {
 		_Ng = ng;
 		this._ComponentBuilder = _ComponentBuilder;
+	}
+
+	private void updateSystem(SystemBase system) {
+		float time = TimeUtils.millis();
+		system.onBeforeUpdate();
+		Set<Entity> entities = _Ng.EntityBuilder.getEntitiesForSystem(system);
+
+		for (Entity entity : entities) {
+			system.onUpdate(entity);
+		}
+
+		system.onAfterUpdate();
+		system.deltaTime = TimeUtils.millis() - time;
 	}
 
 	protected void createConfigurations() {
@@ -94,19 +107,6 @@ public class SystemFactory {
 		EntityBuilder.addSystem(_SpriteSystem);
 		EntityBuilder.addSystem(_SystemCamera);
 		EntityBuilder.addSystem(_StageSystem);
-	}
-
-	private void updateSystem(SystemBase system) {
-		float time = TimeUtils.millis();
-		system.onBeforeUpdate();
-		Set<Entity> entities = _Ng.EntityBuilder.getEntitiesForSystem(system);
-
-		for (Entity entity : entities) {
-			system.onUpdate(entity);
-		}
-
-		system.onAfterUpdate();
-		system.deltaTime = TimeUtils.millis() - time;
 	}
 
 	protected void updateSystems() {

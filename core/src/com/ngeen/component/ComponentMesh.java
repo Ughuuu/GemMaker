@@ -16,14 +16,6 @@ public class ComponentMesh extends ComponentBase {
 		super(ng, ent);
 	}
 
-	private void computeBox() {
-		try {
-			_Vertices.calculateBoundingBox(Box);
-		} catch (Exception e) {
-			Debugger.log(e);
-		}
-	}
-
 	public Mesh createMesh(int size, int ind) {
 		return _Vertices = _Ng._MeshBuilder.makeMesh((getOwner().getComponent(ComponentMaterial.class).getShader()),
 				size, ind);
@@ -31,6 +23,20 @@ public class ComponentMesh extends ComponentBase {
 
 	public Mesh getVertices() {
 		return _Vertices;
+	}
+
+	public ComponentMesh setVertices(Mesh Vertices) {
+		_Vertices = Vertices;
+		computeBox();
+		return this;
+	}
+
+	private void computeBox() {
+		try {
+			_Vertices.calculateBoundingBox(Box);
+		} catch (Exception e) {
+			Debugger.log(e);
+		}
 	}
 
 	@Override
@@ -44,11 +50,5 @@ public class ComponentMesh extends ComponentBase {
 		element.element("Component").attribute("_Type", _Type.getName())
 				// element.attribute("_ShaderName", _ShaderName)
 				.pop();
-	}
-
-	public ComponentMesh setVertices(Mesh Vertices) {
-		_Vertices = Vertices;
-		computeBox();
-		return this;
 	}
 }

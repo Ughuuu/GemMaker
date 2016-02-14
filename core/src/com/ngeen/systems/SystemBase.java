@@ -23,10 +23,10 @@ public abstract class SystemBase {
 		}
 	}
 	private final static Comparator<Entity> _EntityComparator = new EntityComparator();
-	protected SystemConfiguration _Config = null;
 	public final Ngeen _Ng;
-
 	public float deltaTime;
+
+	protected SystemConfiguration _Config = null;
 
 	protected boolean Enable;
 

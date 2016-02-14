@@ -16,7 +16,7 @@ public class SystemStage extends SystemBase implements TypeObserver {
 	private List<ComponentBase> _ChangedComponent;
 	private final ComponentFactory _ComponentBuilder;
 	private List<ComponentBase> _RemovedComponent;
-	private final UISolver _UISolver = new UISolver();
+	private final UISolver _UISolver;
 
 	public SystemStage(Ngeen ng, SystemConfiguration conf, ComponentFactory _ComponentBuilder) {
 		super(ng, conf);
@@ -26,6 +26,7 @@ public class SystemStage extends SystemBase implements TypeObserver {
 		this._ComponentBuilder = _ComponentBuilder;
 		_ComponentBuilder.addObserver(this);
 		_Ng.EntityBuilder.addObserver(this);
+		_UISolver = new UISolver();
 	}
 
 	@Override

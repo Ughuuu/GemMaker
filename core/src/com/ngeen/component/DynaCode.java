@@ -316,16 +316,6 @@ public final class DynaCode {
 		return loadedClass.clazz;
 	}
 
-	private SourceDir locateResource(String resource) {
-		for (int i = 0; i < sourceDirs.size(); i++) {
-			SourceDir src = (SourceDir) sourceDirs.get(i);
-			if (new File(src.srcDir, resource).exists()) {
-				return src;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Create a proxy instance that implements the specified access interface
 	 * and delegates incoming invocations to the specified dynamic
@@ -350,6 +340,16 @@ public final class DynaCode {
 		Object obj = e.create();
 
 		return obj;
+	}
+
+	private SourceDir locateResource(String resource) {
+		for (int i = 0; i < sourceDirs.size(); i++) {
+			SourceDir src = (SourceDir) sourceDirs.get(i);
+			if (new File(src.srcDir, resource).exists()) {
+				return src;
+			}
+		}
+		return null;
 	}
 
 	private void unload(SourceDir src) {

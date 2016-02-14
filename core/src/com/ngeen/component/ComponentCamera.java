@@ -17,8 +17,8 @@ import com.ngeen.entity.Entity;
  */
 public class ComponentCamera extends ComponentBase {
 
-	private float _Fov = -1;
 	public Camera Camera;
+	private float _Fov = -1;
 
 	public ComponentCamera(Ngeen ng, Entity ent) {
 		super(ng, ent);

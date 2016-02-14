@@ -47,26 +47,6 @@ public class SystemConfiguration {
 		return this;
 	}
 
-	private void configure() {
-		_Configuration.clear();
-		if (_Or == null) {
-			_Configuration.add(new BitSet((EngineInfo.TotalComponents)));
-			for (Class<?> cls : _All) {
-				_Configuration.get(0).set(EngineInfo.ComponentIndexMap.get(cls));
-			}
-		} else {
-			int i = 0;
-			for (Class<?> cls : _Or) {
-				_Configuration.add(new BitSet((EngineInfo.TotalComponents)));
-				for (Class<?> cls2 : _All) {
-					_Configuration.get(i).set(EngineInfo.ComponentIndexMap.get(cls2));
-				}
-				_Configuration.get(i).set(EngineInfo.ComponentIndexMap.get(cls));
-				i++;
-			}
-		}
-	}
-
 	public boolean equals(Set<Class<?>> obj) {
 		return _All.equals(obj);
 	}
@@ -103,5 +83,25 @@ public class SystemConfiguration {
 
 	public void removeClass(Class<?>... cls) {
 		_All.removeAll(Arrays.asList(cls));
+	}
+
+	private void configure() {
+		_Configuration.clear();
+		if (_Or == null) {
+			_Configuration.add(new BitSet((EngineInfo.TotalComponents)));
+			for (Class<?> cls : _All) {
+				_Configuration.get(0).set(EngineInfo.ComponentIndexMap.get(cls));
+			}
+		} else {
+			int i = 0;
+			for (Class<?> cls : _Or) {
+				_Configuration.add(new BitSet((EngineInfo.TotalComponents)));
+				for (Class<?> cls2 : _All) {
+					_Configuration.get(i).set(EngineInfo.ComponentIndexMap.get(cls2));
+				}
+				_Configuration.get(i).set(EngineInfo.ComponentIndexMap.get(cls));
+				i++;
+			}
+		}
 	}
 }

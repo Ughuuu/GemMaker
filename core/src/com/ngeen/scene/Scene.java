@@ -12,18 +12,6 @@ public class Scene {
 	private SceneFactory _SceneFactory;
 	protected Ngeen ng;
 
-	protected void addNgeen(final Ngeen ng) {
-		this.ng = ng;
-	}
-
-	protected void addSceneFactory(final SceneFactory _SceneFactory) {
-		this._SceneFactory = _SceneFactory;
-	}
-
-	protected Entity CreateObject(String name) {
-		return ng.EntityBuilder.makeEntity(name);
-	}
-
 	public void onExit() {
 		// Debugger.println("onExit()");
 	}
@@ -93,5 +81,17 @@ public class Scene {
 	public void onZoom(float start, float distance) {
 		// Debugger.println("onZoom(): [start=" + start + ",distance=" +
 		// distance + "]");
+	}
+
+	protected void addNgeen(final Ngeen ng) {
+		this.ng = ng;
+	}
+
+	protected void addSceneFactory(final SceneFactory _SceneFactory) {
+		this._SceneFactory = _SceneFactory;
+	}
+
+	protected Entity CreateObject(String name) {
+		return ng.EntityBuilder.makeEntity(name);
 	}
 }

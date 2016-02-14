@@ -7,8 +7,7 @@ import com.ngeen.component.ComponentBase;
 import com.ngeen.engine.Ngeen;
 import com.ngeen.entity.Entity;
 
-public abstract class ComponentUIWidget extends ComponentBase {
-	protected Widget _Widget;
+public abstract class ComponentUIWidget extends ComponentUIBase {
 
 	public ComponentUIWidget(Ngeen ng, Entity ent) {
 		super(ng, ent);
@@ -16,7 +15,7 @@ public abstract class ComponentUIWidget extends ComponentBase {
 	}
 
 	public void act(float act) {
-		_Widget.act(act);
+		getActor().act(act);
 	}
 
 	@Override
