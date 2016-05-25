@@ -4,60 +4,64 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.ngeen.component.ComponentBase;
+import com.ngeen.component.ComponentFactory;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.ComponentSpokesman;
 import com.ngeen.entity.Entity;
 
 public class ComponentUIVerticalGroup extends ComponentUILayout {
-	private boolean _Saved = false;
-	private VerticalGroup _VerticalGroup;
-	
-	public ComponentUIVerticalGroup(Ngeen ng, Entity ent) {
-		super(ng, ent);
-		_VerticalGroup = new VerticalGroup();
-		getOwner().addSuperComponent((ComponentUILayout) this);
-	}
+    private boolean _Saved = false;
+    private VerticalGroup _VerticalGroup;
 
-	@Override
-	public ComponentUIVerticalGroup remove() {
-		getOwner().removeComponent(ComponentUILayout.class);
-		_Owner.removeComponent(this.getClass(), Id);
-		return this;
-	}
+    public ComponentUIVerticalGroup(Ngeen ng, Entity ent, ComponentFactory factory,
+                                    ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+        _VerticalGroup = new VerticalGroup();
+    }
 
-	@Override
-	protected void Load(Element element) throws Exception {
-	}
+    @Override
+    public ComponentUIVerticalGroup remove() {
+        getOwner().removeComponent(ComponentUILayout.class);
+        _Owner.removeComponent(this.getClass(), Id);
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		if (_Saved) {
-			_Saved = false;
-			return;
-		}
-		_Saved = true;
-		element.element("Component").attribute("_Type", this.getClass().getName()).pop();
-	}
+    @Override
+    protected void add(ComponentUIBase comp) {
+        // TODO Auto-generated method stub
 
-	@Override
-	protected WidgetGroup get() {
-		return _VerticalGroup;
-	}
+    }
 
-	@Override
-	protected void add(ComponentUIBase comp) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected void del(ComponentUIBase comp) {
+        // TODO Auto-generated method stub
 
-	@Override
-	protected void del(ComponentUIBase comp) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	protected void swap(ComponentUIBase a, ComponentUIBase b) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected WidgetGroup get() {
+        return _VerticalGroup;
+    }
+
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        return this;
+    }
+
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", this.getClass().getName()).pop();
+    }
+
+    @Override
+    protected void swap(ComponentUIBase a, ComponentUIBase b) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        factory.callComponentNotify(this, component);
+    }
 }

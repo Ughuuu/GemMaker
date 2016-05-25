@@ -7,54 +7,68 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.asset.Asset;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.ComponentSpokesman;
 import com.ngeen.entity.Entity;
 
 public class ComponentSprite extends ComponentBase {
-	private String _TextureAsset;
-	private Sprite spr;
+    private String _TextureAsset;
+    private Sprite spr;
 
-	public ComponentSprite(Ngeen ng, Entity ent) {
-		super(ng, ent);
-	}
+    public ComponentSprite(Ngeen ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+    }
 
-	public Color getColor() {
-		return spr.getColor();
-	}
+    public Color getColor() {
+        return spr.getColor();
+    }
 
-	public Sprite getSprite() {
-		return spr;
-	}
+    public void setColor(Color col) {
+        spr.setColor(col);
+    }
 
-	public Texture getTexture(Asset<Texture> tex) {
-		return spr.getTexture();
-	}
+    public Sprite getSprite() {
+        return spr;
+    }
 
-	public void setColor(Color col) {
-		spr.setColor(col);
-	}
+    public Texture getTexture(Asset<Texture> tex) {
+        return spr.getTexture();
+    }
 
-	public ComponentSprite setTexture(Asset<Texture> tex) {
-		_TextureAsset = tex.getFolder() + tex.getPath();
-		spr = new Sprite(tex.getData());
-		return this;
-	}
+    @Override
+    public void notifyWithComponent(ComponentPoint point) {
+        spr.setPosition(point.getPosition().x - spr.getWidth() / 2, point.getPosition().y - spr.getHeight() / 2);
+        spr.setScale(point.getScale().x, point.getScale().y);
+        spr.setRotation(point.getRotation().z);
+    }
 
-	public ComponentSprite setTexture(String tex) {
-		_TextureAsset = tex;
-		spr = new Sprite((Texture) _Ng.Loader.getAsset(tex).getData());
-		return this;
-	}
+    public ComponentSprite setTexture(Asset<Texture> tex) {
+        _TextureAsset = tex.getFolder() + tex.getPath();
+        spr = new Sprite(tex.getData());
+        return this;
+    }
 
-	@Override
-	protected void Load(Element element) throws Exception {
-		spr = new Sprite();
-		_TextureAsset = element.getChildByName("_TextureAsset").get("String");
-		setTexture(_TextureAsset);
-	}
+    public ComponentSprite setTexture(String tex) {
+        _TextureAsset = tex;
+        spr = new Sprite((Texture) _Ng.Loader.getAsset(tex).getData());
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName()).element("_TextureAsset")
-				.attribute("String", _TextureAsset).pop().pop();
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        spr = new Sprite();
+        _TextureAsset = element.getChildByName("Sprite").get("TextureAtlas");
+        setTexture(_TextureAsset);
+        return this;
+    }
+
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", _Type.getName()).element("Sprite")
+                .attribute("TextureAtlas", _TextureAsset).pop().pop();
+    }
+
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        component.notifyWithComponent(this);
+    }
 }

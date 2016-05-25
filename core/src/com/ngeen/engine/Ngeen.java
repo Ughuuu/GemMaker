@@ -3,21 +3,18 @@ package com.ngeen.engine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.ngeen.action.CommandFactory;
 import com.ngeen.asset.Asset;
 import com.ngeen.asset.AssetFactory;
 import com.ngeen.asset.MeshFactory;
 import com.ngeen.component.ComponentFactory;
-import com.ngeen.component.XmlComponent;
-import com.ngeen.entity.CollidableFactory;
-import com.ngeen.entity.Entity;
-import com.ngeen.entity.EntityFactory;
-import com.ngeen.entity.XmlEntity;
+import com.ngeen.entity.*;
 import com.ngeen.scene.SceneFactory;
 
 /**
  * Main engine class. Links all elements and holds entities. <img src=
  * "https://raw.githubusercontent.com/Ughuuu/ngeen/online/core/doc/img/Ngeen.png"/>
- * 
+ *
  * @author Dragos
  * @opt hide com.badlogic.*
  * @opt shape node
@@ -30,102 +27,111 @@ import com.ngeen.scene.SceneFactory;
  * @composed 1 has * XmlComponent
  */
 public abstract class Ngeen extends ApplicationAdapter {
-	private MeshFactory _MeshBuilder;
-	private CollidableFactory CollidableBuilder;
-	private EntityFactory EntityBuilder;
-	private AssetFactory Loader;
-	private UIFactory UIBuilder;
-	private XmlEntity XmlSave;
+    public MeshFactory _MeshBuilder;
+    public CollidableFactory CollidableBuilder;
+    public EntityFactory EntityBuilder;
+    public AssetFactory Loader;
+    protected ComponentFactory _ComponentBuilder;
+    protected SystemFactory _SystemBuilder;
+    protected SceneFactory SceneBuilder;
+    private ComponentSpokesman _ComponentSpokesman;
+    private UIFactory UIBuilder;
+    private XmlEntity XmlSave;
 
-	private XmlComponent _XmlComponent;
+    public void changeScene(String newScene) {
+        SceneBuilder.changeScene(newScene);
+    }
 
-	protected ComponentFactory _ComponentBuilder;
-	protected SystemFactory _SystemBuilder;
+    @Override
+    public void create() {
+        if (EngineInfo.Debug)
+            CommandFactory.factory._Ng = this;
+        init();
+    }
 
-	protected SceneFactory SceneBuilder;
+    public <T> Asset<T> getAsset(String name) {
+        return Loader.getAsset(name);
+    }
 
-	public void changeScene(String newScene) {
-		SceneBuilder.changeScene(newScene);
-	}
+    public Class<?> getCurrentScene() {
+        return _SystemBuilder._SceneSystem.getScene();
+    }
 
-	@Override
-	public void create() {
-		init();
-	}
+    public Entity getEntity(int id) {
+        return EntityBuilder.getById(id);
+    }
 
-	public <T> Asset<T> getAsset(String name) {
-		return Loader.getAsset(name);
-	}
+    public Entity getEntity(String name) {
+        return EntityBuilder.getByName(name);
+    }
 
-	public Class<?> getCurrentScene() {
-		return _SystemBuilder._SceneSystem.getScene();
-	}
+    public abstract Class<?> getEntry();
 
-	public Entity getEntity(int id) {
-		return EntityBuilder.getById(id);
-	}
+    public void init() {
+        Gdx.graphics.setVSync(false);
+        Loader = new AssetFactory(this);
 
-	public Entity getEntity(String name) {
-		return EntityBuilder.getByName(name);
-	}
+        UIBuilder = new UIFactory(this);
+        _ComponentSpokesman = new ComponentSpokesman(UIBuilder);
 
-	public abstract Class<?> getEntry();
+        _ComponentBuilder = new ComponentFactory(this, _ComponentSpokesman);
 
-	public void init() {
-		Loader = new AssetFactory(this);
-		_ComponentBuilder = new ComponentFactory(this);
-		_SystemBuilder = new SystemFactory(this, _ComponentBuilder);
-		_SystemBuilder.createConfigurations();
-		EntityBuilder = new EntityFactory(this, _ComponentBuilder, _SystemBuilder);
-		_MeshBuilder = new MeshFactory(this);
-		UIBuilder = new UIFactory(this);
+        XmlSave = new XmlEntity(this);
 
-		_SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);
+        _SystemBuilder = new SystemFactory(this, _ComponentBuilder, XmlSave);
+        _SystemBuilder.createConfigurations();
 
-		SceneBuilder = new SceneFactory(this, _SystemBuilder._SceneSystem);
-		SceneBuilder.changeScene(getEntry().getName());
+        EntityBuilder = new EntityFactory(_ComponentBuilder, XmlSave, _ComponentSpokesman);
+        _MeshBuilder = new MeshFactory(this);
 
-		EngineInfo.makeBasicEntities(this);
-		EngineInfo.makeOptionalEntities(this);
+        _SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);
 
-		_SystemBuilder.createUISystems();
+        SceneBuilder = new SceneFactory(this, _SystemBuilder._SceneSystem);
+        SceneBuilder.changeScene(getEntry().getName());
 
-		UIBuilder.createMultiplexer();
+        EngineInfo.makeBasicEntities(this, UIBuilder);
+        EngineInfo.makeOptionalEntities(this);
 
-		_SystemBuilder.sendConfigurations(EntityBuilder);
+        _SystemBuilder.createUISystems();
 
-		_XmlComponent = new XmlComponent();
-		XmlSave = new XmlEntity(this, _XmlComponent);
-	}
+        UIBuilder.createMultiplexer();
 
-	public void remove() {
-		EntityBuilder.clear();
-		_ComponentBuilder.clear();
-	}
+        _SystemBuilder.sendConfigurations(EntityBuilder);
+    }
 
-	@Override
-	public void render() {
-		Gdx.gl.glClearColor(EngineInfo.BackgroundColor.r, EngineInfo.BackgroundColor.g, EngineInfo.BackgroundColor.b,
-				EngineInfo.BackgroundColor.a);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		update(Gdx.graphics.getDeltaTime());
-	}
+    public void remove() {
+        EntityBuilder.clear();
+        _ComponentBuilder.clear();
+    }
 
-	@Override
-	public void resize(int w, int h) {
-		EngineInfo.makeBasicEntities(this);
-		UIBuilder.resize(w, h);
-	}
+    @Override
+    public void render() {
+        Gdx.gl.glClearColor(EngineInfo.BackgroundColor.r, EngineInfo.BackgroundColor.g, EngineInfo.BackgroundColor.b,
+                EngineInfo.BackgroundColor.a);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        update(Gdx.graphics.getDeltaTime());
+        UIBuilder.resize((int) EngineInfo.ScreenWidth, (int) EngineInfo.ScreenHeight);
+    }
 
-	public void restart() {
-		EntityBuilder.clear();
-		EngineInfo.makeBasicEntities(this);
-	}
+    @Override
+    public void resize(int w, int h) {
+        EngineInfo.makeBasicEntities(this, UIBuilder);
+    }
 
-	public void update(float delta) {
-		if (EngineInfo.Debug && EntityBuilder.getByName("~CAMERA") == null) {
-			EngineInfo.makeBasicEntities(this);
-		}
-		_SystemBuilder.updateSystems();
-	}
+    public void restart() {
+        EntityBuilder.clear();
+        EngineInfo.makeBasicEntities(this, UIBuilder);
+    }
+
+    protected void update(float delta) {
+        if (EngineInfo.Debug && EntityBuilder.getByName("~CAMERA") == null) {
+            EngineInfo.makeBasicEntities(this, UIBuilder);
+        }
+        _SystemBuilder.updateSystems();
+        try {
+            long time = (long) (1000 / EngineInfo.Fps - Gdx.graphics.getDeltaTime());
+            Thread.sleep(time < 0 ? 0 : time);
+        } catch (InterruptedException e) {
+        }
+    }
 }

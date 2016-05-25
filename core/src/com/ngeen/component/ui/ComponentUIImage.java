@@ -4,41 +4,45 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.ngeen.component.ComponentBase;
+import com.ngeen.component.ComponentFactory;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.ComponentSpokesman;
 import com.ngeen.entity.Entity;
 
 public class ComponentUIImage extends ComponentUIWidget {
-	private boolean _Saved = false;
-	private Image _Image;
-	public ComponentUIImage(Ngeen ng, Entity ent) {
-		super(ng, ent);
-		_Image = new Image();
-		getOwner().addSuperComponent((ComponentUIWidget) this);
-	}
+    private Image _Image;
+    private boolean _Saved = false;
 
-	@Override
-	public ComponentUIImage remove() {
-		getOwner().removeComponent(ComponentUIWidget.class);
-		_Owner.removeComponent(this.getClass(), Id);
-		return this;
-	}
+    public ComponentUIImage(Ngeen ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+        _Image = new Image();
+    }
 
-	@Override
-	protected void Load(Element element) throws Exception {
-	}
+    @Override
+    public ComponentUIImage remove() {
+        getOwner().removeComponent(ComponentUIWidget.class);
+        _Owner.removeComponent(this.getClass(), Id);
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		if (_Saved) {
-			_Saved = false;
-			return;
-		}
-		_Saved = true;
-		element.element("Component").attribute("_Type", this.getClass().getName()).pop();
-	}
+    @Override
+    protected Actor getActor() {
+        return _Image;
+    }
 
-	@Override
-	protected Actor getActor() {
-		return _Image;
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        return this;
+    }
+
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", this.getClass().getName()).pop();
+    }
+
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        factory.callComponentNotify(this, component);
+    }
 }

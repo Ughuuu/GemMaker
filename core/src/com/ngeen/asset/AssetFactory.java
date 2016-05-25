@@ -1,13 +1,5 @@
 package com.ngeen.asset;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -23,317 +15,308 @@ import com.ngeen.debug.Debugger;
 import com.ngeen.engine.EngineInfo;
 import com.ngeen.engine.Ngeen;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 /**
  * This method has all the necessary assets to a game. It can hold types like
  * _Types = { { "png", "jpg", "jpeg", "gif" }, { "pack", "atlas" }, { "fnt" }, {
  * "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { "vert" } } In order to load
  * all files in all folders located at the data folder, relative to your project
  * classpath, use the function {@link #scoutFiles() scoutFiles}
- * 
+ * <p>
  * Usualy, files are loaded when the scene loads, searching for the folder with
  * the name of your scene.
- * 
+ * <p>
  * If you do wish to load files on your own, use finish() to do synchronous
  * loading(call it and the loading will be done when the function returns, or
  * asynchronous loading with the function done() (call it multiple times,
  * returns true if loading is finished).
- * 
- * @composed 1 has * Asset
+ *
  * @author Dragos
+ * @composed 1 has * Asset
  */
 public class AssetFactory {
-	public static String _PrePath;
+    public static String _PrePath;
+    private final Class<?>[] _ClassType = {Texture.class, TextureAtlas.class, BitmapFont.class, Sound.class,
+            Music.class, ShaderProgram.class};
+    private final Ngeen _Ng;
+    /**
+     * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shader
+     */
+    private final String[][] _Types = {{"png", "jpg", "jpeg", "gif"}, {"pack", "atlas"}, {"fnt"},
+            {"wav", "ogg", "mp3"}, {"wav", "ogg", "mp3"}, {"vert"}};
+    private Map<Integer, Asset> _AssetMap;
+    private Map<String, Integer> _AssetNameMap;
+    /**
+     * Map from Stage Name Folder(Ex. LoadStage, GameStage, etc.) in data to All
+     * the files in it. The string also has an index number to follow it,
+     * representing the Types it holds. Ex LoadStage0, LoadStage1..
+     */
+    private Map<String, List<String>> _Folders = new HashMap<String, List<String>>();
+    /**
+     * All underlying assets are kept here.
+     */
+    private AssetManager _Manager;
+    private List<String> _UpdateFolders;
 
-	private Map<Integer, Asset> _AssetMap;
+    public AssetFactory(Ngeen ng) {
+        _Ng = ng;
+        _Manager = new AssetManager();
+        _Manager.setLoader(ShaderProgram.class, new ShaderLoader(new InternalFileHandleResolver()));
+        _AssetMap = new HashMap<Integer, Asset>();
+        _AssetNameMap = new HashMap<String, Integer>();
+        _UpdateFolders = new ArrayList<String>();
 
-	private Map<String, Integer> _AssetNameMap;
+        if (Gdx.app.getType() == ApplicationType.Android || EngineInfo.Applet == true || EngineInfo.Android == true) {
+            _PrePath = "data/";
+        } else {
+            _PrePath = "data/";
+            //_PrePath = "./bin/data/"; // On eclipse we also need this?
+        }
+    }
 
-	private final Class<?>[] _ClassType = { Texture.class, TextureAtlas.class, BitmapFont.class, Sound.class,
-			Music.class, ShaderProgram.class };
+    /**
+     * Loads a folder previously enqued.
+     *
+     * @param folder Folder name that is in the map.
+     */
+    public void addFolder(String folder) {
+        folder += "/";
+        for (int i = 0; i < _Types.length; i++) {
+            List<String> names = _Folders.get(folder + i);
+            if (names != null) {
+                for (String name : names) {
+                    loadAsset(_PrePath + name, i);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Map from Stage Name Folder(Ex. LoadStage, GameStage, etc.) in data to All
-	 * the files in it. The string also has an index number to follow it,
-	 * representing the Types it holds. Ex LoadStage0, LoadStage1..
-	 */
-	private Map<String, List<String>> _Folders = new HashMap<String, List<String>>();
+    /**
+     * Free all the assets.
+     */
+    public void dispose() {
+        _Manager.dispose();
+    }
 
-	/**
-	 * If this factory still loads objects or not.
-	 */
-	private boolean _Loading = false;
+    /**
+     * Free all the assets.
+     */
+    public void disposeFolder(String folder) {
 
-	/**
-	 * All underlying assets are kept here.
-	 */
-	private AssetManager _Manager;
+        for (int i = 0; i < _Types.length; i++) {
+            List<String> names = _Folders.get(folder + i);
+            if (names != null) {
+                while (names.size() != 0) {
+                    unloadAsset(names.get(0), i, folder);
+                }
+            }
+            _Folders.remove(folder + i);
+        }
+    }
 
-	private final Ngeen _Ng;
+    /**
+     * Has to be called to keep the loading going.
+     *
+     * @return true if loading is finished.
+     */
+    public boolean done() {
+        boolean loading = _Manager.update();
+        if (loading) {
+            for (int i = 0; i < _UpdateFolders.size(); i++) {
+                String folder = _UpdateFolders.get(i);
+                addAssets(folder);
+            }
+            _UpdateFolders.clear();
+        }
+        return loading;
+    }
 
-	/**
-	 * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shader
-	 */
-	private final String[][] _Types = { { "png", "jpg", "jpeg", "gif" }, { "pack", "atlas" }, { "fnt" },
-			{ "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { "vert" } };
+    public void enqueFolder(String folder) {
+        enqueFolder(folder, "");
+    }
 
-	private List<String> _UpdateFolders;
+    /**
+     * Has to be called to keep the loading going.
+     *
+     * @return
+     */
+    public boolean finish() {
+        _Manager.finishLoading();
+        for (int i = 0; i < _UpdateFolders.size(); i++) {
+            String folder = _UpdateFolders.get(i);
+            addAssets(folder);
+        }
+        _UpdateFolders.clear();
+        return true;
+    }
 
-	public AssetFactory(Ngeen ng) {
-		_Ng = ng;
-		_Manager = new AssetManager();
-		_Manager.setLoader(ShaderProgram.class, new ShaderLoader(new InternalFileHandleResolver()));
-		_AssetMap = new HashMap<Integer, Asset>();
-		_AssetNameMap = new HashMap<String, Integer>();
-		_UpdateFolders = new ArrayList<String>();
+    public <T> Asset<T> getAsset(String path) {
+        Integer id = _AssetNameMap.get(path);
+        if (id == null) {
+            Debugger.log("Asset not found " + path);
+            return null;
+        }
+        return getAssetById(id);
+    }
 
-		if (Gdx.app.getType() == ApplicationType.Android || EngineInfo.Applet == true) {
-			_PrePath = "data/";
-		} else {
-			_PrePath = "./bin/data/";
-		}
-	}
+    public <T> Asset<T> getAssetById(int id) {
+        Asset<T> asset = _AssetMap.get(id);
+        return asset;
+    }
 
-	/**
-	 * Loads a folder previously enqued.
-	 * 
-	 * @param folder
-	 *            Folder name that is in the map.
-	 */
-	public void addFolder(String folder) {
-		folder += "/";
-		for (int i = 0; i < _Types.length; i++) {
-			List<String> names = _Folders.get(folder + i);
-			if (names != null) {
-				for (String name : names) {
-					loadAsset(_PrePath + name, i);
-				}
-			}
-		}
-	}
+    public List<String> getAssetsNameFolder(String folder) {
+        List<String> ret = new ArrayList<String>();
+        for (int i = 0; i < _Types.length; i++) {
+            List<String> names = _Folders.get(folder + i);
+            if (names != null) {
+                for (String name : names) {
+                    ret.add(name);
+                }
+            }
+        }
+        return ret;
+    }
 
-	/**
-	 * Free all the assets.
-	 */
-	public void dispose() {
-		_Manager.dispose();
-	}
+    /**
+     * Set of String because we might have doubles.
+     *
+     * @param folder
+     * @return
+     */
+    public Set<String> getFolderNames() {
+        Set<String> ret = new TreeSet<String>();
+        for (Entry<String, List<String>> folderNamePair : _Folders.entrySet()) {
+            String n = folderNamePair.getKey();
+            ret.add(n.substring(0, n.length() - 1));
+        }
+        return ret;
+    }
 
-	/**
-	 * Free all the assets.
-	 */
-	public void disposeFolder(String folder) {
+    public float getPercentage() {
+        return _Manager.getProgress();
+    }
 
-		for (int i = 0; i < _Types.length; i++) {
-			List<String> names = _Folders.get(folder + i);
-			if (names != null) {
-				while (names.size() != 0) {
-					unloadAsset(names.get(0), i, folder);
-				}
-			}
-			_Folders.remove(folder + i);
-		}
-	}
+    public void scoutFiles() {
+        _UpdateFolders.add("");
+        FileHandle dirHandle = Gdx.files.internal(_PrePath);
+        String folder = "", actualFolder = "";
 
-	/**
-	 * Has to be called to keep the loading going.
-	 * 
-	 * @return true if loading is finished.
-	 */
-	public boolean done() {
-		boolean loading = _Manager.update();
-		if (loading) {
-			for (int i = 0; i < _UpdateFolders.size(); i++) {
-				String folder = _UpdateFolders.get(i);
-				addAssets(folder);
-			}
-			_UpdateFolders.clear();
-		}
-		return loading;
-	}
+        for (FileHandle entry : dirHandle.list()) {
+            String name = entry.name();
+            String extension = entry.extension();
 
-	public void enqueFolder(String folder) {
-		enqueFolder(folder, "");
-	}
+            if (entry.isDirectory()) {// this has to be a class name.
+                enqueFolder(name + "/", "");
+            } else {
+                int extensionKey = getExt(extension);
+                List<String> list = null;
+                if (_Folders.containsKey(folder + extensionKey) == false) {
+                    list = new ArrayList<String>();
+                    _Folders.put(folder + extensionKey, list);
+                } else {
+                    list = _Folders.get(folder + extensionKey);
+                }
+                loadAsset(_PrePath + name, extensionKey);
+                list.add(name);
+            }
+        }
+    }
 
-	/**
-	 * Has to be called to keep the loading going.
-	 * 
-	 * @return
-	 */
-	public boolean finish() {
-		_Manager.finishLoading();
-		for (int i = 0; i < _UpdateFolders.size(); i++) {
-			String folder = _UpdateFolders.get(i);
-			addAssets(folder);
-		}
-		_UpdateFolders.clear();
-		return true;
-	}
+    public void unloadAsset(String path, int resType, String folder) {
+        try {
+            _Manager.unload(_PrePath + folder + path);
+            _Folders.get(folder + resType).remove(path);
+            int ind = _AssetNameMap.remove(folder + path);
+            _AssetMap.remove(ind);
+        } catch (Exception e) {
+            Debugger.println(path + " is not loaded.");// Known bug. Sorry.
+        }
+    }
 
-	public <T> Asset<T> getAsset(String path) {
-		Integer id = _AssetNameMap.get(path);
-		if (id == null) {
-			Debugger.log("Asset not found " + path);
-			return null;
-		}
-		return getAssetById(id);
-	}
+    private void addAssets(String folder) {
+        for (int i = 0; i < _Types.length; i++) {
+            List<String> names = _Folders.get(folder + i);
+            if (names != null) {
+                for (String name : names) {
+                    Asset addNew = new Asset(_Ng, name, _Manager.get(_PrePath + folder + name), i, folder);
+                    _AssetMap.put(addNew.getId(), addNew);
+                    _AssetNameMap.put(addNew.getFolder() + addNew.getPath(), addNew.getId());
+                }
+            }
+        }
+    }
 
-	public <T> Asset<T> getAssetById(int id) {
-		Asset<T> asset = _AssetMap.get(id);
-		return asset;
-	}
+    /**
+     * Check if given file is of specific given type. This is done only when
+     * specified. Will not be done in Release mode.
+     *
+     * @param name Name of the file
+     * @param i    Index of _Types array of arrays.
+     * @return If it is of specified type or not.
+     */
+    private boolean checkExt(String name, int i) {
+        for (int j = 0; j < _Types[i].length; j++) {
+            if (name.compareTo(_Types[i][j]) == 0 || name.compareTo(_Types[i][j].toUpperCase()) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public List<String> getAssetsNameFolder(String folder) {
-		List<String> ret = new ArrayList<String>();
-		for (int i = 0; i < _Types.length; i++) {
-			List<String> names = _Folders.get(folder + i);
-			if (names != null) {
-				for (String name : names) {
-					ret.add(name);
-				}
-			}
-		}
-		return ret;
-	}
+    /**
+     * Adds folder to the map. Can be used to load or save later.
+     *
+     * @param folder
+     */
+    private void enqueFolder(String folder, String actualFolder) {
+        _UpdateFolders.add(folder);
+        FileHandle dirHandle = Gdx.files.internal(_PrePath + folder + actualFolder);
 
-	/**
-	 * Set of String because we might have doubles.
-	 * 
-	 * @param folder
-	 * @return
-	 */
-	public Set<String> getFolderNames() {
-		Set<String> ret = new TreeSet<String>();
-		for (Entry<String, List<String>> folderNamePair : _Folders.entrySet()) {
-			String n = folderNamePair.getKey();
-			ret.add(n.substring(0, n.length() - 1));
-		}
-		return ret;
-	}
+        for (FileHandle entry : dirHandle.list()) {
+            String name = entry.name();
+            String extension = entry.extension();
 
-	public float getPercentage() {
-		return _Manager.getProgress();
-	}
+            if (entry.isDirectory()) {// this has to be a class name.
+                enqueFolder(folder, actualFolder + name + "/");
+            } else {
+                int extensionKey = getExt(extension);
+                if (extensionKey == -1) {
+                    continue;
+                }
+                List<String> list = null;
+                if (_Folders.containsKey(folder + extensionKey) == false) {
+                    list = new ArrayList<String>();
+                    _Folders.put(folder + extensionKey, list);
+                } else {
+                    list = _Folders.get(folder + extensionKey);
+                }
+                loadAsset(_PrePath + folder + actualFolder + name, extensionKey);
+                list.add(actualFolder + name);
+            }
+        }
+    }
 
-	public void scoutFiles() {
-		_UpdateFolders.add("");
-		FileHandle dirHandle = Gdx.files.internal(_PrePath);
-		String folder = "", actualFolder = "";
+    /**
+     * Get the coresponding index for the given file extension.
+     *
+     * @param name File extension.
+     * @return Coresponding index in data types table.
+     */
+    private int getExt(String name) {
+        for (int i = 0; i < _Types.length; i++) {
+            if (checkExt(name, i) == true)
+                return i;
+        }
+        return -1;
+    }
 
-		for (FileHandle entry : dirHandle.list()) {
-			String name = entry.name();
-			String extension = entry.extension();
-
-			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(name + "/", "");
-			} else {
-				int extensionKey = getExt(extension);
-				List<String> list = null;
-				if (_Folders.containsKey(folder + extensionKey) == false) {
-					list = new ArrayList<String>();
-					_Folders.put(folder + extensionKey, list);
-				} else {
-					list = _Folders.get(folder + extensionKey);
-				}
-				loadAsset(_PrePath + name, extensionKey);
-				list.add(name);
-			}
-		}
-	}
-
-	public void unloadAsset(String path, int resType, String folder) {
-		try {
-			_Manager.unload(_PrePath + folder + path);
-			_Folders.get(folder + resType).remove(path);
-			int ind = _AssetNameMap.remove(folder + path);
-			_AssetMap.remove(ind);
-		} catch (Exception e) {
-			Debugger.println(path + " is not loaded.");// Known bug. Sorry.
-		}
-	}
-
-	private void addAssets(String folder) {
-		for (int i = 0; i < _Types.length; i++) {
-			List<String> names = _Folders.get(folder + i);
-			if (names != null) {
-				for (String name : names) {
-					Asset addNew = new Asset(_Ng, name, _Manager.get(_PrePath + folder + name), i, folder);
-					_AssetMap.put(addNew.getId(), addNew);
-					_AssetNameMap.put(addNew.getFolder() + addNew.getPath(), addNew.getId());
-				}
-			}
-		}
-	}
-
-	/**
-	 * Check if given file is of specific given type. This is done only when
-	 * specified. Will not be done in Release mode.
-	 * 
-	 * @param name
-	 *            Name of the file
-	 * @param i
-	 *            Index of _Types array of arrays.
-	 * @return If it is of specified type or not.
-	 */
-	private boolean checkExt(String name, int i) {
-		for (int j = 0; j < _Types[i].length; j++) {
-			if (name.compareTo(_Types[i][j]) == 0 || name.compareTo(_Types[i][j].toUpperCase()) == 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Adds folder to the map. Can be used to load or save later.
-	 * 
-	 * @param folder
-	 */
-	private void enqueFolder(String folder, String actualFolder) {
-		_UpdateFolders.add(folder);
-		FileHandle dirHandle = Gdx.files.internal(_PrePath + folder + actualFolder);
-
-		for (FileHandle entry : dirHandle.list()) {
-			String name = entry.name();
-			String extension = entry.extension();
-
-			if (entry.isDirectory()) {// this has to be a class name.
-				enqueFolder(folder, actualFolder + name + "/");
-			} else {
-				int extensionKey = getExt(extension);
-				if (extensionKey == -1) {
-					continue;
-				}
-				List<String> list = null;
-				if (_Folders.containsKey(folder + extensionKey) == false) {
-					list = new ArrayList<String>();
-					_Folders.put(folder + extensionKey, list);
-				} else {
-					list = _Folders.get(folder + extensionKey);
-				}
-				loadAsset(_PrePath + folder + actualFolder + name, extensionKey);
-				list.add(actualFolder + name);
-			}
-		}
-	}
-
-	/**
-	 * Get the coresponding index for the given file extension.
-	 * 
-	 * @param name
-	 *            File extension.
-	 * @return Coresponding index in data types table.
-	 */
-	private int getExt(String name) {
-		for (int i = 0; i < _Types.length; i++) {
-			if (checkExt(name, i) == true)
-				return i;
-		}
-		return -1;
-	}
-
-	private void loadAsset(String path, int resType) {
-		_Manager.load(path, _ClassType[resType]);
-	}
+    private void loadAsset(String path, int resType) {
+        // if
+        if (resType == -1) {
+            return;
+        }
+        _Manager.load(path, _ClassType[resType]);
+    }
 }

@@ -6,49 +6,56 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.ngeen.debug.Debugger;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.ComponentSpokesman;
 import com.ngeen.entity.Entity;
 
 public class ComponentMesh extends ComponentBase {
-	public Mesh _Vertices;
-	BoundingBox Box;
+    public Mesh _Vertices;
+    BoundingBox Box;
 
-	public ComponentMesh(Ngeen ng, Entity ent) {
-		super(ng, ent);
-	}
+    public ComponentMesh(Ngeen ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+    }
 
-	public Mesh createMesh(int size, int ind) {
-		return _Vertices = _Ng._MeshBuilder.makeMesh((getOwner().getComponent(ComponentMaterial.class).getShader()),
-				size, ind);
-	}
+    public Mesh createMesh(int size, int ind) {
+        return _Vertices = _Ng._MeshBuilder.makeMesh((getOwner().getComponent(ComponentMaterial.class).getShader()),
+                size, ind);
+    }
 
-	public Mesh getVertices() {
-		return _Vertices;
-	}
+    public Mesh getVertices() {
+        return _Vertices;
+    }
 
-	public ComponentMesh setVertices(Mesh Vertices) {
-		_Vertices = Vertices;
-		computeBox();
-		return this;
-	}
+    public ComponentMesh setVertices(Mesh Vertices) {
+        _Vertices = Vertices;
+        computeBox();
+        return this;
+    }
 
-	private void computeBox() {
-		try {
-			_Vertices.calculateBoundingBox(Box);
-		} catch (Exception e) {
-			Debugger.log(e);
-		}
-	}
+    private void computeBox() {
+        try {
+            _Vertices.calculateBoundingBox(Box);
+        } catch (Exception e) {
+            Debugger.log(e);
+        }
+    }
 
-	@Override
-	protected void Load(Element element) throws Exception {
-		// _ShaderName = element.get("_ShaderName");
-		// setShader(_ShaderName);
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        // _ShaderName = element.get("_ShaderName");
+        // setShader(_ShaderName);
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("_Type", _Type.getName())
-				// element.attribute("_ShaderName", _ShaderName)
-				.pop();
-	}
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", _Type.getName())
+                // element.attribute("_ShaderName", _ShaderName)
+                .pop();
+    }
+
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        component.notifyWithComponent(this);
+    }
 }

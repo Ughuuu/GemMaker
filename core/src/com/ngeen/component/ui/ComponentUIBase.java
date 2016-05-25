@@ -1,26 +1,56 @@
 package com.ngeen.component.ui;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.XmlReader.Element;
-import com.badlogic.gdx.utils.XmlWriter;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
+import com.badlogic.gdx.utils.Align;
 import com.ngeen.component.ComponentBase;
+import com.ngeen.component.ComponentFactory;
+import com.ngeen.component.ComponentPoint;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.ComponentSpokesman;
 import com.ngeen.entity.Entity;
 
-public abstract class ComponentUIBase extends ComponentBase{
+public abstract class ComponentUIBase extends ComponentBase {
 
-	protected boolean click = false;
-	
-	public ComponentUIBase(Ngeen ng, Entity ent) {
-		super(ng, ent);
-	}
+    protected int _Depth = 0, _Align;
+    protected Entity _UIParent;
+    protected boolean click = false;
+    Value width;
 
-	protected void add(ComponentUIBase comp){}
-	
-	protected void del(ComponentUIBase comp){}
-	
-	protected void swap(ComponentUIBase a, ComponentUIBase b){}
-	
-	protected abstract Actor getActor();
+    public ComponentUIBase(Ngeen ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+    }
 
+    public Entity getUIParent() {
+        return _UIParent;
+    }
+
+    @Override
+    public void notifyWithComponent(ComponentPoint point) {
+        Actor actor = getActor();
+        actor.setOrigin(Align.center);
+        actor.setPosition(point.getPosition().x, point.getPosition().y);
+        actor.setZIndex(_Depth);
+        if (point.getScale().isZero() && point.getRotation().isZero()) {
+        } else {
+            actor.setScale(point.getScale().x, point.getScale().y);
+            actor.setRotation(point.getRotation().z);
+        }
+    }
+
+    protected void add(ComponentUIBase comp) {
+    }
+
+    protected void del(ComponentUIBase comp) {
+    }
+
+    protected abstract Actor getActor();
+
+    @Override
+    protected void reinit() {
+        // _ComponentFactory.addSuperComponent(this);
+    }
+
+    protected void swap(ComponentUIBase a, ComponentUIBase b) {
+    }
 }
