@@ -1,102 +1,96 @@
 package com.ngeen.scene;
 
-import com.artemis.World;
 import com.badlogic.gdx.math.Vector2;
-import com.ngeen.debug.Debugger;
-import com.ngeen.engine.Constant;
 import com.ngeen.engine.Ngeen;
+import com.ngeen.entity.Entity;
 
+/**
+ * @author Dragos
+ */
 public class Scene {
-	public static Ngeen ng;
+    protected Ngeen ng;
+    private SceneFactory _SceneFactory;
 
-	/**
-	 * Called before onEnter so you can assist the loading part of objects.
-	 */
-	public void onInit() {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onInit()");
-	}
+    public void onExit() {
+        // Debugger.println("onExit()");
+    }
 
-	public void onLeave() {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onLeave()");
-	}
+    public void onFling(float x, float y) {
+        // Debugger.println("onFling(): [x=" + x + ",y=" + y + "]");
+    }
 
-	public void onEnter() {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onEnter()");
-	}
+    /**
+     * Called before onEnter so you can assist the loading part of objects.
+     */
+    public void onInit() {
+        // Debugger.println("onInit()");
+    }
 
-	public void onUpdate(float delta) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onUpdate(): [delta=" + delta + "]");
-	}
+    public void onKeyDown(int keycode) {
+        // Debugger.println("onKeyDown(): [keycode=" + keycode + "]");
+    }
 
-	public void onKeyUp(int keycode) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onKeyUp(): [keycode=" + keycode + "]");
-	}
+    public void onKeyUp(int keycode) {
+        // Debugger.println("onKeyUp(): [keycode=" + keycode + "]");
+    }
 
-	public void onKeyDown(int keycode) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onKeyDown(): [keycode=" + keycode + "]");
-	}
+    public void onLongPress(float x, float y) {
+        // Debugger.println("onLongPress(): [x=" + x + ",y=" + y + "]");
+    }
 
-	public void onTouchDrag(float x, float y, int index) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onTouchDrag(): [x=" + x + ",y=" + y + ",index="
-					+ index + "]");
-	}
+    public void onPan(float x, float y, float deltax, float deltay) {
+        // Debugger.println("onPan(): [x=" + x + ",y=" + y + ",deltax=" + deltax
+        // + ",deltay=" + deltay + "]");
+    }
 
-	public void onTouchDown(float x, float y, int index) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onTouchDown(): [x=" + x + ",y=" + y + ",index="
-					+ index + "]");
-	}
+    public void onPanStop(float x, float y) {
+        // Debugger.println("onPanStop(): [x=" + x + ",y=" + y + "]");
+    }
 
-	public void onTouchUp(float x, float y, int index) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onTouchUp(): [x=" + x + ",y=" + y + ",index="
-					+ index + "]");
-	}
+    public void onPinch(Vector2 start1, Vector2 start2, Vector2 final1, Vector2 final2) {
+        // Debugger.println(
+        // "onZoom(): [start1=" + start1 + ",start2=" + start2 + ",final1=" +
+        // final1 + ",final2=" + final2 + "]");
+    }
 
-	public void onTap(float x, float y, int count) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onTap(): [x=" + x + ",y=" + y + ",count="
-					+ count + "]");
-	}
+    public void onTap(float x, float y, int count) {
+        // Debugger.println("onTap(): [x=" + x + ",y=" + y + ",count=" + count +
+        // "]");
+    }
 
-	public void onLongPress(float x, float y) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onLongPress(): [x=" + x + ",y=" + y + "]");
-	}
+    public void onTouchDown(float x, float y, int index) {
+        // Debugger.println("onTouchDown(): [x=" + x + ",y=" + y + ",index=" +
+        // index + "]");
+    }
 
-	public void onFling(float x, float y) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onFling(): [x=" + x + ",y=" + y + "]");
-	}
+    public void onTouchDrag(float x, float y, int index) {
+        // Debugger.println("onTouchDrag(): [x=" + x + ",y=" + y + ",index=" +
+        // index + "]");
+    }
 
-	public void onPan(float x, float y, float deltax, float deltay) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onPan(): [x=" + x + ",y=" + y + ",deltax="
-					+ deltax + ",deltay=" + deltay + "]");
-	}
+    public void onTouchUp(float x, float y, int index) {
+        // Debugger.println("onTouchUp(): [x=" + x + ",y=" + y + ",index=" +
+        // index + "]");
+    }
 
-	public void onPanStop(float x, float y) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onPanStop(): [x=" + x + ",y=" + y + "]");
-	}
+    public void onUpdate(float delta) {
+        // Debugger.println("onUpdate(): [delta=" + delta + "]");
+    }
 
-	public void onZoom(float start, float distance) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onZoom(): [start=" + start + ",distance="
-					+ distance + "]");
-	}
+    public void onZoom(float start, float distance) {
+        // Debugger.println("onZoom(): [start=" + start + ",distance=" +
+        // distance + "]");
+    }
 
-	public void onPinch(Vector2 start1, Vector2 start2, Vector2 final1,
-			Vector2 final2) {
-		if (Constant.DEBUG_LEVEL == 0)
-			Debugger.println("onZoom(): [start1=" + start1 + ",start2="
-					+ start2 + ",final1=" + final1 + ",final2=" + final2 + "]");
-	}
+    protected void addNgeen(final Ngeen ng) {
+        this.ng = ng;
+    }
+
+    protected void addSceneFactory(final SceneFactory _SceneFactory) {
+        this._SceneFactory = _SceneFactory;
+    }
+
+    protected Entity CreateObject(String name) {
+        return ng.EntityBuilder.makeEntity(name);
+    }
 }

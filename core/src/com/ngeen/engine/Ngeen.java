@@ -1,146 +1,137 @@
 package com.ngeen.engine;
 
-import java.util.List;
-
-import com.artemis.BaseSystem;
-import com.artemis.Entity;
-import com.artemis.World;
-import com.artemis.WorldConfiguration;
-import com.artemis.managers.GroupManager;
-import com.artemis.managers.TagManager;
-import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.ngeen.components.CameraComponent;
-import com.ngeen.debug.Debugger;
-import com.ngeen.debug.Spy;
-import com.ngeen.factories.CollidableFactory;
-import com.ngeen.factories.InputFactory;
-import com.ngeen.factories.LoaderFactory;
-import com.ngeen.scene.LoadScene;
-import com.ngeen.scene.Scene;
-import com.ngeen.systems.LogSystem;
-import com.ngeen.systems.OverlaySystem;
-import com.ngeen.systems.PhysicsSystem;
-import com.ngeen.systems.RenderSystem;
-import com.ngeen.systems.SceneSystem;
-import com.ngeen.systems.TransformSystem;
-import com.ngeen.tester.Test;
+import com.ngeen.action.CommandFactory;
+import com.ngeen.asset.Asset;
+import com.ngeen.asset.AssetFactory;
+import com.ngeen.asset.MeshFactory;
+import com.ngeen.component.ComponentFactory;
+import com.ngeen.entity.*;
+import com.ngeen.scene.SceneFactory;
 
-public class Ngeen extends ApplicationAdapter {
+/**
+ * Main engine class. Links all elements and holds entities. <img src=
+ * "https://raw.githubusercontent.com/Ughuuu/ngeen/online/core/doc/img/Ngeen.png"/>
+ *
+ * @author Dragos
+ * @opt hide com.badlogic.*
+ * @opt shape node
+ * @composed 1 has * AssetFactory
+ * @composed 1 has * EntityFactory
+ * @composed 1 has * MeshFactory
+ * @composed 1 has * ComponentFactory
+ * @composed 1 has * SceneFactory
+ * @composed 1 has * SystemFactory
+ * @composed 1 has * XmlComponent
+ */
+public abstract class Ngeen extends ApplicationAdapter {
+    public MeshFactory _MeshBuilder;
+    public CollidableFactory CollidableBuilder;
+    public EntityFactory EntityBuilder;
+    public AssetFactory Loader;
+    protected ComponentFactory _ComponentBuilder;
+    protected SystemFactory _SystemBuilder;
+    protected SceneFactory SceneBuilder;
+    private ComponentSpokesman _ComponentSpokesman;
+    private UIFactory UIBuilder;
+    private XmlEntity XmlSave;
 
-	private GestureListener sceneSystem, inputEditor;
-	private Debugger debug;
+    public void changeScene(String newScene) {
+        SceneBuilder.changeScene(newScene);
+    }
 
-	public Entity getByName(String tag) {
-		return null;
-	}
+    @Override
+    public void create() {
+        if (EngineInfo.Debug)
+            CommandFactory.factory._Ng = this;
+        init();
+    }
 
-	public Entity getById(int id) {
-		return null;
-	}
+    public <T> Asset<T> getAsset(String name) {
+        return Loader.getAsset(name);
+    }
 
-	public void removeEntity(int id) {
-	}
+    public Class<?> getCurrentScene() {
+        return _SystemBuilder._SceneSystem.getScene();
+    }
 
-	public void clear() {
-	}
+    public Entity getEntity(int id) {
+        return EntityBuilder.getById(id);
+    }
 
-	private void addDummyEntities() {
-		/*
-		 * Entity cameraEntity = entityHelper.createPositional("~CAMERA",
-		 * "~ENGINE"); CameraComponent camera =
-		 * cameraEntity.edit().create(CameraComponent.class); camera.camera =
-		 * new OrthographicCamera(Constant.W, Constant.H); Constant.CAMERA =
-		 * cameraEntity;
-		 * 
-		 * cameraEntity = entityHelper.createPositional("~UI_CAMERA",
-		 * "~ENGINE"); camera =
-		 * cameraEntity.edit().create(CameraComponent.class); camera.camera =
-		 * new OrthographicCamera(Constant.W, Constant.H);
-		 * camera.camera.translate(Constant.W / 2, Constant.H / 2, 0);
-		 * camera.camera.update(); Constant.UI_CAMERA = cameraEntity;
-		 */
-	}
+    public Entity getEntity(String name) {
+        return EntityBuilder.getByName(name);
+    }
 
-	public void zoom() {
-		/*
-		 * if (Constant.ZOOM < 0.1f) Constant.ZOOM = 0.1f; if (Constant.ZOOM >
-		 * 2) Constant.ZOOM = 2;
-		 * Constant.CAMERA.getComponent(CameraComponent.class).camera.
-		 * viewportHeight = Constant.H * Constant.ZOOM;
-		 * Constant.CAMERA.getComponent(CameraComponent.class).camera.
-		 * viewportWidth = Constant.W * Constant.ZOOM;
-		 * Constant.CAMERA.getComponent(CameraComponent.class).camera.update();
-		 */
-	}
+    public abstract Class<?> getEntry();
 
-	public void load(String name) {
-		LoaderFactory.preLoadAll(name);
-	}
+    public void init() {
+        Gdx.graphics.setVSync(false);
+        Loader = new AssetFactory(this);
 
-	public void init() {
-		Scene.ng = this;
-		Constant.DEBUG_FONT = new BitmapFont(Gdx.files.internal("data/font/AmaticSC-Regular.fnt"));
+        UIBuilder = new UIFactory(this);
+        _ComponentSpokesman = new ComponentSpokesman(UIBuilder);
 
-		Constant.MANAGER = new AssetManager();
+        _ComponentBuilder = new ComponentFactory(this, _ComponentSpokesman);
 
-		final InputMultiplexer multiplexer = new InputMultiplexer();
-		if (Constant.DEBUG) {
-			Integer ii = new Integer(17);
-			debug = new Debugger(ii, this);
-			multiplexer.addProcessor(debug);
-		}
-		multiplexer.addProcessor((InputProcessor) inputEditor);
-		multiplexer.addProcessor((InputProcessor) this);
-		multiplexer.addProcessor(new GestureDetector(sceneSystem));
-		Gdx.input.setInputProcessor(multiplexer);
+        XmlSave = new XmlEntity(this);
 
-		addDummyEntities();
-	}
+        _SystemBuilder = new SystemFactory(this, _ComponentBuilder, XmlSave);
+        _SystemBuilder.createConfigurations();
 
-	public void setScene(Scene sc) {
-		((SceneSystem) sceneSystem).setScene(sc);
-	}
+        EntityBuilder = new EntityFactory(_ComponentBuilder, XmlSave, _ComponentSpokesman);
+        _MeshBuilder = new MeshFactory(this);
 
-	public void afterLoad(String name) {
-		Debugger.println("Started loading: \"" + name + "\" folder");
-	}
+        _SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);
 
-	public void update(float delta) {
-		LoaderFactory.done();
-	}
+        SceneBuilder = new SceneFactory(this, _SystemBuilder._SceneSystem);
+        SceneBuilder.changeScene(getEntry().getName());
 
-	public void restart() {
-	}
+        EngineInfo.makeBasicEntities(this, UIBuilder);
+        EngineInfo.makeOptionalEntities(this);
 
-	@Override
-	public void create() {
-		init();
-	}
+        _SystemBuilder.createUISystems();
 
-	@Override
-	public void render() {
-		Gdx.gl.glClearColor(Constant.BACKGROUND_COLOR.r, Constant.BACKGROUND_COLOR.g, Constant.BACKGROUND_COLOR.b,
-				Constant.BACKGROUND_COLOR.a);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		update(Gdx.graphics.getDeltaTime());
-	}
+        UIBuilder.createMultiplexer();
 
-	@Override
-	public void resize(int w, int h) {
-	}
+        _SystemBuilder.sendConfigurations(EntityBuilder);
+    }
 
-	public void dispose() {
-		Constant.BATCH.dispose();
-	}
+    public void remove() {
+        EntityBuilder.clear();
+        _ComponentBuilder.clear();
+    }
+
+    @Override
+    public void render() {
+        Gdx.gl.glClearColor(EngineInfo.BackgroundColor.r, EngineInfo.BackgroundColor.g, EngineInfo.BackgroundColor.b,
+                EngineInfo.BackgroundColor.a);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        update(Gdx.graphics.getDeltaTime());
+        UIBuilder.resize((int) EngineInfo.ScreenWidth, (int) EngineInfo.ScreenHeight);
+    }
+
+    @Override
+    public void resize(int w, int h) {
+        EngineInfo.makeBasicEntities(this, UIBuilder);
+    }
+
+    public void restart() {
+        EntityBuilder.clear();
+        EngineInfo.makeBasicEntities(this, UIBuilder);
+    }
+
+    protected void update(float delta) {
+        if (EngineInfo.Debug && EntityBuilder.getByName("~CAMERA") == null) {
+            EngineInfo.makeBasicEntities(this, UIBuilder);
+        }
+        _SystemBuilder.updateSystems();
+        try {
+            long time = (long) (1000 / EngineInfo.Fps - Gdx.graphics.getDeltaTime());
+            Thread.sleep(time < 0 ? 0 : time);
+        } catch (InterruptedException e) {
+        }
+    }
 }
