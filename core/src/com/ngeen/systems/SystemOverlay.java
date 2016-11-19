@@ -203,7 +203,6 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
         _SpriteBatch.setProjectionMatrix(_Comb);
         BitmapFont font = (BitmapFont) _Ng.Loader.getAsset("engine/fonts/impact.fnt").getData();
         font.getData().setScale(0.2f);
-        // font.setColor(1, 1, 1, 0.5f);
         for (Entity ent : _AllEntities) {
             Matrix4 onlyPos = new Matrix4(ent.getComponent(ComponentPoint.class).getPosition(), new Quaternion(),
                     new Vector3(1, 1, 1));
@@ -413,4 +412,10 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
         }
         _SelectAll = false;
     }
+
+	@Override
+	public void pinchStop() {
+		// TODO Auto-generated method stub
+		
+	}
 }

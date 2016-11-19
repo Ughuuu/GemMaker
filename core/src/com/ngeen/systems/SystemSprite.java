@@ -32,7 +32,7 @@ public class SystemSprite extends SystemBase {
     public void onBeforeUpdate() {
         _CameraView = _Ng.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class).Camera.combined;
         _SpriteBatch.begin();
-        // _SpriteBatch.disableBlending();
+        _SpriteBatch.disableBlending();
         _SpriteBatch.setProjectionMatrix(_CameraView);
         _SpriteBatch.setTransformMatrix(new Matrix4());
     }
@@ -40,7 +40,6 @@ public class SystemSprite extends SystemBase {
     @Override
     public void onUpdate(Entity ent) {
         ComponentSprite sprComp = ent.getComponent(ComponentSprite.class);
-        ComponentPoint pos = ent.getComponent(ComponentPoint.class);
         Sprite spr = sprComp.getSprite();
 
         if (spr.getTexture() == null) {

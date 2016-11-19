@@ -9,13 +9,14 @@ import com.ngeen.entity.ComponentSpokesman;
 import com.ngeen.entity.Entity;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * @author Dragos
  * @composed 1 - 1 Script
  */
 public class ComponentScript extends ComponentBase {
-    protected Script Program;
+    protected Sync<Script> Program;
     private String _ProgramName;
 
     public ComponentScript(Ngeen ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
@@ -73,9 +74,9 @@ public class ComponentScript extends ComponentBase {
     }
 
     private void makeProxyScript(String name) throws Exception {
-        DynaCode dynacode = new DynaCode(_Ng, getOwner());
-        dynacode.addSourceDir(new File("scripts"));
-        Program = (Script) dynacode.newClassInstance(Script.class, name);
+        Sync syncCode = new Sync();
+        syncCode.loadFromFile(Paths.get("assets/scripts/" + name.replace('.', '/') + ".java"), "scripts." + name);
+        //Program = syncCode.get();
 
         _ProgramName = name;
         Program.ng = _Ng;

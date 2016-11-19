@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 public class CommandFactory {
     public static CommandFactory factory = new CommandFactory();
+    
     public Ngeen _Ng;
     private Deque<Command> actions = new LinkedList<Command>();
     private Deque<Command> futureActions = new LinkedList<Command>();

@@ -104,7 +104,7 @@ public abstract class ComponentBase {
      *
      * @param component
      */
-    protected void notiftyParented(Entity parent) {
+    protected void notifyParented(Entity parent) {
     }
 
     protected void notifyDeparented(Entity parent) {

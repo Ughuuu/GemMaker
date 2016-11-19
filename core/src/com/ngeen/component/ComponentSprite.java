@@ -36,6 +36,7 @@ public class ComponentSprite extends ComponentBase {
 
     @Override
     public void notifyWithComponent(ComponentPoint point) {
+        spr.setOrigin(spr.getWidth()/2, spr.getHeight()/2);
         spr.setPosition(point.getPosition().x - spr.getWidth() / 2, point.getPosition().y - spr.getHeight() / 2);
         spr.setScale(point.getScale().x, point.getScale().y);
         spr.setRotation(point.getRotation().z);

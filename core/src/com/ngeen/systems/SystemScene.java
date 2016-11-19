@@ -209,4 +209,10 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
             _Scene.onZoom(initialDistance, distance);
         return false;
     }
+
+	@Override
+	public void pinchStop() {
+		// TODO Auto-generated method stub
+		
+	}
 }

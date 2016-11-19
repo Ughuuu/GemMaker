@@ -63,6 +63,8 @@ public class ComponentUILabel extends ComponentUIWidget {
 
     @Override
     protected ComponentBase Load(Element element) throws Exception {
+        setFont(element.getChildByName("Label").get("FontName"));
+        setText(element.getChildByName("Label").get("Text"));
         return this;
     }
 

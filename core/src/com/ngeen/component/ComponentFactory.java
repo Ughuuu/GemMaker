@@ -151,7 +151,7 @@ public class ComponentFactory extends TypeObservable<ComponentBase> {
     public void callSetParentNotifty(Entity entity, Entity parent) {
         List<ComponentBase> components = entity.getComponents();
         for (ComponentBase comp : components) {
-            comp.notiftyParented(parent);
+            comp.notifyParented(parent);
         }
     }
 
