@@ -11,55 +11,57 @@ import com.ngeen.entity.Entity;
 import java.io.File;
 import java.nio.file.Paths;
 
+import org.jsync.sync.Commiter;
+import org.jsync.sync.Sync;
+import org.jsync.sync.Updater;
+
 /**
  * @author Dragos
  * @composed 1 - 1 Script
  */
 public class ComponentScript extends ComponentBase {
+	protected static final Updater updater;
     protected Sync<Script> Program;
     private String _ProgramName;
+    
+    static{
+    	Updater updaterCpy = null;
+    	try{
+    		updaterCpy = new Commiter();
+    	} catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	updater = updaterCpy;
+    }
 
     public ComponentScript(Ngeen ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
         super(ng, ent, factory, _ComponentSpokesman);
-        Program = null;
     }
 
     public Script getScript() {
-        return Program;
+        return Program.getInstance();
     }
 
     public ComponentScript setScript(Class<?> name) {
-        try {
-            makeScript(name);
-            Program.onInit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	setScript(name.getCanonicalName());
         return this;
     }
 
     public ComponentScript setScript(String name) {
         try {
             if (EngineInfo.Debug) {
-                makeProxyScript(name);
-                Program.onInit();
+                loadClass(name);
+                Program.getInstance().onInit();
                 return this;
             }
         } catch (Exception e) {
             Debugger.log(e.getStackTrace());
         }
-        try {
-            Class<?> act = Class.forName(name);
-            makeScript(act);
-            Program.onInit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return this;
     }
 
     public boolean isValid() {
-        if (Program != null && Program.ng != null && Program.holder != null) {
+        if (Program != null && Program.getInstance() != null && Program.getInstance().ng != null && Program.getInstance().holder != null) {
             return true;
         }
         return false;
@@ -69,33 +71,26 @@ public class ComponentScript extends ComponentBase {
     public ComponentScript setEnabled(boolean Enable) {
         this.Enable = Enable;
         if (Program != null)
-            Program.onInit();
+            Program.getInstance().onInit();
         return this;
     }
 
-    private void makeProxyScript(String name) throws Exception {
-        Sync syncCode = new Sync();
-        syncCode.loadFromFile(Paths.get("assets/scripts/" + name.replace('.', '/') + ".java"), "scripts." + name);
-        //Program = syncCode.get();
-
+    private void loadClass(String name) throws Exception {        
         _ProgramName = name;
-        Program.ng = _Ng;
-        Program.holder = getOwner();
-    }
-
-    private void makeScript(Class<?> script) throws Exception {
-        _ProgramName = script.getName();
-        Program = (Script) script.newInstance();
-        Program.ng = _Ng;
-        Program.holder = getOwner();
+        if(Program == null){
+        	Program = new Sync<Script>(name, updater);
+        }
+        else{
+        	Program.update(name);
+        }
+        Program.getInstance().ng = _Ng;
+        Program.getInstance().holder = getOwner();
     }
 
     @Override
     protected void destroyed() {
         if(Program==null)
             return;
-        Program.ng = null;
-        Program.holder = null;
         Program = null;
     }
 
@@ -103,23 +98,12 @@ public class ComponentScript extends ComponentBase {
     protected ComponentBase Load(Element element) throws Exception {
         try {
             _ProgramName = element.getChildByName("Program").get("Name");
-            boolean tryTwice = true;
             try {
                 if (EngineInfo.Debug) {
-                    makeProxyScript(_ProgramName);
-                    tryTwice = false;
+                    loadClass(_ProgramName);
                 }
             } catch (Exception e) {
                 Debugger.log(e.toString());
-            }
-            try {
-                if (tryTwice) {
-                    Class<?> act = Class.forName(_ProgramName);
-                    makeScript(act);
-                }
-            } catch (Exception e) {
-                Debugger.log(e.toString());
-                // e.printStackTrace();
             }
             Enable = false;
         } catch (Exception e) {
