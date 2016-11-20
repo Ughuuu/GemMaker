@@ -2,7 +2,7 @@ package com.example.app.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplet;
 import com.example.app.Main;
-import com.ngeen.engine.EngineInfo;
+import com.gem.engine.EngineInfo;
 
 public class DesktopApplet extends LwjglApplet {
     private static final long serialVersionUID = 1L;

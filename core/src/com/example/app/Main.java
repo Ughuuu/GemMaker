@@ -1,15 +1,15 @@
 package com.example.app;
 
-import com.ngeen.engine.Ngeen;
+import com.gem.engine.Gem;
 
-public class Main extends Ngeen {
+public class Main extends Gem {
 
-    public static void main(String[] arg) {
-        new Main().create();
-    }
+	public static void main(String[] arg) {
+		new Main().create();
+	}
 
-    @Override
-    public Class<?> getEntry() {
-        return LoadScene.class;
-    }
+	@Override
+	public Class<?> getEntry() {
+		return LoadScene.class;
+	}
 }

@@ -1,0 +1,22 @@
+<com.example.app.LoadScene Width="1380.6741" Height="960.0">
+	<Entity Name="~CAMERA" Parent="null" Order="-1">
+		<Component Type="com.gem.component.ComponentCamera">
+			<Viewport Fov="-1.0" Width="1380.6741" Height="960.0"/>
+		</Component>
+		<Component Type="com.gem.component.ComponentPoint">
+			<Position X="-13.183471" Y="52.734097" Z="0.0"/>
+			<Scale X="1.0" Y="1.0" Z="1.0"/>
+			<Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+		</Component>
+	</Entity>
+	<Entity Name="~UICAMERA" Parent="null" Order="-1">
+		<Component Type="com.gem.component.ComponentCamera">
+			<Viewport Fov="-1.0" Width="1152.0" Height="801.0"/>
+		</Component>
+		<Component Type="com.gem.component.ComponentPoint">
+			<Position X="576.0" Y="400.5" Z="0.0"/>
+			<Scale X="1.0" Y="1.0" Z="1.0"/>
+			<Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+		</Component>
+	</Entity>
+</com.example.app.TestScene>

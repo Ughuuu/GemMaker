@@ -2,10 +2,14 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { 
+        	url "https://repo.eclipse.org/content/groups/releases/"
+			url 'http://repo1.maven.org/maven2'
+        	url "https://oss.sonatype.org/content/repositories/snapshots/" 
+        	url "http://localrepo:8081/artifactory/libs-release"
+        	url "https://jitpack.io"
+        }
         mavenLocal()
-        maven { url "https://jitpack.io" }
-   		maven { url "http://localrepo:8081/artifactory/libs-release" }
         jcenter()
     }
     dependencies {
@@ -27,13 +31,22 @@ allprojects {
         roboVMVersion = '2.2.0'
         box2DLightsVersion = '1.4'
         aiVersion = '1.8.0'
+        lombokVersion = '1.16.10'
+        javaSyncVersion = '617c445c18'
+     	sfl4jVersion = "1.6.1"
     }
 
     repositories {
-        maven { url "https://jitpack.io" }
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { 
+        	url "https://repo.eclipse.org/content/groups/releases/"
+			url 'http://repo1.maven.org/maven2'
+        	url "https://oss.sonatype.org/content/repositories/snapshots/" 
+        	url "http://localrepo:8081/artifactory/libs-release"
+        	url "https://jitpack.io"
+        }
+        mavenLocal()
+        jcenter()
     }
 }
 
@@ -156,9 +169,12 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-		compile group: 'net.openhft', name: 'compiler', version: '2.2.5'
 		
-	    compile 'com.github.Ughuuu:JavaSync:5dd1de19bd'
+	    compile "com.github.Ughuuu:JavaSync:$javaSyncVersion"
+		compile group: 'org.slf4j', name: 'slf4j-simple', version: sfl4jVersion
+	    
+	    compileOnly "org.projectlombok:lombok:$lombokVersion"
+		testCompileOnly "org.projectlombok:lombok:$lombokVersion"
 		
         compile fileTree(dir: '../libs', include: '*.jar')
     }

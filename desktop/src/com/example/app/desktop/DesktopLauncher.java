@@ -3,7 +3,7 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.example.app.Main;
-import com.ngeen.engine.EngineInfo;
+import com.gem.engine.EngineInfo;
 
 public class DesktopLauncher {
     public static void main(String[] arg) {
@@ -13,9 +13,9 @@ public class DesktopLauncher {
         config.width = 1366;
         config.height = 760;
         config.vSyncEnabled = true;
-        config.addIcon("gem-ico128.png", Files.FileType.Internal);
-        config.addIcon("gem-ico32.png", Files.FileType.Internal);
-        config.addIcon("gem-ico16.png", Files.FileType.Internal);
+        config.addIcon("data/engine/gem-ico128.png", Files.FileType.Internal);
+        config.addIcon("data/engine/gem-ico32.png", Files.FileType.Internal);
+        config.addIcon("data/engine/gem-ico16.png", Files.FileType.Internal);
         EngineInfo.Applet = false;
         EngineInfo.Android = false;
         //EngineInfo.Debug = true;
