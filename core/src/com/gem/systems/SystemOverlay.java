@@ -31,9 +31,11 @@ import com.gem.entity.XmlEntity;
  * @composed 1 - 1 OverlaySelector
  */
 public class SystemOverlay extends SystemBase implements GestureListener, InputProcessor {
+	public static float x;
+	public static float y;
 	public static float x1;
-	public static float x2;
 	public static float y1;
+	public static float x2;
 	public static float y2;
 	private final XmlEntity xmlFactory;
 	private Set<Entity> allEntities = new TreeSet<Entity>(new Comparator<Entity>() {
@@ -43,12 +45,11 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 			return Integer.signum(o1.hashCode() - o2.hashCode());
 		}
 	});
-	private Matrix4 comb;
 	private boolean deleteSelected = false, selectAll = false, writeMode = false, shift = false, ctrl, alt;
 	private String entityName = "null";
 	private int modifyType = 0;
 	private OverlaySelector overlaySelector;
-	private Set<Entity> selected = new TreeSet<Entity>(new Comparator<Entity>() {
+	public static Set<Entity> selected = new TreeSet<Entity>(new Comparator<Entity>() {
 
 		@Override
 		public int compare(Entity o1, Entity o2) {
@@ -131,7 +132,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		}
 		if (Input.Keys.C == keycode) {
 			selected.clear();
-			Entity ent = gem.EntityBuilder.makeEntity("NewEntity");
+			Entity ent = gem.entityBuilder.makeEntity("NewEntity");
 			ent.addComponent(ComponentPoint.class);
 			selected.add(ent);
 		}
@@ -192,6 +193,8 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+		x = screenX;
+		y = screenY;
 		return false;
 	}
 
@@ -200,8 +203,8 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		shapeRenderer.end();
 
 		spriteBatch.begin();
-		spriteBatch.setProjectionMatrix(comb);
-		BitmapFont font = (BitmapFont) gem.Loader.getAsset("engine/fonts/impact.fnt").getAsset();
+		spriteBatch.setProjectionMatrix(gem.entityBuilder.getByName("~EDITOR").getComponent(ComponentCamera.class).getCombined());
+		BitmapFont font = (BitmapFont) gem.loader.getAsset("engine/fonts/impact.fnt").getAsset();
 		font.getData().setScale(0.2f);
 		for (Entity ent : allEntities) {
 			Matrix4 onlyPos = new Matrix4(ent.getComponent(ComponentPoint.class).getPosition(), new Quaternion(),
@@ -220,13 +223,27 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 
 	@Override
 	public void onBeforeUpdate() {
+		x%=EngineInfo.ScreenWidth;
+		y%=EngineInfo.ScreenHeight;
+		x1%=EngineInfo.ScreenWidth;
+		y1%=EngineInfo.ScreenHeight;
+		x2%=EngineInfo.ScreenWidth;
+		y2%=EngineInfo.ScreenHeight;
+		if(x<0)x+=EngineInfo.ScreenWidth;
+		if(x1<0)x1+=EngineInfo.ScreenWidth;
+		if(x2<0)x2+=EngineInfo.ScreenWidth;
+		if(y<0)y+=EngineInfo.ScreenHeight;
+		if(y1<0)y1+=EngineInfo.ScreenHeight;
+		if(y2<0)y2+=EngineInfo.ScreenHeight;
+		
+		drawMouse();
+		
 		if (selectAll) {
 			SelectAll();
 		}
 		if (deleteSelected) {
 			DeleteAll();
 		}
-		comb = gem.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class).Camera.combined;
 		shapeRenderer.begin(ShapeType.Line);
 		computeSelection();
 		if (modifyType != 0) {
@@ -244,7 +261,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		if (selecting)
 			overlaySelector.Select(ent, selected, selection);
 
-		overlaySelector.Overlay(ent, comb, selected.contains(ent));
+		overlaySelector.Overlay(ent, gem.entityBuilder.getByName("~EDITOR").getComponent(ComponentCamera.class).getCombined(), selected.contains(ent));
 	}
 
 	@Override
@@ -273,13 +290,16 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 
 	@Override
 	public boolean scrolled(int amount) {
-		ComponentCamera cam = gem.EntityBuilder.getByName("~CAMERA").getComponent(ComponentCamera.class);
-		float ratio = cam.Camera.viewportWidth / cam.Camera.viewportHeight;
-		cam.Camera.viewportWidth += ratio * amount * 20;
-		cam.Camera.viewportHeight += amount * 20;
-		EngineInfo.Width = cam.Camera.viewportWidth;
-		EngineInfo.Height = cam.Camera.viewportHeight;
-		cam.Camera.update();
+		Entity camera = gem.entityBuilder.getByName("~EDITOR");
+		ComponentCamera cam = camera.getComponent(ComponentCamera.class);
+		ComponentPoint pos = camera.getComponent(ComponentPoint.class);
+		float ratio = cam.getViewportWidth() / cam.getViewportHeight();
+		pos.setScale(pos.getScale().add(ratio * amount / 80));
+		float posx = (EngineInfo.ScreenWidth / 2 - x) / EngineInfo.ScreenWidth * amount * 80 * ratio;
+		float posy = (EngineInfo.ScreenHeight / 2 - y) / EngineInfo.ScreenHeight * amount * 80 * ratio * -1;
+		pos.setPosition(pos.getPosition().add(new Vector3(posx, posy, 0)));
+		EngineInfo.Width = cam.getViewportWidth();
+		EngineInfo.Height = cam.getViewportHeight();
 		return false;
 	}
 
@@ -291,12 +311,18 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 
 	@Override
 	public boolean touchDown(float x, float y, int pointer, int button) {
-		// TODO Auto-generated method stub
+		SystemOverlay.x = x;
+		SystemOverlay.y = y;
 		return false;
 	}
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		if(button == 2){
+			Gdx.input.setCursorCatched(false);
+		}else{
+			Gdx.input.setCursorCatched(true);
+		}
 		writeMode = false;
 		modifyType = 0;
 		if (button != Input.Buttons.LEFT) {
@@ -307,6 +333,8 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		y1 = screenY;
 		x2 = x1;
 		y2 = y1;
+		x = screenX;
+		y = screenY;
 		return false;
 	}
 
@@ -315,6 +343,8 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		selecting = true;
 		x2 = screenX;
 		y2 = screenY;
+		x = screenX;
+		y = screenY;
 		return false;
 	}
 
@@ -328,6 +358,8 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 		y1 = 0;
 		x2 = 0;
 		y2 = 0;
+		x = screenX;
+		y = screenY;
 		return false;
 	}
 
@@ -338,25 +370,40 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 	}
 
 	private void computeSelection() {
-		Entity ent = gem.EntityBuilder.getByName("~UICAMERA");
+		Entity ent = gem.entityBuilder.getByName("~UICAMERA");
 		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
 
-		Entity ent2 = gem.EntityBuilder.getByName("~CAMERA");
-		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
-
-		Matrix4 comb = cam.Camera.combined;
 		selection = new BoundingBox(new Vector3(x1, EngineInfo.ScreenHeight - y1, -10),
 				new Vector3(x2, EngineInfo.ScreenHeight - y2, 10));
-		selection.mul(new Matrix4().translate(new Vector3(-cam.Camera.position.x, -cam.Camera.position.y, 0)));
+		Vector3 position = cam.getPosition();
+		selection.mul(new Matrix4().translate(new Vector3(-position.x, -position.y, 0)));
 		selection
 				.mul(new Matrix4(new Vector3(), new Quaternion(), new Vector3(EngineInfo.Width / EngineInfo.ScreenWidth,
 						EngineInfo.Height / EngineInfo.ScreenHeight, 1)));
 	}
+	
+	private void drawMouse(){
+		Entity ent = gem.entityBuilder.getByName("~UICAMERA");
+		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
+		Matrix4 comb = cam.getCombined();
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.rect(-EngineInfo.ScreenWidth/2, -EngineInfo.ScreenHeight/2, EngineInfo.ScreenWidth, EngineInfo.ScreenHeight);
+		shapeRenderer.setProjectionMatrix(comb);
+		shapeRenderer.rect(0, 0, EngineInfo.ScreenWidth, EngineInfo.ScreenHeight);
+		shapeRenderer.line(x+16, EngineInfo.ScreenHeight-y-12, 
+				x, EngineInfo.ScreenHeight-y);
+		shapeRenderer.end();
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.triangle(x + 2, EngineInfo.ScreenHeight-y - 6, 
+				x + 10, EngineInfo.ScreenHeight-y, 
+				x, EngineInfo.ScreenHeight-y);
+		shapeRenderer.end();
+	}
 
 	private void drawSelection() {
-		Entity ent = gem.EntityBuilder.getByName("~UICAMERA");
+		Entity ent = gem.entityBuilder.getByName("~UICAMERA");
 		ComponentCamera cam = ent.getComponent(ComponentCamera.class);
-		Matrix4 comb = cam.Camera.combined;
+		Matrix4 comb = cam.getCombined();
 		shapeRenderer.setProjectionMatrix(comb);
 		shapeRenderer.rect(x1, EngineInfo.ScreenHeight - y1, x2 - x1, -y2 + y1);
 	}
@@ -378,7 +425,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 				break;
 			case 2:
 				Vector3 rot = new Vector3(ent.getComponent(ComponentPoint.class).getRotation());
-				rot.add(0, 0, (deltaX - deltaY));
+				rot.add(0, 0, (deltaX - deltaY)/1000);
 				ent.getComponent(ComponentPoint.class).setRotation(rot);
 				break;
 			case 3:
@@ -412,7 +459,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 
 	void SelectAll() {
 		selected.clear();
-		for (Entity ent : gem.EntityBuilder.getEntities()) {
+		for (Entity ent : gem.entityBuilder.getEntities()) {
 			if (ent.hasComponent(ComponentPoint.class) && !ent.hasComponent(ComponentCamera.class))
 				selected.add(ent);
 		}

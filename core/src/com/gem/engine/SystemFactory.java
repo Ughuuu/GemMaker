@@ -2,8 +2,10 @@ package com.gem.engine;
 
 import java.util.Set;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.gem.component.ComponentCamera;
 import com.gem.component.ComponentFactory;
 import com.gem.component.ComponentMaterial;
 import com.gem.component.ComponentMesh;
@@ -16,6 +18,7 @@ import com.gem.entity.Entity;
 import com.gem.entity.EntityFactory;
 import com.gem.entity.XmlEntity;
 import com.gem.systems.SystemBase;
+import com.gem.systems.SystemCamera;
 import com.gem.systems.SystemConfiguration;
 import com.gem.systems.SystemDraw;
 import com.gem.systems.SystemOverlay;
@@ -29,32 +32,27 @@ import com.gem.systems.SystemStage;
  * @composed 1 - 1 SystemBase
  */
 public class SystemFactory {
-	protected final ComponentFactory _ComponentBuilder;
-	protected final Gem _Ng;
+	protected final ComponentFactory componentBuilder;
+	protected final Gem gem;
 	private final XmlEntity xmlFactory;
-	protected SystemDraw _DrawingSystem;
-	protected SystemOverlay _OverlaySystem;
-	protected SystemPhysics _PhysicsSystem;
-	protected SystemScene _SceneSystem;
-	protected SystemSprite _SpriteSystem;
-	protected SystemStage _StageSystem;
-	private SystemConfiguration _ConfigurationStage;
-	private SystemConfiguration _DrawingConfiguration;
-	private SystemConfiguration _PointConfiguration;
-	private SystemConfiguration _RigidConfiguration;
-	private SystemConfiguration _ScriptConfiguration;
-	private SystemConfiguration _SpriteConfiguration;
+	protected SystemDraw drawingSystem;
+	protected SystemOverlay overlaySystem;
+	protected SystemPhysics phisicsSystem;
+	protected SystemScene sceneSystem;
+	protected SystemSprite spriteSystem;
+	protected SystemCamera cameraSystem;
+	protected SystemStage stageSystem;
 
 	public SystemFactory(Gem ng, ComponentFactory _ComponentBuilder, XmlEntity xml) {
-		_Ng = ng;
+		gem = ng;
 		xmlFactory = xml;
-		this._ComponentBuilder = _ComponentBuilder;
+		this.componentBuilder = _ComponentBuilder;
 	}
 
 	private void updateSystem(SystemBase system) {
 		float time = TimeUtils.millis();
 		system.onBeforeUpdate();
-		Set<Entity> entities = _Ng.EntityBuilder.getEntitiesForSystem(system);
+		Set<Entity> entities = gem.entityBuilder.getEntitiesForSystem(system);
 
 		for (Entity entity : entities) {
 			system.onUpdate(entity);
@@ -64,56 +62,58 @@ public class SystemFactory {
 		system.deltaTime = TimeUtils.millis() - time;
 	}
 
-	protected void createConfigurations() {
-		_PointConfiguration = new SystemConfiguration().all(ComponentPoint.class);
-		_RigidConfiguration = new SystemConfiguration().all(ComponentPoint.class, ComponentRigid.class);
-		_ScriptConfiguration = new SystemConfiguration().all(ComponentScript.class);
-		_DrawingConfiguration = new SystemConfiguration().all(ComponentPoint.class, ComponentMesh.class,
-				ComponentMaterial.class);
-		_SpriteConfiguration = new SystemConfiguration().all(ComponentPoint.class, ComponentSprite.class);
-		_ConfigurationStage = new SystemConfiguration().all(ComponentPoint.class, ComponentUIStage.class);
-	}
-
 	protected void createMainSystems(SpriteBatch batch) {
-		createConfigurations();
-
-		_PhysicsSystem = new SystemPhysics(_Ng, _RigidConfiguration);
+		phisicsSystem = new SystemPhysics(gem, new SystemConfiguration().all(ComponentPoint.class, ComponentRigid.class));
 
 		if (EngineInfo.Debug == true) {
-			_OverlaySystem = new SystemOverlay(_Ng, _PointConfiguration, batch, xmlFactory);
+			overlaySystem = new SystemOverlay(gem, new SystemConfiguration().all(ComponentPoint.class), batch, xmlFactory);
 		}
-		_SceneSystem = new SystemScene(_Ng, _ScriptConfiguration, xmlFactory);
-		_DrawingSystem = new SystemDraw(_Ng, _DrawingConfiguration);
-		_SpriteSystem = new SystemSprite(_Ng, _SpriteConfiguration, batch);
+		cameraSystem = new SystemCamera(gem, new SystemConfiguration().all(ComponentPoint.class, ComponentCamera.class));
+		sceneSystem = new SystemScene(gem, new SystemConfiguration().all(ComponentScript.class), xmlFactory);
+		drawingSystem = new SystemDraw(gem, new SystemConfiguration().all(ComponentPoint.class, ComponentMesh.class,
+				ComponentMaterial.class));
+		spriteSystem = new SystemSprite(gem, new SystemConfiguration().all(ComponentPoint.class, ComponentSprite.class), batch);
 	}
 
 	protected void createUISystems() {
-		_StageSystem = new SystemStage(_Ng, _ConfigurationStage, _ComponentBuilder);
+		stageSystem = new SystemStage(gem, new SystemConfiguration().all(ComponentPoint.class, ComponentUIStage.class), componentBuilder);
 	}
 
 	protected void sendConfigurations(EntityFactory EntityBuilder) {
-		EntityBuilder.addSystem(_SceneSystem);
+		EntityBuilder.addSystem(sceneSystem);
 		if (EngineInfo.Debug == true) {
-			EntityBuilder.addSystem(_OverlaySystem);
+			EntityBuilder.addSystem(overlaySystem);
 		}
-		EntityBuilder.addSystem(_PhysicsSystem);
-		EntityBuilder.addSystem(_DrawingSystem);
-		EntityBuilder.addSystem(_SpriteSystem);
-		EntityBuilder.addSystem(_StageSystem);
+		EntityBuilder.addSystem(phisicsSystem);
+		EntityBuilder.addSystem(drawingSystem);
+		EntityBuilder.addSystem(spriteSystem);
+		EntityBuilder.addSystem(stageSystem);
 	}
 
 	protected void updateSystems() {
 
-		updateSystem(_PhysicsSystem);
-		updateSystem(_DrawingSystem);
-		updateSystem(_SpriteSystem);
+		updateSystem(phisicsSystem);
+		updateSystem(drawingSystem);
+		updateSystem(spriteSystem);
 
-		updateSystem(_StageSystem);
+		updateSystem(stageSystem);
 
 		if (EngineInfo.Debug == true) {
-			updateSystem(_OverlaySystem);
+			updateSystem(overlaySystem);
 		}
 
-		updateSystem(_SceneSystem);
+		updateSystem(sceneSystem);
+	}
+
+	public void resize(int w, int h) {
+		if(cameraSystem != null){
+			cameraSystem.resize(w, h);
+		}
+	}
+
+	public void restart() {
+		if(cameraSystem != null){
+			cameraSystem.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		}
 	}
 }

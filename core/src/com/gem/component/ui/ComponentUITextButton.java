@@ -19,7 +19,7 @@ public class ComponentUITextButton extends ComponentUILayout {
 	public ComponentUITextButton(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		super(ng, ent, factory, _ComponentSpokesman);
 		TextButtonStyle style = new TextButtonStyle();
-		BitmapFont font = (BitmapFont) Ng.Loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
+		BitmapFont font = (BitmapFont) gem.loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
 		style.font = font;
 		TextButton but = new TextButton("Text", style);
 		_TextButton = but;

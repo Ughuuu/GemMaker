@@ -19,7 +19,7 @@ public class ComponentUITextArea extends ComponentUIWidget {
 	public ComponentUITextArea(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		super(ng, ent, factory, _ComponentSpokesman);
 		TextFieldStyle style = new TextFieldStyle();
-		BitmapFont font = (BitmapFont) Ng.Loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
+		BitmapFont font = (BitmapFont) gem.loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
 		style.font = font;
 		_TextArea = new TextArea("Text", style);
 	}

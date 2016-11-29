@@ -29,7 +29,6 @@ public class MeshFactory {
 		if (prog == null)
 			return null;
 		String[] atr = prog.getAttributes();
-		Debugger.log(atr.length);
 		Set<VertexAttribute> attributes = new TreeSet<VertexAttribute>(new Comparator<VertexAttribute>() {
 			@Override
 			public int compare(VertexAttribute o1, VertexAttribute o2) {

@@ -11,53 +11,53 @@ public class TestEntity {
 	}
 
 	private void SimpleTest(Gem ng) {
-		ng.EntityBuilder.makeEntity("e1");
-		ng.EntityBuilder.makeEntity("e2");
-		ng.EntityBuilder.makeEntity("e3");
-		ng.EntityBuilder.makeEntity("e4");
-		ng.EntityBuilder.makeEntity("e5");
+		ng.entityBuilder.makeEntity("e1");
+		ng.entityBuilder.makeEntity("e2");
+		ng.entityBuilder.makeEntity("e3");
+		ng.entityBuilder.makeEntity("e4");
+		ng.entityBuilder.makeEntity("e5");
 
-		assert (ng.EntityBuilder.getByName("e1") != null);
-		assert (ng.EntityBuilder.getByName("e2") != null);
-		assert (ng.EntityBuilder.getByName("e3") != null);
-		assert (ng.EntityBuilder.getByName("e4") != null);
-		assert (ng.EntityBuilder.getByName("e5") != null);
+		assert (ng.entityBuilder.getByName("e1") != null);
+		assert (ng.entityBuilder.getByName("e2") != null);
+		assert (ng.entityBuilder.getByName("e3") != null);
+		assert (ng.entityBuilder.getByName("e4") != null);
+		assert (ng.entityBuilder.getByName("e5") != null);
 
-		ng.EntityBuilder.getByName("e1").remove();
-		ng.EntityBuilder.getByName("e2").remove();
-		ng.EntityBuilder.getByName("e3").remove();
-		ng.EntityBuilder.getByName("e4").remove();
+		ng.entityBuilder.getByName("e1").remove();
+		ng.entityBuilder.getByName("e2").remove();
+		ng.entityBuilder.getByName("e3").remove();
+		ng.entityBuilder.getByName("e4").remove();
 
-		assert (ng.EntityBuilder.getByName("e1") == null);
-		assert (ng.EntityBuilder.getByName("e2") == null);
-		assert (ng.EntityBuilder.getByName("e3") == null);
-		assert (ng.EntityBuilder.getByName("e4") == null);
+		assert (ng.entityBuilder.getByName("e1") == null);
+		assert (ng.entityBuilder.getByName("e2") == null);
+		assert (ng.entityBuilder.getByName("e3") == null);
+		assert (ng.entityBuilder.getByName("e4") == null);
 
-		ng.EntityBuilder.makeEntity("e1");
-		ng.EntityBuilder.makeEntity("e2");
-		ng.EntityBuilder.makeEntity("e3");
-		ng.EntityBuilder.makeEntity("e4");
-		ng.EntityBuilder.makeEntity("e5");
+		ng.entityBuilder.makeEntity("e1");
+		ng.entityBuilder.makeEntity("e2");
+		ng.entityBuilder.makeEntity("e3");
+		ng.entityBuilder.makeEntity("e4");
+		ng.entityBuilder.makeEntity("e5");
 
-		assert (ng.EntityBuilder.getByName("e1") != null);
-		assert (ng.EntityBuilder.getByName("e2") != null);
-		assert (ng.EntityBuilder.getByName("e3") != null);
-		assert (ng.EntityBuilder.getByName("e4") != null);
-		assert (ng.EntityBuilder.getByName("e5") != null);
+		assert (ng.entityBuilder.getByName("e1") != null);
+		assert (ng.entityBuilder.getByName("e2") != null);
+		assert (ng.entityBuilder.getByName("e3") != null);
+		assert (ng.entityBuilder.getByName("e4") != null);
+		assert (ng.entityBuilder.getByName("e5") != null);
 
-		ng.EntityBuilder.getByName("e1").remove();
-		ng.EntityBuilder.getByName("e2").remove();
-		ng.EntityBuilder.getByName("e3").remove();
-		ng.EntityBuilder.getByName("e4").remove();
-		ng.EntityBuilder.getByName("e5").remove();
+		ng.entityBuilder.getByName("e1").remove();
+		ng.entityBuilder.getByName("e2").remove();
+		ng.entityBuilder.getByName("e3").remove();
+		ng.entityBuilder.getByName("e4").remove();
+		ng.entityBuilder.getByName("e5").remove();
 	}
 
 	private void StressTest(Gem ng) {
 		for (int i = 0; i < 2000; i++) {
-			ng.EntityBuilder.makeEntity("test" + i).addComponent(ComponentPoint.class);
+			ng.entityBuilder.makeEntity("test" + i).addComponent(ComponentPoint.class);
 		}
 		for (int i = 0; i < 2000; i++) {
-			ng.EntityBuilder.getByName("test" + i).remove();
+			ng.entityBuilder.getByName("test" + i).remove();
 		}
 	}
 }

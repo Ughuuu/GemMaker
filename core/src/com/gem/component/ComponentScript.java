@@ -18,20 +18,20 @@ import lombok.val;
 public class ComponentScript extends ComponentBase {
 	private static final String scriptFolder = ".";
 	private static final String outputFolder = "data";
-	protected Sync<Script> program;
-	private String programName;
+	protected Sync<Script> script;
+	private String scriptName;
 
 	public ComponentScript(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		super(ng, ent, factory, _ComponentSpokesman);
 	}
 
 	public Script getScript() {
-		return program.getInstance();
+		return script.getInstance();
 	}
 
 	public boolean isValid() {
-		if (program != null && program.getInstance() != null && program.getInstance().gem != null
-				&& program.getInstance().holder != null) {
+		if (script != null && script.getInstance() != null && script.getInstance().gem != null
+				&& script.getInstance().holder != null) {
 			return true;
 		}
 		return false;
@@ -40,13 +40,13 @@ public class ComponentScript extends ComponentBase {
 	@Override
 	public ComponentScript setEnabled(boolean Enable) {
 		this.Enable = Enable;
-		if (program != null && program.getInstance() != null)
-			program.getInstance().onInit();
+		if (script != null && script.getInstance() != null)
+			script.getInstance().onInit();
 		return this;
 	}
 	
 	public String update() throws Exception{
-		return loadClass(programName);
+		return loadClass(scriptName);
 	}
 
 	public ComponentScript setScript(Class<?> name) {
@@ -58,49 +58,48 @@ public class ComponentScript extends ComponentBase {
 		try {
 			if (EngineInfo.Debug) {
 				loadClass(name);
-				program.getInstance().onInit();
+				script.getInstance().onInit();
 				return this;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			// Debugger.log(e.getStackTrace());
 		}
 		return this;
 	}
 
 	private String loadClass(String name) throws Exception {
-		programName = name;
+		scriptName = name;
 		String err = "";
-		if (program == null) {
-			program = new Sync<Script>(name, scriptFolder, outputFolder).setOptions("-1.7");
-			err = program.update();
+		if (script == null) {
+			script = new Sync<Script>(name, scriptFolder, outputFolder).setOptions("-1.7");
+			err = script.update();
 		} else {
-			err = program.update(name);
+			err = script.update(name);
 		}
-		if(program.getInstance() == null)
+		if(script.getInstance() == null)
 			return err;
-		program.getInstance().gem = Ng;
-		program.getInstance().holder = getOwner();
-		if(program.getChanged()){
-			program.getInstance().onInit();
+		script.getInstance().gem = gem;
+		script.getInstance().holder = getOwner();
+		if(script.getChanged()){
+			script.getInstance().onInit();
 		}
 		return err;
 	}
 
 	@Override
 	protected void destroyed() {
-		if (program == null)
+		if (script == null)
 			return;
-		program = null;
+		script = null;
 	}
 
 	@Override
 	protected ComponentBase Load(Element element) throws Exception {
 		try {
-			programName = element.getChildByName("Program").get("Name");
+			scriptName = element.getChildByName("Script").get("Name");
 			try {
 				if (EngineInfo.Debug) {
-					loadClass(programName);
+					loadClass(scriptName);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -117,8 +116,8 @@ public class ComponentScript extends ComponentBase {
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("Type", Type.getName()).element("Program")
-				.attribute("Name", programName).pop().pop();
+		element.element("Component").attribute("Type", Type.getName()).element("Script")
+				.attribute("Name", scriptName).pop().pop();
 	}
 
 	@Override

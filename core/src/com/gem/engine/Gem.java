@@ -1,5 +1,7 @@
 package com.gem.engine;
 
+import java.util.List;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -7,7 +9,10 @@ import com.gem.action.CommandFactory;
 import com.gem.asset.Asset;
 import com.gem.asset.AssetFactory;
 import com.gem.asset.MeshFactory;
+import com.gem.component.ComponentBase;
 import com.gem.component.ComponentFactory;
+import com.gem.component.ui.ComponentUILayout;
+import com.gem.component.ui.ComponentUIWidget;
 import com.gem.debug.Debugger;
 import com.gem.entity.CollidableFactory;
 import com.gem.entity.ComponentSpokesman;
@@ -33,14 +38,14 @@ import com.gem.scene.SceneFactory;
  * @composed 1 has * XmlComponent
  */
 public abstract class Gem extends ApplicationAdapter {
-	public MeshFactory _MeshBuilder;
-	public CollidableFactory CollidableBuilder;
-	public EntityFactory EntityBuilder;
-	public AssetFactory Loader;
-	protected ComponentFactory _ComponentBuilder;
-	protected SystemFactory _SystemBuilder;
+	public MeshFactory meshBuilder;
+	public CollidableFactory collidableBuilder;
+	public EntityFactory entityBuilder;
+	public AssetFactory loader;
+	protected ComponentFactory componentFactory;
+	protected SystemFactory systemBuilder;
 	protected SceneFactory SceneBuilder;
-	private ComponentSpokesman _ComponentSpokesman;
+	private ComponentSpokesman componentSpokesman;
 	private UIFactory UIBuilder;
 	private XmlEntity XmlSave;
 
@@ -56,19 +61,19 @@ public abstract class Gem extends ApplicationAdapter {
 	}
 
 	public <T> Asset<T> getAsset(String name) {
-		return Loader.getAsset(name);
+		return loader.getAsset(name);
 	}
 
 	public Scene getCurrentScene() {
-		return _SystemBuilder._SceneSystem.getScene();
+		return systemBuilder.sceneSystem.getScene();
 	}
 
 	public Entity getEntity(int id) {
-		return EntityBuilder.getById(id);
+		return entityBuilder.getById(id);
 	}
 
 	public Entity getEntity(String name) {
-		return EntityBuilder.getByName(name);
+		return entityBuilder.getByName(name);
 	}
 
 	public abstract Class<?> getEntry();
@@ -77,39 +82,38 @@ public abstract class Gem extends ApplicationAdapter {
 		if (EngineInfo.Debug)
 			Debugger.setGem(this);
 		Gdx.graphics.setVSync(false);
-		Loader = new AssetFactory(this);
+		loader = new AssetFactory(this);
 
 		UIBuilder = new UIFactory(this);
-		_ComponentSpokesman = new ComponentSpokesman(UIBuilder);
+		EngineInfo.makeBasicEntities(this, UIBuilder);
+		componentSpokesman = new ComponentSpokesman(UIBuilder);
 
-		_ComponentBuilder = new ComponentFactory(this, _ComponentSpokesman);
+		componentFactory = new ComponentFactory(this, componentSpokesman);
 
 		XmlSave = new XmlEntity(this);
 
-		_SystemBuilder = new SystemFactory(this, _ComponentBuilder, XmlSave);
-		_SystemBuilder.createConfigurations();
+		systemBuilder = new SystemFactory(this, componentFactory, XmlSave);
 
-		EntityBuilder = new EntityFactory(_ComponentBuilder, XmlSave, _ComponentSpokesman);
-		_MeshBuilder = new MeshFactory(this);
+		entityBuilder = new EntityFactory(componentFactory, XmlSave, componentSpokesman);
+		meshBuilder = new MeshFactory(this);
 
-		_SystemBuilder.createMainSystems(UIBuilder._SpriteBatch);
+		systemBuilder.createMainSystems(UIBuilder._SpriteBatch);
 
-		SceneBuilder = new SceneFactory(this, _SystemBuilder._SceneSystem);
+		SceneBuilder = new SceneFactory(this, systemBuilder.sceneSystem);
 		SceneBuilder.changeScene(getEntry().getName());
 
-		// EngineInfo.makeBasicEntities(this, UIBuilder);
 		EngineInfo.makeOptionalEntities(this);
 
-		_SystemBuilder.createUISystems();
+		systemBuilder.createUISystems();
 
 		UIBuilder.createMultiplexer();
 
-		_SystemBuilder.sendConfigurations(EntityBuilder);
+		systemBuilder.sendConfigurations(entityBuilder);
 	}
 
 	public void remove() {
-		EntityBuilder.clear();
-		_ComponentBuilder.clear();
+		entityBuilder.clear();
+		componentFactory.clear();
 	}
 
 	@Override
@@ -123,21 +127,80 @@ public abstract class Gem extends ApplicationAdapter {
 
 	@Override
 	public void resize(int w, int h) {
+		systemBuilder.resize(w, h);
 		EngineInfo.makeBasicEntities(this, UIBuilder);
 	}
 
 	public void restart() {
-		EntityBuilder.clear();
-		// EngineInfo.makeBasicEntities(this, UIBuilder);
+		entityBuilder.clear();
+		systemBuilder.restart();
+		EngineInfo.makeBasicEntities(this, UIBuilder);
 	}
 
 	protected void update(float delta) {
-		_SystemBuilder.updateSystems();
+		systemBuilder.updateSystems();
 		try {
 			long time = (long) (1000 / EngineInfo.Fps - Gdx.graphics.getDeltaTime());
 			Thread.sleep(time < 0 ? 0 : time);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Goes upwards
+	 *
+	 * @param ent
+	 * @param cls
+	 * @return
+	 */
+	public static <T extends ComponentBase> T goFindUpWithComponent(Entity ent, Class<T> cls) {
+		if (ent == null) {
+			return null;
+		}
+		if (!ent.hasComponent(cls)) {
+			return goUpForComponent(ent, cls);
+		}
+		return ent.getComponent(cls);
+	}
+
+	/**
+	 * Goes upwards
+	 *
+	 * @param ent
+	 * @param cls
+	 * @return
+	 */
+	public static <T extends ComponentBase> T goUpForComponent(Entity ent, Class<T> cls) {
+		Entity parent = ent.getParent();
+		if (parent == null) {
+			return null;
+		}
+		if (parent != null && !parent.hasComponent(cls)) {
+			return goUpForComponent(parent, cls);
+		}
+		return parent.getComponent(cls);
+	}
+
+	/**
+	 * Goes downwards on leafs.
+	 *
+	 * @param ent
+	 * @param cls
+	 * @return
+	 */
+	public static List<Entity> goDownFind(Entity ent, Class<?> cls) {
+		List<Entity> children = ent.getChildren();
+		for (Entity child : children) {
+			if (!child.hasComponent(ComponentUILayout.class) && !child.hasComponent(ComponentUIWidget.class)) {
+				children.remove(child);
+				List<Entity> subChildren = child.getChildren();
+				for (Entity subChild : subChildren) {
+					children.addAll(goDownFind(subChild, cls));
+				}
+				children.addAll(subChildren);
+			}
+		}
+		return children;
 	}
 }

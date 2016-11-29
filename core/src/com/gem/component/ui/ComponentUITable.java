@@ -1,5 +1,6 @@
 package com.gem.component.ui;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.XmlReader.Element;
@@ -12,6 +13,7 @@ import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
 public class ComponentUITable extends ComponentUILayout {
+	private static final Vector3 ONE = new Vector3(1, 1, 1);
 	private String _BackgroundAsset = "";
 	private boolean _Saved = false, _Packed = true;
 	private Table _Table;
@@ -33,7 +35,7 @@ public class ComponentUITable extends ComponentUILayout {
 	@Override
 	public void notifyWithComponent(ComponentPoint point) {
 		super.notifyWithComponent(point);
-		if (point.getScale().isZero() && point.getRotation().isZero()) {
+		if (point.getScale().equals(ONE) && point.getRotation().isZero()) {
 			_Table.setTransform(false);
 		} else {
 			_Table.setTransform(true);

@@ -9,42 +9,42 @@ import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
 public class ComponentMaterial extends ComponentBase {
-	private Asset<ShaderProgram> _Shader;
-	private String _ShaderName;
+	private Asset<ShaderProgram> shaderAsset;
+	private String shaderName;
 
 	public ComponentMaterial(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		super(ng, ent, factory, _ComponentSpokesman);
 	}
 
 	public ShaderProgram getShader() {
-		if (_Shader == null) {
+		if (shaderAsset == null) {
 			return null;
 		}
-		return _Shader.getAsset();
+		return shaderAsset.getAsset();
 	}
 
 	public ComponentMaterial setShader(Asset<ShaderProgram> shader) {
-		_ShaderName = shader.getFolder() + shader.getPath();
-		_Shader = shader;
+		shaderName = shader.getFolder() + shader.getPath();
+		shaderAsset = shader;
 		return this;
 	}
 
 	public ComponentMaterial setShader(String shaderName) {
-		_ShaderName = shaderName;
-		_Shader = Ng.Loader.getAsset(shaderName);
+		this.shaderName = shaderName;
+		shaderAsset = gem.loader.getAsset(shaderName);
 		return this;
 	}
 
 	@Override
 	protected ComponentBase Load(Element element) throws Exception {
-		_ShaderName = element.getChildByName("Shader").get("Name");
-		setShader(_ShaderName);
+		shaderName = element.getChildByName("Shader").get("Name");
+		setShader(shaderName);
 		return this;
 	}
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("Type", Type.getName()).element("Shader").attribute("Name", _ShaderName)
+		element.element("Component").attribute("Type", Type.getName()).element("Shader").attribute("Name", shaderName)
 				.pop().pop();
 	}
 

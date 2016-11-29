@@ -37,6 +37,7 @@ public class EntityFactory extends TypeObservable<Entity> {
 	public EntityFactory(ComponentFactory _ComponentFactory, XmlEntity xmlSave,
 			ComponentSpokesman _ComponentSpokesman) {
 		this.componentFactory = _ComponentFactory;
+		componentFactory.addObserver(new CameraObserver(this));
 		entityCache = new Entity[EngineInfo.EntitiesCache];
 		entityMap = new HashMap<Integer, Entity>();
 		entityNameMap = new HashMap<String, Integer>();

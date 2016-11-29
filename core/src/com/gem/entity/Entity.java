@@ -15,12 +15,14 @@ import com.badlogic.gdx.utils.XmlWriter;
 import com.gem.action.Command;
 import com.gem.action.CommandFactory;
 import com.gem.component.ComponentBase;
+import com.gem.component.ComponentCamera;
 import com.gem.component.ComponentFactory;
 import com.gem.component.XmlComponent;
 import com.gem.component.ui.ComponentUIBase;
 import com.gem.engine.EngineInfo;
 
 import lombok.Getter;
+import lombok.val;
 
 /**
  * @composed 1 has * ComponentFactory
@@ -28,7 +30,7 @@ import lombok.Getter;
 public class Entity {
 	private static final List emptyList = new ArrayList();
 	private static int uniqueId = 0;
-	private final ComponentFactory componentFactory;
+	protected final ComponentFactory componentFactory;
 	private final ComponentSpokesman componentSpokesman;
 	private final EntityFactory entityFactory;
 	protected String _ParentName = "null";
@@ -69,8 +71,8 @@ public class Entity {
 			final String finalName = new String(name);
 			final Class<T> finalType = type;
 			CommandFactory.factory.doAction(new Command(
-					() -> CommandFactory.factory.gem.EntityBuilder.getByName(finalName).addComponent(finalType),
-					() -> CommandFactory.factory.gem.EntityBuilder.getByName(finalName).removeComponent(finalType),
+					() -> CommandFactory.factory.gem.entityBuilder.getByName(finalName).addComponent(finalType),
+					() -> CommandFactory.factory.gem.entityBuilder.getByName(finalName).removeComponent(finalType),
 					"addComponent(" + type.getName() + ") -> " + name));
 		}
 
@@ -245,17 +247,14 @@ public class Entity {
 	 * Remove this entity from the scene.
 	 */
 	public void remove() {
-		// if (Name.equals("~CAMERA") || Name.equals("~UICAMERA"))
-		// return;
-
 		// do this to remember the actions we will do, for do/undo
 		if (EngineInfo.Debug) {
 			final String saved = entityFactory.saveEntity(this);
 			CommandFactory.factory
-					.doAction(new Command(() -> CommandFactory.factory.gem.EntityBuilder.getByName(name).remove(),
-							() -> CommandFactory.factory.gem.EntityBuilder.loadEntity(saved), "remove(" + name + ")"));
+					.doAction(new Command(() -> CommandFactory.factory.gem.entityBuilder.getByName(name).remove(),
+							() -> CommandFactory.factory.gem.entityBuilder.loadEntity(saved), "remove(" + name + ")"));
 		}
-
+		
 		if (parent != null)
 			detachParent();
 		for (; children.size() != 0;) {
@@ -435,8 +434,13 @@ public class Entity {
 	}
 
 	protected void Load(Element element, XmlComponent _XmlComponent) throws Exception {
+		try{
 		_ParentName = element.get("Parent");
 		order = element.getInt("Order");
+		}catch(Exception e){
+			order = -1;
+			_ParentName = "null";
+		}
 		for (Element el : element.getChildrenByName("Component")) {
 			try {
 				String type = el.get("Type");

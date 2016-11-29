@@ -43,7 +43,7 @@ public abstract class ComponentBase {
 	private static int UniqueId = 0;
 	protected final ComponentFactory ComponentFactory;
 	protected final ComponentSpokesman ComponentSpokesman;
-	protected final Gem Ng;
+	protected final Gem gem;
 	@Getter
 	protected Entity Owner;
 	@Getter
@@ -66,7 +66,7 @@ public abstract class ComponentBase {
 	 */
 	public ComponentBase(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		this.ComponentSpokesman = _ComponentSpokesman;
-		Ng = ng;
+		gem = ng;
 		Type = this.getClass();
 		SubType = this.getClass().getSuperclass();
 		Owner = ent;

@@ -1,5 +1,6 @@
 package com.gem.systems;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
@@ -18,35 +19,48 @@ import com.gem.entity.Entity;
  * @hidden
  */
 public class SystemDraw extends SystemBase {
+	int cameraId;
 	Matrix4 cam;
-
+	
 	public SystemDraw(Gem ng, SystemConfiguration conf) {
 		super(ng, conf);
 	}
 
 	@Override
 	public void onBeforeUpdate() {
-		Entity ent = gem.EntityBuilder.getByName("~CAMERA");
-		ComponentCamera comp = ent.getComponent(ComponentCamera.class);
-		Camera camera = comp.Camera;
-		cam = camera.combined;
 	}
 
 	@Override
 	public void onUpdate(Entity ent) {
-		Debugger.log(config);
+		ComponentCamera camera = Gem.goUpForComponent(ent, ComponentCamera.class);
+		if(camera == null){
+			return;
+		}
+		if(cameraId != camera.getId()){
+			cam = camera.getCombined();
+			cameraId = camera.getId();
+		}
+		
 		Matrix4 model = getModel(ent);
-		Mesh mesh = ent.getComponent(ComponentMesh.class)._Vertices;
+		Mesh mesh = ent.getComponent(ComponentMesh.class).getMesh();
 		ShaderProgram prog = ent.getComponent(ComponentMaterial.class).getShader();
+		
+		 //no need for depth...
+	    Gdx.gl.glDepthMask(false);
+
+	    //enable blending, for alpha
+	    Gdx.gl.glEnable(GL20.GL_BLEND);
+	    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+	    
+		prog.begin();
 		prog.setUniformMatrix("u_projView", cam);
 		prog.setUniformMatrix("u_Model", model);
 
-		// ent.addComponent(ComponentVariable.class).setData("u_sampler0",
-		// tex.getData().glTarget);
-
-		prog.setUniformi("u_sampler0", 0);
 		mesh.bind(prog);
 		mesh.render(prog, GL20.GL_TRIANGLES);
+		prog.end();
+		 //re-enable depth to reset states to their default
+	    Gdx.gl.glDepthMask(true);
 	}
 
 	private Matrix4 getModel(Entity ent) {

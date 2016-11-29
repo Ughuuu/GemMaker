@@ -164,24 +164,26 @@ public class EngineInfo {
 
 		Width = Height / ScreenHeight * ScreenWidth;
 
-		if (ng == null || ng.EntityBuilder == null) {
+		if (ng == null || ng.entityBuilder == null) {
 			return;
 		}
 		Entity camera = ng.getEntity("~CAMERA");
 		Entity uiCamera = ng.getEntity("~UICAMERA");
+		Entity editorCamera = ng.getEntity("~EDITOR");
 		if (camera == null || uiCamera == null) {
-			camera = ng.EntityBuilder.makeEntity("~CAMERA");
-			uiCamera = ng.EntityBuilder.makeEntity("~UICAMERA");
+			camera = ng.entityBuilder.makeEntity("~CAMERA");
+			uiCamera = ng.entityBuilder.makeEntity("~UICAMERA");
+			editorCamera = ng.entityBuilder.makeEntity("~EDITOR");
 		}
 		
-		ComponentCamera cam = camera.addComponent(ComponentCamera.class);
-		cam.createCamera(Width, Height);
-		ComponentPoint pos = camera.addComponent(ComponentPoint.class);
+		camera.addComponent(ComponentCamera.class).createOrthographicCamera(Width, Height);
+		editorCamera.addComponent(ComponentCamera.class).createOrthographicCamera(Width, Height);
+		
+		camera.addComponent(ComponentPoint.class);
+		editorCamera.addComponent(ComponentPoint.class);
 
-		ComponentCamera uiCam = uiCamera.addComponent(ComponentCamera.class);
-		uiCam.createCamera(ScreenWidth, ScreenHeight);
-		ComponentPoint uiPos = uiCamera.addComponent(ComponentPoint.class);
-		uiPos.setPosition(new Vector3(ScreenWidth / 2, ScreenHeight / 2, 0));
+		uiCamera.addComponent(ComponentCamera.class).createOrthographicCamera(ScreenWidth, ScreenHeight);
+		uiCamera.addComponent(ComponentPoint.class).setPosition(new Vector3(ScreenWidth / 2, ScreenHeight / 2, 0));
 
 		// camera probably changed, reset it to viewport
 		UIBuilder.resize((int) ScreenWidth, (int) ScreenHeight);
@@ -189,9 +191,9 @@ public class EngineInfo {
 
 	protected static void makeOptionalEntities(Gem ng) {
 		if (Debug) {
-			ng.Loader.enqueFolder("engine/");
-			ng.Loader.addFolder("engine/");
-			ng.Loader.finish();
+			ng.loader.enqueFolder("engine/");
+			ng.loader.addFolder("engine/");
+			ng.loader.finish();
 		}
 	}
 }

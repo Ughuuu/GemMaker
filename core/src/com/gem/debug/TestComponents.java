@@ -12,10 +12,10 @@ public class TestComponents {
 	}
 
 	private void SimpleTest(Gem ng) {
-		Entity ent = ng.EntityBuilder.makeEntity("dragos");
+		Entity ent = ng.entityBuilder.makeEntity("dragos");
 		assert (ent != null);
-		assert (ng.EntityBuilder.getByName("dragos") != null);
-		Entity ent2 = ng.EntityBuilder.getByName("dragos");
+		assert (ng.entityBuilder.getByName("dragos") != null);
+		Entity ent2 = ng.entityBuilder.getByName("dragos");
 		assert (ent == ent2);
 		assert (ent.getId() == ent2.getId());
 		ent.addComponent(ComponentCamera.class);
@@ -37,6 +37,6 @@ public class TestComponents {
 
 		ent.remove();
 
-		assert (ng.EntityBuilder.getByName("dragos") == null);
+		assert (ng.entityBuilder.getByName("dragos") == null);
 	}
 }

@@ -185,7 +185,6 @@ public class ComponentFactory extends TypeObservable<ComponentBase> {
 	}
 
 	public void changeName(ComponentUIBase comp, String name) {
-
 	}
 
 	public void clear() {

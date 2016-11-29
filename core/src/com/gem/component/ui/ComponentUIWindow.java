@@ -19,7 +19,7 @@ public class ComponentUIWindow extends ComponentUILayout {
 	public ComponentUIWindow(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		super(ng, ent, factory, _ComponentSpokesman);
 		WindowStyle style = new WindowStyle();
-		BitmapFont font = (BitmapFont) Ng.Loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
+		BitmapFont font = (BitmapFont) gem.loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
 		style.titleFont = font;
 		_Window = new Window("Text", style);
 	}

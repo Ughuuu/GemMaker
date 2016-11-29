@@ -19,7 +19,7 @@ public class ComponentUITextField extends ComponentUIWidget {
 	public ComponentUITextField(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
 		super(ng, ent, factory, _ComponentSpokesman);
 		TextFieldStyle style = new TextFieldStyle();
-		BitmapFont font = (BitmapFont) Ng.Loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
+		BitmapFont font = (BitmapFont) gem.loader.getAsset("LoadScene/fonts/impact.fnt").getAsset();
 		style.font = font;
 		_TextField = new TextField("Text", style);
 	}

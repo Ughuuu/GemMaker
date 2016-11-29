@@ -66,11 +66,11 @@ public class Asset<T> {
 	 * to make mistakes.
 	 */
 	public void dispose() {
-		gem.Loader.unloadAsset(Path, ResId, Folder);
+		gem.loader.unloadAsset(Path, ResId, Folder);
 	}
 
 	public void reload() {
-		gem.Loader.unloadAsset(Path, ResId, Folder);
-		gem.Loader.loadAsset(Path, ResId);
+		gem.loader.unloadAsset(Path, ResId, Folder);
+		gem.loader.loadAsset(Path, ResId);
 	}
 }

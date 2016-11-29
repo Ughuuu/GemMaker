@@ -10,6 +10,8 @@ import com.gem.engine.Gem;
 import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
+import lombok.val;
+
 public class ComponentSprite extends ComponentBase {
 	private String _TextureAsset;
 	private Sprite spr;
@@ -37,6 +39,14 @@ public class ComponentSprite extends ComponentBase {
 		spr.setScale(point.getScale().x, point.getScale().y);
 		spr.setRotation(point.getRotation().z);
 	}
+	
+	public void setWidth(int width){
+		spr.setSize(width, spr.getHeight());
+	}
+	
+	public void setHeight(int height){
+		spr.setSize(spr.getWidth(), height);
+	}
 
 	public void setColor(Color col) {
 		spr.setColor(col);
@@ -44,28 +54,46 @@ public class ComponentSprite extends ComponentBase {
 
 	public ComponentSprite setTexture(Asset<Texture> tex) {
 		_TextureAsset = tex.getFolder() + tex.getPath();
-		spr = new Sprite(tex.getAsset());
+		Texture texture = (Texture)tex.getAsset();
+		spr.setTexture(texture);
+		spr.setSize(texture.getWidth(), texture.getHeight());
+		spr.setRegion(0, 0, texture.getWidth(), texture.getHeight());
+		spr.setColor(1, 1, 1, 1);
+		spr.setOrigin(texture.getWidth(), texture.getHeight());
 		return this;
 	}
 
 	public ComponentSprite setTexture(String tex) {
 		_TextureAsset = tex;
-		spr = new Sprite((Texture) Ng.Loader.getAsset(tex).getAsset());
+		setTexture(gem.loader.getAsset(tex));
 		return this;
 	}
 
 	@Override
 	protected ComponentBase Load(Element element) throws Exception {
 		spr = new Sprite();
-		_TextureAsset = element.getChildByName("Sprite").get("TextureAtlas");
+		_TextureAsset = element.getChildByName("Sprite").get("Texture");
 		setTexture(_TextureAsset);
+		try{
+			spr.setColor(Color.valueOf(element.getChildByName("Sprite").get("Color")));
+			float width = element.getChildByName("Sprite").getFloat("Width");
+			float height = element.getChildByName("Sprite").getFloat("Height");
+			spr.setSize(width, height);
+		}catch(Exception e){
+		}
 		return this;
 	}
 
 	@Override
 	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("Type", Type.getName()).element("Sprite")
-				.attribute("TextureAtlas", _TextureAsset).pop().pop();
+		element.element("Component").attribute("Type", Type.getName())
+			.element("Sprite")
+				.attribute("Texture", _TextureAsset)
+				.attribute("Color", spr.getColor())
+				.attribute("Width", spr.getWidth())
+				.attribute("Height", spr.getHeight())
+			.pop()
+		.pop();
 	}
 
 	@Override

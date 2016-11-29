@@ -98,9 +98,9 @@ class OverlaySelector {
 	}
 
 	boolean onCircle(Vector3 mouse, Vector3 point, float radius) {
-		Entity ent2 = gem.EntityBuilder.getByName("~CAMERA");
+		Entity ent2 = gem.entityBuilder.getByName("~EDITOR");
 		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
-		Vector3 proj = new Vector3(point).mul(cam2.Camera.view);
+		Vector3 proj = new Vector3(point).mul(cam2.getView());
 		if (proj.sub(mouse).len() < radius) {
 			return true;
 		}
@@ -112,9 +112,9 @@ class OverlaySelector {
 	}
 
 	boolean selectPoint(Vector3 point, BoundingBox _Selection) {
-		Entity ent2 = gem.EntityBuilder.getByName("~CAMERA");
+		Entity ent2 = gem.entityBuilder.getByName("~EDITOR");
 		ComponentCamera cam2 = ent2.getComponent(ComponentCamera.class);
-		Vector3 proj = new Vector3(point).mul(cam2.Camera.view);
+		Vector3 proj = new Vector3(point).mul(cam2.getView());
 		if (_Selection.contains(proj)) {
 			return true;
 		}

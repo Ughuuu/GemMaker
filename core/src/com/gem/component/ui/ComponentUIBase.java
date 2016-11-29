@@ -10,10 +10,12 @@ import com.gem.engine.Gem;
 import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
+import lombok.val;
+
 public abstract class ComponentUIBase extends ComponentBase {
 
 	protected int _Depth = 0, _Align;
-	protected Entity _UIParent;
+	protected Entity uiParent;
 	protected boolean click = false;
 	Value width;
 
@@ -22,7 +24,7 @@ public abstract class ComponentUIBase extends ComponentBase {
 	}
 
 	public Entity getUIParent() {
-		return _UIParent;
+		return uiParent;
 	}
 
 	@Override

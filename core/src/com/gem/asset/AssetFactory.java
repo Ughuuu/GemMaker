@@ -47,13 +47,14 @@ import lombok.val;
 public class AssetFactory {
 	public static String prePath;
 	private final Class<?>[] classType = { Texture.class, TextureAtlas.class, BitmapFont.class, Sound.class,
-			Music.class, ShaderProgram.class , Script.class};
+			Music.class, ShaderProgram.class};
 	private final Gem gem;
 	/**
 	 * 0 - texture 1 - texture atlas 2 - fonts 3 - sound 4 - music 5 - shader
 	 */
 	private final String[][] types = { { "png", "jpg", "jpeg", "gif" }, { "pack", "atlas" }, { "fnt" },
 			{ "wav", "ogg", "mp3" }, { "wav", "ogg", "mp3" }, { "vert" }};
+	private final String[] change = { null, null, null, null, null, ""};
 	private Map<Integer, Asset> assetMap;
 	private Map<String, Integer> assetNameMap;
 	/**
@@ -253,7 +254,11 @@ public class AssetFactory {
 			List<String> names = folders.get(folder + i);
 			if (names != null) {
 				for (String name : names) {
-					Asset addNew = new Asset(gem, name, manager.get(prePath + folder + name), i, folder);
+					String origName = name;
+					if(change[i] != null){
+						name = name.substring(0, name.indexOf('.')) + change[i];
+					}
+					Asset addNew = new Asset(gem, name, manager.get(prePath + folder + origName), i, folder);
 					assetMap.put(addNew.getId(), addNew);
 					assetNameMap.put(addNew.getFolder() + addNew.getPath(), addNew.getId());
 				}
@@ -286,6 +291,8 @@ public class AssetFactory {
 	 * @param folder
 	 */
 	private void enqueFolder(String folder, String actualFolder) {
+		if(folder.equals(".git/"))
+			return;
 		updateFolders.add(folder);
 		FileHandle dirHandle = Gdx.files.internal(prePath + folder + actualFolder);
 

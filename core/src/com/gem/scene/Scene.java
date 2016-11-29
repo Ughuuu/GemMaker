@@ -95,6 +95,6 @@ public class Scene {
 	}
 
 	protected Entity CreateObject(String name) {
-		return gem.EntityBuilder.makeEntity(name);
+		return gem.entityBuilder.makeEntity(name);
 	}
 }

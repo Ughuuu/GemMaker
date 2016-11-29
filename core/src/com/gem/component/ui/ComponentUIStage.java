@@ -36,7 +36,7 @@ public class ComponentUIStage extends ComponentUIBase {
 
 	@Override
 	public void notifyWithComponent(ComponentPoint point) {
-		// _Stage.getViewport().getCamera().view.set(point.getMatrix());
+		//_Stage.getViewport().getCamera().view.set(point.getMatrix());
 	}
 
 	public void setStage(Viewport view, SpriteBatch batch, InputMultiplexer multiplexer) {

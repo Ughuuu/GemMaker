@@ -17,34 +17,31 @@ import com.gem.component.ui.ComponentUIStage;
 public class UIFactory {
 	protected final InputMultiplexer _InputMultiplexer = new InputMultiplexer();
 	protected final SpriteBatch _SpriteBatch;
-	private final Gem _Ng;
-	private Viewport _Viewport;
+	private final Gem gem;
+	private Viewport viewport;
 
 	public UIFactory(Gem _Ng) {
-		this._Ng = _Ng;
+		this.gem = _Ng;
 		_SpriteBatch = new SpriteBatch();
 	}
 
 	public void createStage(ComponentUIStage stage) {
-		Camera cam = _Ng.getEntity("~UICAMERA").getComponent(ComponentCamera.class).Camera;
-		if (_Viewport == null) {
-			_Viewport = new ScreenViewport(cam);
-		}
-		stage.setStage(_Viewport, _SpriteBatch, _InputMultiplexer);
+		viewport = new ScreenViewport();
+		gem.getEntity("~UICAMERA").getComponent(ComponentCamera.class).setToCamera(viewport);
+		stage.setStage(viewport, _SpriteBatch, _InputMultiplexer);
 	}
 
 	protected void createMultiplexer() {
 		Gdx.input.setInputProcessor(_InputMultiplexer);
-		_InputMultiplexer.addProcessor(new GestureDetector(_Ng._SystemBuilder._SceneSystem));
-		if (_Ng._SystemBuilder._OverlaySystem != null)
-			_InputMultiplexer.addProcessor(_Ng._SystemBuilder._OverlaySystem);
+		_InputMultiplexer.addProcessor(new GestureDetector(gem.systemBuilder.sceneSystem));
+		if (gem.systemBuilder.overlaySystem != null)
+			_InputMultiplexer.addProcessor(gem.systemBuilder.overlaySystem);
 	}
 
 	protected void resize(int w, int h) {
-		if (_Viewport != null) {
-			_Viewport.update(w, h);
-			Camera cam = _Ng.getEntity("~UICAMERA").getComponent(ComponentCamera.class).Camera;
-			_Viewport.setCamera(cam);
+		if (viewport != null) {
+			viewport.update(w, h);
+			gem.getEntity("~UICAMERA").getComponent(ComponentCamera.class).setToCamera(viewport);
 		}
 	}
 }

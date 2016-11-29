@@ -8,16 +8,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.gem.component.ComponentBase;
 import com.gem.component.ComponentFactory;
+import com.gem.component.ComponentPoint;
 import com.gem.engine.Gem;
 import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
 public class ComponentUILabel extends ComponentUIWidget {
 	private String assetBackground = null;
-	private String assetFont = "LoadScene/fonts/impact.fnt";
+	private String assetFont = "engine/fonts/impact.fnt";
 	private Label label;
 	private boolean saved = false;
 
@@ -25,11 +27,12 @@ public class ComponentUILabel extends ComponentUIWidget {
 		super(ng, ent, factory, _ComponentSpokesman);
 		LabelStyle style = new LabelStyle();
 		// TODO make asset background equal to something
-		if (assetBackground != null && Ng.Loader.getAsset(assetBackground) != null) {
+		if (assetBackground != null && gem.loader.getAsset(assetBackground) != null) {
 			style.background = new TextureRegionDrawable(
-					new TextureRegion(((Texture) Ng.Loader.getAsset(assetBackground).getAsset())));
+					new TextureRegion(((Texture) gem.loader.getAsset(assetBackground).getAsset())));
 		}
-		style.font = (BitmapFont) Ng.Loader.getAsset(assetFont).getAsset();
+		style.font = (BitmapFont) gem.loader.getAsset(assetFont).getAsset();
+		style.font.getData().scale(0.1f);
 		label = new Label("Text", style);
 	}
 
@@ -50,11 +53,25 @@ public class ComponentUILabel extends ComponentUIWidget {
 
 	public void setFont(String fontName) {
 		assetFont = fontName;
-		label.getStyle().font = (BitmapFont) Ng.Loader.getAsset(assetFont).getAsset();
+		label.getStyle().font = (BitmapFont) gem.loader.getAsset(assetFont).getAsset();
 	}
 
 	public void setText(String text) {
 		label.setText(text);
+	}	
+
+	@Override
+	public void notifyWithComponent(ComponentPoint point) {
+		Actor actor = getActor();
+		actor.setOrigin(Align.center);
+		actor.setPosition(point.getPosition().x, point.getPosition().y);
+		actor.setZIndex(_Depth);
+		if (point.getScale().isZero() && point.getRotation().isZero()) {
+			label.setFontScale(1, 1);
+		} else {
+			label.setFontScale(point.getScale().x, point.getScale().y);
+			actor.setRotation(point.getRotation().z);
+		}
 	}
 
 	@Override
@@ -64,8 +81,16 @@ public class ComponentUILabel extends ComponentUIWidget {
 
 	@Override
 	protected ComponentBase Load(Element element) throws Exception {
-		setFont(element.getChildByName("Label").get("FontName"));
-		setText(element.getChildByName("Label").get("Text"));
+		try {
+			setFont(element.getChildByName("Label").get("FontName"));
+		} catch (Exception e) {
+			setFont(assetFont);
+		}
+		try {
+			setText(element.getChildByName("Label").get("Text"));
+		} catch (Exception e) {
+			setText("");
+		}
 		return this;
 	}
 

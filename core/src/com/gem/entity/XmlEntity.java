@@ -22,6 +22,8 @@ import com.gem.component.XmlComponent;
 import com.gem.engine.EngineInfo;
 import com.gem.engine.Gem;
 
+import lombok.val;
+
 /**
  * @author Dragos
  * @hidden
@@ -62,7 +64,7 @@ public class XmlEntity {
 			String scene = gem.getCurrentScene().getName();
 			xmlWriter.element(scene).attribute("Width", EngineInfo.Width).attribute("Height", EngineInfo.Height);
 
-			List<Entity> entities = gem.EntityBuilder.getEntities();
+			List<Entity> entities = gem.entityBuilder.getEntities();
 			for (Entity ent : entities) {
 				SaveEntity(ent);
 			}
@@ -93,7 +95,7 @@ public class XmlEntity {
 			for (Element el : element.getChildrenByName("Entity")) {
 				LoadEntity(el);
 			}
-			List<Entity> entities = gem.EntityBuilder.getEntities();
+			List<Entity> entities = gem.entityBuilder.getEntities();
 			for (Entity ent : entities) {
 				ent.setParent(ent._ParentName);
 				if (ent.hasComponent(ComponentScript.class)) {
@@ -108,19 +110,24 @@ public class XmlEntity {
 	}
 
 	public Entity LoadEntity(String s) throws Exception {
-		XmlReader.Element el = xmlReader.parse(s);
-		String name = el.get("Name");
-		while (gem.EntityBuilder.getByName(name) != null) {
-			name += "1";
+		val el = xmlReader.parse(s);
+		val name = el.get("Name");
+		int nr = 0;
+		while (gem.entityBuilder.getByName(name + nr) != null) {
+			nr++;
 		}
-		Entity ent = gem.EntityBuilder.makeEntity(name);
-		ent.Load(el, xmlComponent);
+		val ent = gem.entityBuilder.makeEntity(name + nr);
 		return ent;
 	}
 
 	public void LoadEntity(XmlReader.Element el) throws Exception {
 		String name = el.get("Name");
-		gem.EntityBuilder.makeEntity(name).Load(el, xmlComponent);
+		Entity ent = gem.entityBuilder.makeEntity(name);
+		ent.Load(el, xmlComponent);
+		val components = ent.getComponents();
+		for(val comp : components){
+			ent.componentFactory.notifyAllComponents(ent.getComponents(), comp);
+		}
 	}
 
 	public void Save() {
@@ -184,7 +191,7 @@ public class XmlEntity {
 				break;
 			}
 		}
-		gem.Loader.finish();
+		gem.loader.finish();
 		// TODO maybe reput this?
 		//try {
 			//String scene = gem.getCurrentScene().getName();

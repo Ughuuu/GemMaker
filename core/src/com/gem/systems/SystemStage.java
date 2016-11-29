@@ -25,7 +25,7 @@ public class SystemStage extends SystemBase implements TypeObserver {
 		removedComponent = new ArrayList<ComponentBase>();
 		this.componentBuilder = _ComponentBuilder;
 		_ComponentBuilder.addObserver(this);
-		gem.EntityBuilder.addObserver(this);
+		gem.entityBuilder.addObserver(this);
 		uiSolver = new UISolver();
 	}
 
