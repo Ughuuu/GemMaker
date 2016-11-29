@@ -425,7 +425,7 @@ public class SystemOverlay extends SystemBase implements GestureListener, InputP
 				break;
 			case 2:
 				Vector3 rot = new Vector3(ent.getComponent(ComponentPoint.class).getRotation());
-				rot.add(0, 0, (deltaX - deltaY)/1000);
+				rot.add(0, 0, (deltaX - deltaY)/100);
 				ent.getComponent(ComponentPoint.class).setRotation(rot);
 				break;
 			case 3:
