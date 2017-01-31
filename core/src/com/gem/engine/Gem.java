@@ -1,7 +1,5 @@
 package com.gem.engine;
 
-import java.util.List;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -14,13 +12,11 @@ import com.gem.component.ComponentFactory;
 import com.gem.component.ui.ComponentUILayout;
 import com.gem.component.ui.ComponentUIWidget;
 import com.gem.debug.Debugger;
-import com.gem.entity.CollidableFactory;
-import com.gem.entity.ComponentSpokesman;
-import com.gem.entity.Entity;
-import com.gem.entity.EntityFactory;
-import com.gem.entity.XmlEntity;
+import com.gem.entity.*;
 import com.gem.scene.Scene;
 import com.gem.scene.SceneFactory;
+
+import java.util.List;
 
 /**
  * Main engine class. Links all elements and holds entities. <img src=
@@ -32,175 +28,172 @@ import com.gem.scene.SceneFactory;
  * @composed 1 has * AssetFactory
  * @composed 1 has * EntityFactory
  * @composed 1 has * MeshFactory
- * @composed 1 has * ComponentFactory
+ * @composed 1 has * componentFactory
  * @composed 1 has * SceneFactory
  * @composed 1 has * SystemFactory
  * @composed 1 has * XmlComponent
  */
 public abstract class Gem extends ApplicationAdapter {
-	public MeshFactory meshBuilder;
-	public CollidableFactory collidableBuilder;
-	public EntityFactory entityBuilder;
-	public AssetFactory loader;
-	protected ComponentFactory componentFactory;
-	protected SystemFactory systemBuilder;
-	protected SceneFactory SceneBuilder;
-	private ComponentSpokesman componentSpokesman;
-	private UIFactory UIBuilder;
-	private XmlEntity XmlSave;
+    public MeshFactory meshBuilder;
+    public CollidableFactory collidableBuilder;
+    public EntityFactory entityBuilder;
+    public AssetFactory loader;
+    protected ComponentFactory componentFactory;
+    protected SystemFactory systemBuilder;
+    protected SceneFactory SceneBuilder;
+    private ComponentSpokesman componentSpokesman;
+    private UIFactory UIBuilder;
+    private XmlEntity XmlSave;
 
-	public void changeScene(String newScene) {
-		SceneBuilder.changeScene(newScene);
-	}
+    /**
+     * Goes upwards
+     *
+     * @param ent
+     * @param cls
+     * @return
+     */
+    public static <T extends ComponentBase> T goFindUpWithComponent(Entity ent, Class<T> cls) {
+        if (ent == null) {
+            return null;
+        }
+        if (!ent.hasComponent(cls)) {
+            return goUpForComponent(ent, cls);
+        }
+        return ent.getComponent(cls);
+    }
 
-	@Override
-	public void create() {
-		if (EngineInfo.Debug)
-			CommandFactory.factory.setGem(this);
-		init();
-	}
+    /**
+     * Goes upwards
+     *
+     * @param ent
+     * @param cls
+     * @return
+     */
+    public static <T extends ComponentBase> T goUpForComponent(Entity ent, Class<T> cls) {
+        Entity parent = ent.getParent();
+        if (parent == null) {
+            return null;
+        }
+        if (parent != null && !parent.hasComponent(cls)) {
+            return goUpForComponent(parent, cls);
+        }
+        return parent.getComponent(cls);
+    }
 
-	public <T> Asset<T> getAsset(String name) {
-		return loader.getAsset(name);
-	}
+    /**
+     * Goes downwards on leafs.
+     *
+     * @param ent
+     * @param cls
+     * @return
+     */
+    public static List<Entity> goDownFind(Entity ent, Class<?> cls) {
+        List<Entity> children = ent.getChildren();
+        for (Entity child : children) {
+            if (!child.hasComponent(ComponentUILayout.class) && !child.hasComponent(ComponentUIWidget.class)) {
+                children.remove(child);
+                List<Entity> subChildren = child.getChildren();
+                for (Entity subChild : subChildren) {
+                    children.addAll(goDownFind(subChild, cls));
+                }
+                children.addAll(subChildren);
+            }
+        }
+        return children;
+    }
 
-	public Scene getCurrentScene() {
-		return systemBuilder.sceneSystem.getScene();
-	}
+    public void changeScene(String newScene) {    	
+        Scene scene = SceneBuilder.makeScene(newScene);
+    	systemBuilder.sceneSystem.setScene(scene);
+    }
 
-	public Entity getEntity(int id) {
-		return entityBuilder.getById(id);
-	}
+    @Override
+    public void create() {
+        if (EngineInfo.Debug)
+            CommandFactory.factory.setGem(this);
+        init();
+    }
 
-	public Entity getEntity(String name) {
-		return entityBuilder.getByName(name);
-	}
+    public <T> Asset<T> getAsset(String name) {
+        return loader.getAsset(name);
+    }
 
-	public abstract Class<?> getEntry();
+    public Scene getCurrentScene() {
+        return systemBuilder.sceneSystem.getScene();
+    }
 
-	public void init() {
-		if (EngineInfo.Debug)
-			Debugger.setGem(this);
-		Gdx.graphics.setVSync(false);
-		loader = new AssetFactory(this);
+    public Entity getEntity(int id) {
+        return entityBuilder.getById(id);
+    }
 
-		UIBuilder = new UIFactory(this);
-		EngineInfo.makeBasicEntities(this, UIBuilder);
-		componentSpokesman = new ComponentSpokesman(UIBuilder);
+    public Entity getEntity(String name) {
+        return entityBuilder.getByName(name);
+    }
 
-		componentFactory = new ComponentFactory(this, componentSpokesman);
+    public abstract Class<?> getEntry();
 
-		XmlSave = new XmlEntity(this);
+    public void init() {
+        if (EngineInfo.Debug)
+            Debugger.setGem(this);
+        Gdx.graphics.setVSync(false);
+        loader = new AssetFactory(this);
 
-		systemBuilder = new SystemFactory(this, componentFactory, XmlSave);
+        UIBuilder = new UIFactory(this);
+        componentSpokesman = new ComponentSpokesman(UIBuilder);
 
-		entityBuilder = new EntityFactory(componentFactory, XmlSave, componentSpokesman);
-		meshBuilder = new MeshFactory(this);
+        componentFactory = new ComponentFactory(this, componentSpokesman);
 
-		systemBuilder.createMainSystems(UIBuilder._SpriteBatch);
+        XmlSave = new XmlEntity(this);
 
-		SceneBuilder = new SceneFactory(this, systemBuilder.sceneSystem);
-		SceneBuilder.changeScene(getEntry().getName());
+        systemBuilder = new SystemFactory(this, componentFactory, XmlSave);
 
-		EngineInfo.makeOptionalEntities(this);
+        entityBuilder = new EntityFactory(componentFactory, XmlSave, componentSpokesman);
+        meshBuilder = new MeshFactory(this);
 
-		systemBuilder.createUISystems();
+        systemBuilder.createMainSystems(UIBuilder._SpriteBatch);
 
-		UIBuilder.createMultiplexer();
+        SceneBuilder = new SceneFactory(this, systemBuilder.sceneSystem);
+        SceneBuilder.changeScene(getEntry().getName());
 
-		systemBuilder.sendConfigurations(entityBuilder);
-	}
+        EngineInfo.makeOptionalEntities(this);
 
-	public void remove() {
-		entityBuilder.clear();
-		componentFactory.clear();
-	}
+        systemBuilder.createUISystems();
 
-	@Override
-	public void render() {
-		Gdx.gl.glClearColor(EngineInfo.BackgroundColor.r, EngineInfo.BackgroundColor.g, EngineInfo.BackgroundColor.b,
-				EngineInfo.BackgroundColor.a);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		update(Gdx.graphics.getDeltaTime());
-		UIBuilder.resize((int) EngineInfo.ScreenWidth, (int) EngineInfo.ScreenHeight);
-	}
+        UIBuilder.createMultiplexer();
 
-	@Override
-	public void resize(int w, int h) {
-		systemBuilder.resize(w, h);
-		EngineInfo.makeBasicEntities(this, UIBuilder);
-	}
+        systemBuilder.sendConfigurations(entityBuilder);
+    }
 
-	public void restart() {
-		entityBuilder.clear();
-		systemBuilder.restart();
-		EngineInfo.makeBasicEntities(this, UIBuilder);
-	}
+    public void remove() {
+        entityBuilder.clear();
+        componentFactory.clear();
+    }
 
-	protected void update(float delta) {
-		systemBuilder.updateSystems();
-		try {
-			long time = (long) (1000 / EngineInfo.Fps - Gdx.graphics.getDeltaTime());
-			Thread.sleep(time < 0 ? 0 : time);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    public void render() {
+        Gdx.gl.glClearColor(EngineInfo.BackgroundColor.r, EngineInfo.BackgroundColor.g, EngineInfo.BackgroundColor.b,
+                EngineInfo.BackgroundColor.a);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        update(Gdx.graphics.getDeltaTime());
+    }
 
-	/**
-	 * Goes upwards
-	 *
-	 * @param ent
-	 * @param cls
-	 * @return
-	 */
-	public static <T extends ComponentBase> T goFindUpWithComponent(Entity ent, Class<T> cls) {
-		if (ent == null) {
-			return null;
-		}
-		if (!ent.hasComponent(cls)) {
-			return goUpForComponent(ent, cls);
-		}
-		return ent.getComponent(cls);
-	}
+    @Override
+    public void resize(int w, int h) {
+        systemBuilder.resize(w, h);
+    }
 
-	/**
-	 * Goes upwards
-	 *
-	 * @param ent
-	 * @param cls
-	 * @return
-	 */
-	public static <T extends ComponentBase> T goUpForComponent(Entity ent, Class<T> cls) {
-		Entity parent = ent.getParent();
-		if (parent == null) {
-			return null;
-		}
-		if (parent != null && !parent.hasComponent(cls)) {
-			return goUpForComponent(parent, cls);
-		}
-		return parent.getComponent(cls);
-	}
+    public void restart() {
+        entityBuilder.clear();
+        systemBuilder.restart();
+    }
 
-	/**
-	 * Goes downwards on leafs.
-	 *
-	 * @param ent
-	 * @param cls
-	 * @return
-	 */
-	public static List<Entity> goDownFind(Entity ent, Class<?> cls) {
-		List<Entity> children = ent.getChildren();
-		for (Entity child : children) {
-			if (!child.hasComponent(ComponentUILayout.class) && !child.hasComponent(ComponentUIWidget.class)) {
-				children.remove(child);
-				List<Entity> subChildren = child.getChildren();
-				for (Entity subChild : subChildren) {
-					children.addAll(goDownFind(subChild, cls));
-				}
-				children.addAll(subChildren);
-			}
-		}
-		return children;
-	}
+    protected void update(float delta) {
+        systemBuilder.updateSystems();
+        try {
+            long time = (long) (1000 / EngineInfo.Fps - Gdx.graphics.getDeltaTime());
+            Thread.sleep(time < 0 ? 0 : time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

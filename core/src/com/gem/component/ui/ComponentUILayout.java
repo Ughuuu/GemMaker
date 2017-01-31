@@ -11,34 +11,34 @@ import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
 public abstract class ComponentUILayout extends ComponentUIBase {
-	protected int _ColSpan = 1;
+    protected int _ColSpan = 1;
 
-	protected boolean _ExpandX, _ExpandY, _FillX, _FillY, _Uniform;
-	protected float _Width, _Height, _PadLeft, _PadRight, _PadTop, _PadBottom, _SpaceLeft, _SpaceRight, _SpaceTop,
-			_SpaceBottom;
+    protected boolean _ExpandX, _ExpandY, _FillX, _FillY, _Uniform;
+    protected float _Width, _Height, _PadLeft, _PadRight, _PadTop, _PadBottom, _SpaceLeft, _SpaceRight, _SpaceTop,
+            _SpaceBottom;
 
-	public ComponentUILayout(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
-		super(ng, ent, factory, _ComponentSpokesman);
-	}
+    public ComponentUILayout(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+    }
 
-	public void act(float act) {
-		get().act(act);
-	}
+    public void act(float act) {
+        get().act(act);
+    }
 
-	protected abstract WidgetGroup get();
+    protected abstract WidgetGroup get();
 
-	@Override
-	protected Actor getActor() {
-		return get();
-	}
+    @Override
+    protected Actor getActor() {
+        return get();
+    }
 
-	@Override
-	protected ComponentBase Load(Element element) throws Exception {
-		return this;
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		// Don't save it, regenerate it.
-	}
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        // Don't save it, regenerate it.
+    }
 }

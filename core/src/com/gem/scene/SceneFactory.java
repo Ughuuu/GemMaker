@@ -9,34 +9,36 @@ import com.gem.systems.SystemScene;
  * @composed 1 - 1 Scene
  */
 public class SceneFactory {
-	private final Gem gem;
-	private final SystemScene sceneSystem;
+    private final Gem gem;
+    private final SystemScene sceneSystem;
 
-	public SceneFactory(Gem gem, SystemScene sceneSystem) {
-		this.gem = gem;
-		this.sceneSystem = sceneSystem;
-	}
+    public SceneFactory(Gem gem, SystemScene sceneSystem) {
+        this.gem = gem;
+        this.sceneSystem = sceneSystem;
+    }
 
-	public void changeScene(String name) {
-		Gdx.graphics.setTitle(name);
-		Scene scene = makeScene(name);
-		scene.name = name;
-		sceneSystem.setScene(scene);
-	}
+    public void changeScene(String name) {
+        Gdx.graphics.setTitle(name);
+        Scene scene = makeScene(name);
+        scene.name = name;
+        sceneSystem.setScene(scene);
+    }
 
-	public Scene makeScene(String name) {
-		try {
-			Class<?> scene = Class.forName(name);
-			Scene scn = (Scene) scene.newInstance();
-			scn.addGem(gem);
-			scn.addSceneFactory(this);
-			return scn;
-		} catch (Exception e) {
-			// You don't have to have a scene class for the scene xml, it's
-			// optional
-			// e.printStackTrace();
-			// Debugger.log(e.t);
-		}
-		return new Scene();
-	}
+    public Scene makeScene(String name) {
+    	Scene scn;
+        try {
+            Class<?> scene = Class.forName(name);
+            scn = (Scene) scene.newInstance();
+        } catch (Exception e) {
+            // You don't have to have a scene class for the scene xml, it's
+            // optional
+            // e.printStackTrace();
+            // Debugger.log(e.t);
+            scn = new Scene();
+            scn.name = name;
+        }
+        scn.addGem(gem);
+        scn.addSceneFactory(this);
+        return scn;
+    }
 }

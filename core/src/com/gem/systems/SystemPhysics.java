@@ -11,23 +11,21 @@ import com.gem.entity.Entity;
  * @hidden
  */
 public class SystemPhysics extends SystemBase {
-	public Box2DDebugRenderer debugRenderer;
-	public World world = new World(EngineInfo.Gravity, true);
+    public Box2DDebugRenderer debugRenderer;
+    public World world = new World(EngineInfo.Gravity, true);
 
-	public SystemPhysics(Gem ng, SystemConfiguration conf) {
-		super(ng, conf);
-		debugRenderer = new Box2DDebugRenderer();
-	}
+    public SystemPhysics(Gem ng, SystemConfiguration conf) {
+        super(ng, conf);
+        debugRenderer = new Box2DDebugRenderer();
+    }
 
-	@Override
-	public void onBeforeUpdate() {
-		world.step(EngineInfo.Ms, 6, 2);
-	}
+    @Override
+    public void onBeforeUpdate() {
+        world.step(EngineInfo.Ms, 6, 2);
+    }
 
-	;
-
-	@Override
-	public void onUpdate(Entity ent) {
-	}
+    @Override
+    public void onUpdate(Entity ent) {
+    }
 
 }

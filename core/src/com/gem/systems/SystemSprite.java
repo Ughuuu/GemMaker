@@ -14,47 +14,44 @@ import com.gem.entity.Entity;
  * @hidden
  */
 public class SystemSprite extends SystemBase {
-	protected SpriteBatch spriteBatch;
-	private Matrix4 cameraView;
-	private int cameraId;
+    protected SpriteBatch spriteBatch;
+    private Matrix4 cameraView;
+    private int cameraId;
 
-	public SystemSprite(Gem ng, SystemConfiguration conf, SpriteBatch batch) {
-		super(ng, conf);
-		spriteBatch = batch;
-	}
+    public SystemSprite(Gem ng, SystemConfiguration conf, SpriteBatch batch) {
+        super(ng, conf);
+        spriteBatch = batch;
+    }
 
-	@Override
-	public void onAfterUpdate() {
-		spriteBatch.end();
-	}
+    @Override
+    public void onAfterUpdate() {
+        spriteBatch.end();
+    }
 
-	@Override
-	public void onBeforeUpdate() {
-		spriteBatch.begin();
-		//spriteBatch.disableBlending();
-		spriteBatch.setTransformMatrix(new Matrix4());
-	}
+    @Override
+    public void onBeforeUpdate() {
+        spriteBatch.begin();
+        //spriteBatch.disableBlending();
+        spriteBatch.setTransformMatrix(new Matrix4());
+    }
 
-	@Override
-	public void onUpdate(Entity ent) {
-		ComponentCamera camera = Gem.goUpForComponent(ent, ComponentCamera.class);
-		if(camera == null){
-			return;
-		}
-		if(cameraId != camera.getId()){
-			cameraView = camera.getCombined();
-			spriteBatch.setProjectionMatrix(cameraView);
-			cameraId = camera.getId();
-		}
-		
-		ComponentSprite sprComp = ent.getComponent(ComponentSprite.class);
-		Sprite spr = sprComp.getSprite();
+    @Override
+    public void onUpdate(Entity ent) {
+        ComponentCamera camera = Gem.goUpForComponent(ent, ComponentCamera.class);
+        if (camera == null) {
+            return;
+        }
+        cameraView = camera.getCombined();
+        spriteBatch.setProjectionMatrix(cameraView);
 
-		if (spr.getTexture() == null) {
-			Debugger.log(ent.getName() + " doesn't have a right texture.");
-			return;
-		}
+        ComponentSprite sprComp = ent.getComponent(ComponentSprite.class);
+        Sprite spr = sprComp.getSprite();
 
-		spr.draw(spriteBatch);
-	}
+        if (spr.getTexture() == null) {
+            Debugger.log(ent.getName() + " doesn't have a right texture.");
+            return;
+        }
+
+        spr.draw(spriteBatch);
+    }
 }

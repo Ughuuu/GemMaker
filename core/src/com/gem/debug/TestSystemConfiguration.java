@@ -9,10 +9,10 @@ import com.gem.systems.SystemConfiguration;
 
 public class TestSystemConfiguration {
 
-	public TestSystemConfiguration(Gem ng) {
-		SystemConfiguration sys = new SystemConfiguration().all(ComponentCamera.class, ComponentPoint.class);
-		sys.addClass(ComponentMaterial.class, ComponentMesh.class);
-		sys.removeClass(ComponentMaterial.class, ComponentMesh.class);
-		Debugger.log("TestSystemConfiguration()---PASS");
-	}
+    public TestSystemConfiguration(Gem ng) {
+        SystemConfiguration sys = new SystemConfiguration().all(ComponentCamera.class, ComponentPoint.class);
+        sys.addClass(ComponentMaterial.class, ComponentMesh.class);
+        sys.removeClass(ComponentMaterial.class, ComponentMesh.class);
+        Debugger.log("TestSystemConfiguration()---PASS");
+    }
 }

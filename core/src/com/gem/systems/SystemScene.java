@@ -1,9 +1,6 @@
 package com.gem.systems;
 
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
@@ -16,6 +13,11 @@ import com.gem.entity.Entity;
 import com.gem.entity.XmlEntity;
 import com.gem.scene.Scene;
 
+import java.awt.Component;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author Dragos
  * @composed 1 - 1 Scene
@@ -24,6 +26,8 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 	private final XmlEntity xmlFactory;
 	private Scene requestChange;
 	private Scene scene;
+	private Set<ComponentScript> toUpdateScripts = new HashSet<ComponentScript>();
+	private Set<ComponentScript> otherScripts = new HashSet<ComponentScript>();
 
 	public SystemScene(Gem ng, SystemConfiguration conf, XmlEntity xml) {
 		super(ng, conf);
@@ -32,8 +36,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean fling(float x, float y, int button) {
-		x = x / Gdx.graphics.getWidth() * EngineInfo.Width;
-		y = EngineInfo.Height - y / Gdx.graphics.getHeight() * EngineInfo.Height;
 		if (scene != null)
 			scene.onFling(x, y);
 		return false;
@@ -41,6 +43,12 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	public Scene getScene() {
 		return scene;
+	}
+
+	public void setScene(Scene sc) {
+		if (sc != null) {
+			this.requestChange = sc;
+		}
 	}
 
 	@Override
@@ -65,8 +73,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean longPress(float x, float y) {
-		x = x / Gdx.graphics.getWidth() * EngineInfo.Width;
-		y = EngineInfo.Height - y / Gdx.graphics.getHeight() * EngineInfo.Height;
 		if (scene != null)
 			scene.onLongPress(x, y);
 		return false;
@@ -89,7 +95,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 			scene = requestChange;
 			xmlFactory.Load();
 			requestChange = null;
-			Debugger.log("Loaded scene " + scene);
 			scene.onInit();
 		}
 		if (scene != null)
@@ -97,26 +102,91 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 	}
 
 	@Override
-	public void onUpdate(Entity ent) {
-		List<ComponentScript> scripts = ent.getComponents(ComponentScript.class);
-
-		for (ComponentScript scriptComponent : scripts) {
-			if(EngineInfo.Debug){
-				try{
-					String err = scriptComponent.update();
-					if(err!= null && err.length() != 0){
-						System.out.println(err);
+	public void onUpdate(Set<Entity> entities) {
+		if (EngineInfo.Debug) {
+			toUpdateScripts.clear();
+			otherScripts.clear();
+			for (Entity ent : entities) {
+				List<ComponentScript> entScripts = ent.getComponents(ComponentScript.class);
+				// find if scripts need to be changed
+				for (ComponentScript scriptComponent : entScripts) {
+					if (scriptComponent.shouldUpdate()) {
+						toUpdateScripts.add(scriptComponent);
+					} else {
+						otherScripts.add(scriptComponent);
 					}
-				}catch(Exception e){
+				}
+			}
+		}
+		if (EngineInfo.Debug && !toUpdateScripts.isEmpty()) {
+			// reload all scrips that changed
+			ComponentScript currentScript = toUpdateScripts.iterator().next();
+			try {
+				toUpdateScripts.remove(currentScript);
+				String err = currentScript.update(toUpdateScripts);
+				if (!err.equals("")) {
+					System.out.println(err);
+				}
+				currentScript.reloadOthers(otherScripts);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				currentScript.runInit();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			for (ComponentScript script : toUpdateScripts) {
+				try {
+					script.runInit();
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			if (scriptComponent.isValid()) {
-				Script script = scriptComponent.getScript();
-				try{
-					script.onUpdate(deltaTime);
-				}catch(Exception e){
+			for (ComponentScript script : otherScripts) {
+				try {
+					script.runInit();
+				} catch (Exception e) {
 					e.printStackTrace();
+				}
+			}
+		}
+		for (Entity ent : entities) {
+			List<ComponentScript> entScripts = ent.getComponents(ComponentScript.class);
+			for (ComponentScript scriptComponent : entScripts) {
+				if (scriptComponent.isValid()) {
+					Script script = scriptComponent.getScript();
+					try {
+						script.onBeforeUpdate();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		for (Entity ent : entities) {
+			List<ComponentScript> entScripts = ent.getComponents(ComponentScript.class);
+			for (ComponentScript scriptComponent : entScripts) {
+				if (scriptComponent.isValid()) {
+					Script script = scriptComponent.getScript();
+					try {
+						script.onUpdate(deltaTime);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		for (Entity ent : entities) {
+			List<ComponentScript> entScripts = ent.getComponents(ComponentScript.class);
+			for (ComponentScript scriptComponent : entScripts) {
+				if (scriptComponent.isValid()) {
+					Script script = scriptComponent.getScript();
+					try {
+						script.onAfterUpdate();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -124,10 +194,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		x = x / Gdx.graphics.getWidth() * EngineInfo.Width;
-		y = EngineInfo.Height - y / Gdx.graphics.getHeight() * EngineInfo.Height;
-		deltaX = deltaX / Gdx.graphics.getWidth() * EngineInfo.Width;
-		deltaY = deltaY / Gdx.graphics.getHeight() * EngineInfo.Height;
 		if (scene != null)
 			scene.onPan(x, y, deltaX, deltaY);
 		return false;
@@ -135,8 +201,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean panStop(float x, float y, int pointer, int button) {
-		x = x / Gdx.graphics.getWidth() * EngineInfo.Width;
-		y = EngineInfo.Height - y / Gdx.graphics.getHeight() * EngineInfo.Height;
 		if (scene != null)
 			scene.onPanStop(x, y);
 		return false;
@@ -160,16 +224,8 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 		return false;
 	}
 
-	public void setScene(Scene sc) {
-		if (sc != null) {
-			this.requestChange = sc;
-		}
-	}
-
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
-		x = x / Gdx.graphics.getWidth() * EngineInfo.Width;
-		y = EngineInfo.Height - y / Gdx.graphics.getHeight() * EngineInfo.Height;
 		if (scene != null)
 			scene.onTap(x, y, count);
 		return false;
@@ -177,14 +233,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean touchDown(float x, float y, int pointer, int button) {
-		x = x / Gdx.graphics.getWidth() * EngineInfo.Width;
-		y = EngineInfo.Height - y / Gdx.graphics.getHeight() * EngineInfo.Height;
-		if (EngineInfo.Debug) {
-			SystemOverlay.x1 = x;
-			SystemOverlay.y1 = y;
-			SystemOverlay.x2 = x;
-			SystemOverlay.y2 = y;
-		}
 		if (scene != null)
 			scene.onTouchDown(x, y, pointer);
 		return false;
@@ -198,12 +246,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean touchDragged(int x, int y, int pointer) {
-		x = (int) (x / (float) Gdx.graphics.getWidth() * EngineInfo.Width);
-		y = (int) (EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height);
-		if (EngineInfo.Debug) {
-			SystemOverlay.x2 = x;
-			SystemOverlay.y2 = y;
-		}
 		if (scene != null)
 			scene.onTouchDrag(x, y, pointer);
 		return false;
@@ -211,14 +253,6 @@ public class SystemScene extends SystemBase implements GestureListener, InputPro
 
 	@Override
 	public boolean touchUp(int x, int y, int pointer, int button) {
-		x = (int) (x / (float) Gdx.graphics.getWidth() * EngineInfo.Width);
-		y = (int) (EngineInfo.Height - y / (float) Gdx.graphics.getHeight() * EngineInfo.Height);
-		if (EngineInfo.Debug) {
-			SystemOverlay.x1 = -1;
-			SystemOverlay.y1 = -1;
-			SystemOverlay.x2 = -1;
-			SystemOverlay.y2 = -1;
-		}
 		if (scene != null)
 			scene.onTouchUp(x, y, pointer);
 		return false;

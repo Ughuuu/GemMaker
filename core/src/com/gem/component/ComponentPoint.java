@@ -1,7 +1,5 @@
 package com.gem.component;
 
-import java.util.List;
-
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -12,290 +10,351 @@ import com.gem.engine.Gem;
 import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
+import java.util.List;
+
 public class ComponentPoint extends ComponentBase {
-	private static final Quaternion IdentityRotation = new Quaternion();
-	private Matrix4 matLocal = new Matrix4();
-	private Matrix4 matGlobal = new Matrix4();
-	private final Vector3[] cache = new Vector3[15];
+    private Matrix4 mat = new Matrix4();
+    private final Quaternion quaternion = new Quaternion();
+    private final Vector3 rotation = new Vector3(),
+            position = new Vector3(),
+            scale = new Vector3(),
+            up = new Vector3(),
+            left = new Vector3(),
+            forward = new Vector3();
 
-	public ComponentPoint(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
-		super(ng, ent, factory, _ComponentSpokesman);
-		for (int i = 0; i < cache.length; i++) {
-			cache[i] = new Vector3();
-		}
-		recalculateFromParent();
-	}
+    private Matrix4 matLocal = new Matrix4();
+    private final Quaternion quaternionLocal = new Quaternion();
+    private final Vector3 rotationLocal = new Vector3(),
+            positionLocal = new Vector3(),
+            scaleLocal = new Vector3(),
+            upLocal = new Vector3(),
+            leftLocal = new Vector3(),
+            forwardLocal = new Vector3();
 
-	public Vector3 getForward() {
-		return getForward(matGlobal, 1);
-	}
+    private final Vector3[] cacheVector = new Vector3[14];
+    private final Quaternion[] cacheQuaternion = new Quaternion[2];
+    private final Matrix4[] cacheMatrix = new Matrix4[2];
 
-	public Vector3 getLeft() {
-		return getLeft(matGlobal, 2);
-	}
+    /**
+     * Construct a new Component Point. Used by factory method only, by componentFactory.
+     * @param gem A reference to the gem.
+     * @param ent The entity that will contain this component.
+     * @param factory The factory that created this.
+     * @param componentSpokesman This is used to comunicate between components and higher builders.
+     */
+    public ComponentPoint(Gem gem, Entity ent, ComponentFactory factory, ComponentSpokesman componentSpokesman) {
+        super(gem, ent, factory, componentSpokesman);
+        for (int i = 0; i < cacheVector.length; i++) {
+            cacheVector[i] = new Vector3();
+        }
+        for (int i = 0; i < cacheQuaternion.length; i++) {
+            cacheQuaternion[i] = new Quaternion();
+        }
+        for (int i = 0; i < cacheMatrix.length; i++) {
+            cacheMatrix[i] = new Matrix4();
+        }
+        recalculateFromParent();
+    }
 
-	public final Matrix4 getLocalMatrix() {
-		return matLocal.cpy();
-	}
+    /**
+     * Get the global translation rotation scale matrix of this object.
+     * @return The 4x4 matrix
+     */
+    public final Matrix4 getMatrix() {
+        return cacheMatrix[0].set(mat);
+    }
 
-	public final Matrix4 getMatrix() {
-		return matGlobal.cpy();
-	}
+    /**
+     * Get the global forward vector of this object.
+     * @return A unit vector representing the forward direction
+     */
+    public final Vector3 getForward() {
+        return cacheVector[0].set(forward);
+    }
 
-	public Vector3 getPosition() {
-		return getPosition(matGlobal, 4);
-	}
+    /**
+     * Get the global left vector of this object.
+     * @return A unit vector representing the left direction.
+     */
+    public final Vector3 getLeft() { return cacheVector[1].set(left); }
 
-	public final Quaternion getQuaternion() {
-		return getQuaternion(matGlobal);
-	}
+    /**
+     * Get the global right vector of this object.
+     * @return A unit vector representing the right direction.
+     */
+    public final Vector3 getRight() {
+        return cacheVector[2].set(left).scl(-1);
+    }
 
-	public Vector3 getRelativeForward() {
-		return getForward(matLocal, 8);
-	}
+    /**
+     * Get the global up vector of this object.
+     * @return A unit vector representing the up direction.
+     */
+    public final Vector3 getUp() {
+        return cacheVector[3].set(up);
+    }
 
-	public Vector3 getRelativeLeft() {
-		return getLeft(matLocal, 9);
-	}
+    /**
+     * Get the global position of this.
+     * @return A vector representing the position in global space.
+     */
+    public final Vector3 getPosition() { return cacheVector[4].set(position); }
 
-	public Vector3 getRelativePosition() {
-		return getPosition(matLocal, 11);
-	}
+    /**
+     * Get the global rotation of this object.
+     * @return A quaternion representing this objects global rotation.
+     */
+    public final Quaternion getQuaternion() {
+        // TODO dirty optimization
+        quaternion.setEulerAngles(rotation.x, rotation.y, rotation.z);
+        return cacheQuaternion[0].set(quaternion);
+    }
 
-	public final Quaternion getRelativeQuaternion() {
-		return getQuaternion(matLocal);
-	}
+    /**
+     * Get the global rotation of this object.
+     * @return A Vector3 where x, y and z represent the rotation on each axis in degrees.
+     */
+    public final Vector3 getRotation() {
+        return cacheVector[5].set(rotation);
+    }
 
-	// GLOBAL SPACE
+    /**
+     * Get the global scale of this object.
+     * @return A Vector3 where x, y and z represent the scale on each axis.
+     */
+    public final Vector3 getScale() {
+        return cacheVector[6].set(scale);
+    }
 
-	public Vector3 getRelativeRight() {
-		return getRight(matLocal, 10);
-	}
+    /**
+     * Get the relative translation rotation scale matrix of this object.
+     * @return The 4x4 matrix
+     */
+    public final Matrix4 getRelativeMatrix() {
+        return cacheMatrix[1].set(matLocal);
+    }
 
-	public final Vector3 getRelativeRotation() {
-		return getRotation(matLocal, 12);
-	}
+    /**
+     * Get the relative forward vector of this object.
+     * @return A unit vector representing the forward direction
+     */
+    public final Vector3 getRelativeForward() {
+        return cacheVector[7].set(forwardLocal);
+    }
 
-	public final Vector3 getRelativeScale() {
-		return getScale(matLocal, 13);
-	}
+    /**
+     * Get the relative left vector of this object.
+     * @return A unit vector representing the left direction.
+     */
+    public final Vector3 getRelativeLeft() { return cacheVector[8].set(leftLocal); }
 
-	public Vector3 getRelativeUp() {
-		return getUp(matLocal, 7);
-	}
+    /**
+     * Get the relative right vector of this object.
+     * @return A unit vector representing the right direction.
+     */
+    public final Vector3 getRelativeRight() {
+        return cacheVector[9].set(leftLocal).scl(-1);
+    }
 
-	public Vector3 getRight() {
-		return getRight(matGlobal, 3);
-	}
+    /**
+     * Get the relative up vector of this object.
+     * @return A unit vector representing the up direction.
+     */
+    public final Vector3 getRelativeUp() {
+        return cacheVector[10].set(upLocal);
+    }
 
-	public final Vector3 getRotation() {
-		return getRotation(matGlobal, 5);
-	}
+    /**
+     * Get the relative position of this.
+     * @return A vector representing the position in global space.
+     */
+    public final Vector3 getRelativePosition() { return cacheVector[11].set(positionLocal); }
 
-	public final Vector3 getScale() {
-		return getScale(matGlobal, 6);
-	}
+    /**
+     * Get the relative rotation of this object.
+     * @return A quaternion representing this objects global rotation.
+     */
+    public final Quaternion getRelativeQuaternion() {
+        // TODO dirty optimization
+        quaternionLocal.setEulerAngles(rotation.x, rotation.y, rotation.z);
+        return cacheQuaternion[1].set(quaternionLocal);
+    }
 
-	public Vector3 getUp() {
-		return getUp(matGlobal, 0);
-	}
+    /**
+     * Get the relative rotation of this object.
+     * @return A Vector3 where x, y and z represent the rotation on each axis in degrees.
+     */
+    public final Vector3 getRelativeRotation() {
+        return cacheVector[12].set(rotationLocal);
+    }
 
-	// LOCAL SPACE
+    /**
+     * Get the relative scale of this object.
+     * @return A Vector3 where x, y and z represent the scale on each axis.
+     */
+    public final Vector3 getRelativeScale() {
+        return cacheVector[13].set(scaleLocal);
+    }
 
-	@Override
-	public void reset() {
-		matGlobal.idt();
-		matLocal.idt();
-		recalculateFromParent();
-	}
+    /**
+     * Resets this object state to have everything put to 0.
+     */
+    @Override
+    public void reset() {
+        position.setZero();
+        scale.set(1, 1, 1);
+        rotation.setZero();
+        quaternion.idt();
 
-	public ComponentPoint setPosition(Vector3 position) {
-		recalculateGlobalPos(position);
-		return this;
-	}
+        positionLocal.setZero();
+        scaleLocal.set(1, 1, 1);
+        rotationLocal.setZero();
+        quaternionLocal.idt();
+        mat.idt();
+        matLocal.idt();
+        recalculateFromParent();
+    }
 
-	public ComponentPoint setRotation(Quaternion rotation) {
-		recalculateGlobal(getPosition(), cache[14].set(rotation.getPitch(), rotation.getYaw(), rotation.getRoll()), getScale());
-		return this;
-	}
+    /**
+     * Set the relative rotation of this object from the given quaternion.
+     * @param rotation Describes the new local rotation of the object.
+     * @return This object for chaining.
+     */
+    public ComponentPoint setRelativeQuaternion(Quaternion rotation) {
+        quaternionLocal.set(rotation);
+        rotationLocal.set(rotation.getPitch(), rotation.getYaw(), rotation.getRoll());
+        recalculateFromParent();
+        return this;
+    }
 
-	public ComponentPoint setRotation(Vector3 rotation) {
-		recalculateGlobal(getPosition(), rotation, getScale());
-		return this;
-	}
+    /**
+     * Set the relative rotation of this object from the given vector.
+     * @param rotation Describes the new local rotation of the object.
+     * @return This object for chaining.
+     */
+    public ComponentPoint setRelativeRotation(Vector3 rotation) {
+        rotationLocal.set(rotation);
+        quaternionLocal.setEulerAngles(rotationLocal.x, rotationLocal.y, rotationLocal.z);
+        recalculateFromParent();
+        return this;
+    }
 
-	public ComponentPoint setScale(float sc) {
-		recalculateGlobal(getPosition(), getRotation(), cache[14].set(sc, sc, sc));
-		return this;
-	}
+    /**
+     * Set the relative scale of this object from the given vector.
+     * @param scale Describes the new local scale of the object.
+     * @return This object for chaining.
+     */
+    public ComponentPoint setRelativeScale(float scale) {
+        this.scaleLocal.set(scale, scale, scale);
+        recalculateFromParent();
+        return this;
+    }
 
-	public ComponentPoint setScale(Vector3 scale) {
-		recalculateGlobal(getPosition(), getRotation(), scale);
-		return this;
-	}
+    /**
+     * Set the relative scale of this object from the given vector.
+     * @param scale Describes the new local scale of the object.
+     * @return This object for chaining.
+     */
+    public ComponentPoint setRelativeScale(Vector3 scale) {
+        this.scaleLocal.set(scale);
+        recalculateFromParent();
+        return this;
+    }
 
-	public ComponentPoint setRelativePosition(Vector3 position) {
-		recalculateFromParent(cache[14].setZero().add(getPosition()).sub(getRelativePosition()).add(position), getQuaternion(),
-				getScale());
-		return this;
-	}
+    /**
+     * Set the relative position of this object from the given vector.
+     * @param scale Describes the new local position of the object.
+     * @return This object for chaining.
+     */
+    public ComponentPoint setRelativePosition(Vector3 position) {
+        this.positionLocal.set(position);
+        recalculateFromParent();
+        return this;
+    }
 
-	public ComponentPoint setRelativeRotation(Quaternion rotation) {
-		Quaternion inverseLocal = LinearMath.inverse(getRelativeQuaternion());
-		recalculateFromParent(getPosition(), new Quaternion().set(getQuaternion()).mul(inverseLocal).mul(rotation), getScale());
-		return this;
-	}
+    private void recalculateFromParent() {
+    	if(owner.getName().equals("P")){
+    		int a = 5;
+    	}
+        matLocal.set(positionLocal.x, positionLocal.y, positionLocal.z,
+                quaternionLocal.x, quaternionLocal.y, quaternionLocal.z, quaternionLocal.w,
+                scaleLocal.x, scaleLocal.y, scaleLocal.z);
+        leftLocal.set(matLocal.val[0], matLocal.val[1], matLocal.val[2]);
+        upLocal.set(matLocal.val[4], matLocal.val[5], matLocal.val[6]);
+        forwardLocal.set(matLocal.val[8], matLocal.val[9], matLocal.val[10]);
+        if (owner.hasParent()) {
+            ComponentPoint parent = owner.getParent().getComponent(ComponentPoint.class);
+            Matrix4 parentMat = parent.getMatrix();
+            mat.set(parentMat).mul(matLocal);
 
-	public ComponentPoint setRelativeRotation(Vector3 rotation) {
-		return setRelativeRotation(new Quaternion().setEulerAngles(rotation.x, rotation.y, rotation.z));
-	}
+            mat.getTranslation(position);
+            mat.getScale(scale);
+            //scale.set(parent.scale.x * scaleLocal.x, parent.scale.y * scaleLocal.y, parent.scale.z * scaleLocal.z);
+            quaternion.set(parent.quaternion).add(quaternionLocal);
+            rotation.set(parent.rotation).add(rotationLocal);
+            left.set(mat.val[0], mat.val[1], mat.val[2]);
+            up.set(mat.val[4], mat.val[5], mat.val[6]);
+            forward.set(mat.val[8], mat.val[9], mat.val[10]);
 
-	public ComponentPoint setRelativeScale(float sc) {
-		recalculateFromParent(cache[14].setZero().add(getPosition()).sub(getRelativePosition()).add(cache[14].set(sc, sc, sc)),
-				getQuaternion(), getScale());
-		return this;
-	}
+        } else {
+            mat.set(matLocal);
 
-	public ComponentPoint setRelativeScale(Vector3 scale) {
-		recalculateFromParent(cache[14].setZero().add(getPosition()).sub(getRelativePosition()).add(scale), getQuaternion(),
-				getScale());
-		return this;
-	}
+            position.set(positionLocal);
+            scale.set(scaleLocal);
+            rotation.set(rotationLocal);
+            quaternion.set(quaternionLocal);
+            up.set(upLocal);
+            left.set(leftLocal);
+            forward.set(forwardLocal);
+        }
+        updateChildren();
+        componentFactory.notifyAllComponents(owner.getComponents(), this);
+    }
 
-	private Vector3 getForward(Matrix4 mat, int cacheLvl) {
-		return cache[cacheLvl].set(mat.val[8], mat.val[9], mat.val[10]);
-	}
+    private void updateChildren() {
+        List<Entity> entities = getOwner().getChildren();
+        for (Entity ent : entities) {
+            ComponentPoint point = ent.getComponent(ComponentPoint.class);
+            point.recalculateFromParent();
+        }
+    }
 
-	private Vector3 getLeft(Matrix4 mat, int cacheLvl) {
-		return cache[cacheLvl].set(mat.val[0], mat.val[1], mat.val[2]);
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        positionLocal.x = element.getChildByName("Position").getFloat("X");
+        positionLocal.y = element.getChildByName("Position").getFloat("Y");
+        positionLocal.z = element.getChildByName("Position").getFloat("Z");
+        rotationLocal.x = element.getChildByName("Rotation").getFloat("X");
+        rotationLocal.y = element.getChildByName("Rotation").getFloat("Y");
+        rotationLocal.z = element.getChildByName("Rotation").getFloat("Z");
+        scaleLocal.x = element.getChildByName("Scale").getFloat("X");
+        scaleLocal.y = element.getChildByName("Scale").getFloat("Y");
+        scaleLocal.z = element.getChildByName("Scale").getFloat("Z");
+        setRelativeRotation(rotationLocal);
+        recalculateFromParent();
+        return this;
+    }
 
-	private Vector3 getPosition(Matrix4 mat, int cacheLvl) {
-		return cache[cacheLvl].set(mat.val[12], mat.val[13], mat.val[14]);
-	}
+    @Override
+    protected void notifyDeparented(Entity parent) {
+        recalculateFromParent();
+    }
 
-	private final Quaternion getQuaternion(Matrix4 mat) {
-		return mat.getRotation(IdentityRotation);
-	}
+    @Override
+    protected void notifyParented(Entity parent) {
+        recalculateFromParent();
+    }
 
-	private Vector3 getRight(Matrix4 mat, int cacheLvl) {
-		return cache[cacheLvl].set(mat.val[0], mat.val[1], mat.val[2]).scl(-1);
-	}
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", type.getName()).element("Position").attribute("X", positionLocal.x)
+                .attribute("Y", positionLocal.y).attribute("Z", positionLocal.z).pop().element("Scale").attribute("X", scaleLocal.x)
+                .attribute("Y", scaleLocal.y).attribute("Z", scaleLocal.z).pop().element("Rotation").attribute("X", rotationLocal.x)
+                .attribute("Y", rotationLocal.y).attribute("Z", rotationLocal.z).pop().pop();
+    }
 
-	private final Vector3 getRotation(Matrix4 mat, int cacheLvl) {
-		Quaternion finalRot = mat.getRotation(IdentityRotation);
-		float x = finalRot.getPitch();
-		float y = finalRot.getYaw();
-		float z = finalRot.getRoll();
-		if(Owner.getName().equals("P")){
-			System.out.println(x + " " + y + " " + z);
-		}
-		return cache[cacheLvl].set(x, y, z);
-	}
-
-	private final Vector3 getScale(Matrix4 mat, int cacheLvl) {
-		return mat.getScale(cache[cacheLvl]);
-	}
-
-	private Vector3 getUp(Matrix4 mat, int cacheLvl) {
-		return cache[cacheLvl].set(mat.val[4], mat.val[5], mat.val[6]);
-	}
-
-	private void recalculateFromParent() {
-		if (Owner.hasParent()) {
-			Matrix4 matcpy = new Matrix4(Owner.getParent().getComponent(ComponentPoint.class).getMatrix());
-			matGlobal = matcpy.mul(matLocal);
-		}else{
-			matGlobal = matLocal;
-		}
-		updateChildren();
-		ComponentFactory.notifyAllComponents(Owner.getComponents(), this);
-	}
-
-	private void recalculateFromParent(Vector3 pos, Quaternion rot, Vector3 scl) {
-		matLocal.set(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w, scl.x, scl.y, scl.z);
-		if (Owner.hasParent()) {
-			Matrix4 matcpy = new Matrix4(Owner.getParent().getComponent(ComponentPoint.class).getMatrix());
-			matGlobal = matcpy.mul(matLocal);
-		}else{
-			matGlobal = matLocal.cpy();
-		}
-		updateChildren();
-		ComponentFactory.notifyAllComponents(Owner.getComponents(), this);
-	}
-	
-	private void recalculateGlobal(Vector3 pos, Vector3 rot, Vector3 scl) {
-		matGlobal.setFromEulerAngles(rot.x, rot.y, rot.z).scl(scl).trn(pos);
-		getRotation();
-		//matGlobal.set(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w, scl.x, scl.y, scl.z);
-		if (Owner.hasParent()) {
-			Matrix4 matcpy = new Matrix4(Owner.getParent().getComponent(ComponentPoint.class).getMatrix());
-			matLocal = matGlobal.cpy().mul(matcpy.inv());
-		}else{
-			matLocal = matGlobal.cpy();
-		}
-		updateChildren();
-		ComponentFactory.notifyAllComponents(Owner.getComponents(), this);
-	}
-	
-	private void recalculateGlobalPos(Vector3 pos) {
-		matGlobal.setTranslation(pos.x, pos.y, pos.z);
-		if (Owner.hasParent()) {
-			Matrix4 matcpy = new Matrix4(Owner.getParent().getComponent(ComponentPoint.class).getMatrix());
-			matLocal = matGlobal.cpy().mul(matcpy.inv());
-		}else{
-			matLocal = matGlobal.cpy();
-		}
-		updateChildren();
-		ComponentFactory.notifyAllComponents(Owner.getComponents(), this);
-	}
-	
-	private void updateChildren() {
-		List<Entity> entities = getOwner().getChildren();
-		for (Entity ent : entities) {
-			ComponentPoint point = ent.getComponent(ComponentPoint.class);
-			point.recalculateFromParent();
-		}
-	}
-
-	@Override
-	protected ComponentBase Load(Element element) throws Exception {
-		cache[4].x = element.getChildByName("Position").getFloat("X");
-		cache[4].y = element.getChildByName("Position").getFloat("Y");
-		cache[4].z = element.getChildByName("Position").getFloat("Z");
-		cache[5].x = element.getChildByName("Rotation").getFloat("X");
-		cache[5].y = element.getChildByName("Rotation").getFloat("Y");
-		cache[5].z = element.getChildByName("Rotation").getFloat("Z");
-		cache[6].x = element.getChildByName("Scale").getFloat("X");
-		cache[6].y = element.getChildByName("Scale").getFloat("Y");
-		cache[6].z = element.getChildByName("Scale").getFloat("Z");
-		recalculateGlobal(cache[4], cache[5], cache[6]);
-		return this;
-	}
-
-	@Override
-	protected void notifyDeparented(Entity parent) {
-		recalculateFromParent();
-	}
-
-	@Override
-	protected void notifyParented(Entity parent) {
-		recalculateFromParent();
-	}
-
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		Vector3 rot = getRotation();
-		Vector3 pos = getPosition();
-		Vector3 scl = getScale();
-		element.element("Component").attribute("Type", Type.getName()).element("Position").attribute("X", pos.x)
-				.attribute("Y", pos.y).attribute("Z", pos.z).pop().element("Scale").attribute("X", scl.x)
-				.attribute("Y", scl.y).attribute("Z", scl.z).pop().element("Rotation").attribute("X", rot.x)
-				.attribute("Y", rot.y).attribute("Z", rot.z).pop().pop();
-	}
-
-	@Override
-	protected void visitComponent(ComponentBase component, ComponentFactory factory) {
-		component.notifyWithComponent(this);
-	}
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        component.notifyWithComponent(this);
+    }
 }

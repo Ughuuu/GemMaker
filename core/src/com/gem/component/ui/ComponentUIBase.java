@@ -10,49 +10,49 @@ import com.gem.engine.Gem;
 import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
-import lombok.val;
-
 public abstract class ComponentUIBase extends ComponentBase {
 
-	protected int _Depth = 0, _Align;
-	protected Entity uiParent;
-	protected boolean click = false;
-	Value width;
+    protected int _Depth = 0, _Align;
+    protected Entity uiParent;
+    protected boolean click = false;
+    Value width;
 
-	public ComponentUIBase(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
-		super(ng, ent, factory, _ComponentSpokesman);
-	}
+    public ComponentUIBase(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+    }
 
-	public Entity getUIParent() {
-		return uiParent;
-	}
+    public Entity getUIParent() {
+        return uiParent;
+    }
 
-	@Override
-	public void notifyWithComponent(ComponentPoint point) {
-		Actor actor = getActor();
-		actor.setOrigin(Align.center);
-		actor.setPosition(point.getPosition().x, point.getPosition().y);
-		actor.setZIndex(_Depth);
-		if (point.getScale().isZero() && point.getRotation().isZero()) {
-		} else {
-			actor.setScale(point.getScale().x, point.getScale().y);
-			actor.setRotation(point.getRotation().z);
-		}
-	}
+    @Override
+    protected void notifyWithComponent(ComponentPoint point) {
+        Actor actor = getActor();
+        if(actor == null)
+        	return;
+        actor.setOrigin(Align.center);
+        actor.setPosition(point.getPosition().x, point.getPosition().y);
+        actor.setZIndex(_Depth);
+        if (point.getScale().isZero() && point.getRotation().isZero()) {
+        } else {
+            actor.setScale(point.getScale().x, point.getScale().y);
+            actor.setRotation(point.getRotation().z);
+        }
+    }
 
-	protected void add(ComponentUIBase comp) {
-	}
+    protected void add(ComponentUIBase comp) {
+    }
 
-	protected void del(ComponentUIBase comp) {
-	}
+    protected void del(ComponentUIBase comp) {
+    }
 
-	protected abstract Actor getActor();
+    protected abstract Actor getActor();
 
-	@Override
-	protected void reinit() {
-		// _ComponentFactory.addSuperComponent(this);
-	}
+    @Override
+    protected void reinit() {
+        // _ComponentFactory.addSuperComponent(this);
+    }
 
-	protected void swap(ComponentUIBase a, ComponentUIBase b) {
-	}
+    protected void swap(ComponentUIBase a, ComponentUIBase b) {
+    }
 }

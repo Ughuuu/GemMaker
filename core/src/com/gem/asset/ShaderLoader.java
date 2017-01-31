@@ -17,34 +17,33 @@ import com.badlogic.gdx.utils.Array;
  */
 public class ShaderLoader extends SynchronousAssetLoader<ShaderProgram, ShaderLoader.ShaderParameter> {
 
-	/**
-	 * @opt hide com.badlogic.*
-	 * @hidden
-	 */
-	static public class ShaderParameter extends AssetLoaderParameters<ShaderProgram> {
-	}
-	
-	private static final String FRAGMENT_SHADER_EXTENSION = ".frag";
+    private static final String FRAGMENT_SHADER_EXTENSION = ".frag";
+    private static final String VERTEX_SHADER_EXTENSION = ".vert";
 
-	private static final String VERTEX_SHADER_EXTENSION = ".vert";
+    public ShaderLoader(final FileHandleResolver resolver) {
+        super(resolver);
+    }
 
-	public ShaderLoader(final FileHandleResolver resolver) {
-		super(resolver);
-	}
+    @Override
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, ShaderParameter parameter) {
+        return null;
+    }
 
-	@Override
-	public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, ShaderParameter parameter) {
-		return null;
-	}
+    @Override
+    public ShaderProgram load(AssetManager assetManager, String fileName, FileHandle file, ShaderParameter parameter) {
+        String shaderName = fileName = (fileName).substring(0, (fileName).length() - 5);
+        final ShaderProgram shader = new ShaderProgram(resolve(shaderName + VERTEX_SHADER_EXTENSION),
+                resolve(shaderName + FRAGMENT_SHADER_EXTENSION));
+        if (shader.isCompiled() == false) {
+            throw new IllegalStateException(shader.getLog());
+        }
+        return shader;
+    }
 
-	@Override
-	public ShaderProgram load(AssetManager assetManager, String fileName, FileHandle file, ShaderParameter parameter) {
-		String shaderName = fileName = (fileName).substring(0, (fileName).length() - 5);
-		final ShaderProgram shader = new ShaderProgram(resolve(shaderName + VERTEX_SHADER_EXTENSION),
-				resolve(shaderName + FRAGMENT_SHADER_EXTENSION));
-		if (shader.isCompiled() == false) {
-			throw new IllegalStateException(shader.getLog());
-		}
-		return shader;
-	}
+    /**
+     * @opt hide com.badlogic.*
+     * @hidden
+     */
+    static public class ShaderParameter extends AssetLoaderParameters<ShaderProgram> {
+    }
 }

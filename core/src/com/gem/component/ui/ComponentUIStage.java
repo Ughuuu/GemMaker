@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gem.component.ComponentBase;
+import com.gem.component.ComponentCamera;
 import com.gem.component.ComponentFactory;
 import com.gem.component.ComponentPoint;
 import com.gem.engine.Gem;
@@ -16,73 +17,78 @@ import com.gem.entity.Entity;
 
 public class ComponentUIStage extends ComponentUIBase {
 
-	protected Stage _Stage;
+    protected Stage stage;
 
-	public ComponentUIStage(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
-		super(ng, ent, factory, _ComponentSpokesman);
-		_ComponentSpokesman.getUIBuilder().createStage(this);
-	}
+    public ComponentUIStage(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+    }
 
-	public ComponentUIStage act() {
-		try {
-			// _Stage.getActors().items[4].setPosition(100, 100);
-		} catch (Exception e) {
+    public ComponentUIStage act() {
+        if(stage == null)
+        	return this;
+        stage.act();
+        stage.draw();
+        return this;
+    }
 
-		}
-		_Stage.act();
-		_Stage.draw();
-		return this;
-	}
+    @Override
+    protected void notifyWithComponent(ComponentCamera camera) {
+    	componentSpokesman.getUIBuilder().createStage(this);
+    }
+    
+    @Override
+    protected void notifyParented(Entity parent){
+        componentSpokesman.getUIBuilder().createStage(this);
+    }
 
-	@Override
-	public void notifyWithComponent(ComponentPoint point) {
-		//_Stage.getViewport().getCamera().view.set(point.getMatrix());
-	}
+    public void setStage(Viewport view, SpriteBatch batch, InputMultiplexer multiplexer) {
+        stage = new Stage(view, batch);
+        stage.setDebugAll(true);
+        multiplexer.addProcessor(stage);
+    }
 
-	public void setStage(Viewport view, SpriteBatch batch, InputMultiplexer multiplexer) {
-		_Stage = new Stage(view, batch);
-		_Stage.setDebugAll(true);
-		multiplexer.addProcessor(_Stage);
-	}
+    @Override
+    protected void add(ComponentUIBase comp) {
+    	if(stage == null)
+    		return;
+        stage.addActor(comp.getActor());
+        componentFactory.notifyAllComponents(owner.getComponents(), comp);
+    }
 
-	@Override
-	protected void add(ComponentUIBase comp) {
-		_Stage.addActor(comp.getActor());
-		ComponentFactory.notifyAllComponents(Owner.getComponents(), comp);
-	}
+    @Override
+    protected void del(ComponentUIBase comp) {
+    	if(stage == null)
+    		return;
+        stage.getActors().removeValue(comp.getActor(), true);
+    }
 
-	@Override
-	protected void del(ComponentUIBase comp) {
-		_Stage.getActors().removeValue(comp.getActor(), true);
-	}
+    /**
+     * Stage is not an actor..
+     */
+    @Override
+    protected Actor getActor() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 * Stage is not an actor..
-	 */
-	@Override
-	protected Actor getActor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        return this;
+    }
 
-	@Override
-	protected ComponentBase Load(Element element) throws Exception {
-		return this;
-	}
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", type.getName()).pop();
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("Type", Type.getName()).pop();
-	}
+    @Override
+    protected void swap(ComponentUIBase a, ComponentUIBase b) {
+        // not important, will use z index... so this will be resorted i hope
+        // don't do anything here.
+    }
 
-	@Override
-	protected void swap(ComponentUIBase a, ComponentUIBase b) {
-		// not important, will use z index... so this will be resorted i hope
-		// don't do anything here.
-	}
-
-	@Override
-	protected void visitComponent(ComponentBase component, ComponentFactory factory) {
-		factory.callComponentNotify(this, component);
-	}
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        factory.callComponentNotify(this, component);
+    }
 }

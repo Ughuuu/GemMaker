@@ -12,39 +12,39 @@ import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
 public class ComponentUITouchpad extends ComponentUIWidget {
-	private boolean _Saved = false;
-	private Touchpad _Touchpad;
+    private boolean _Saved = false;
+    private Touchpad _Touchpad;
 
-	public ComponentUITouchpad(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
-		super(ng, ent, factory, _ComponentSpokesman);
-		TouchpadStyle style = new TouchpadStyle();
-		_Touchpad = new Touchpad(50, style);
-	}
+    public ComponentUITouchpad(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+        TouchpadStyle style = new TouchpadStyle();
+        _Touchpad = new Touchpad(50, style);
+    }
 
-	@Override
-	public ComponentUITouchpad remove() {
-		getOwner().removeComponent(ComponentUIWidget.class);
-		Owner.removeComponent(this.getClass(), Id);
-		return this;
-	}
+    @Override
+    public ComponentUITouchpad remove() {
+        getOwner().removeComponent(ComponentUIWidget.class);
+        owner.removeComponent(this.getClass(), id);
+        return this;
+    }
 
-	@Override
-	protected Actor getActor() {
-		return _Touchpad;
-	}
+    @Override
+    protected Actor getActor() {
+        return _Touchpad;
+    }
 
-	@Override
-	protected ComponentBase Load(Element element) throws Exception {
-		return this;
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("Type", this.getClass().getName()).pop();
-	}
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", this.getClass().getName()).pop();
+    }
 
-	@Override
-	protected void visitComponent(ComponentBase component, ComponentFactory factory) {
-		factory.callComponentNotify(this, component);
-	}
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        factory.callComponentNotify(this, component);
+    }
 }

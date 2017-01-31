@@ -11,38 +11,38 @@ import com.gem.entity.ComponentSpokesman;
 import com.gem.entity.Entity;
 
 public class ComponentUIImage extends ComponentUIWidget {
-	private Image _Image;
-	private boolean _Saved = false;
+    private Image _Image;
+    private boolean _Saved = false;
 
-	public ComponentUIImage(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
-		super(ng, ent, factory, _ComponentSpokesman);
-		_Image = new Image();
-	}
+    public ComponentUIImage(Gem ng, Entity ent, ComponentFactory factory, ComponentSpokesman _ComponentSpokesman) {
+        super(ng, ent, factory, _ComponentSpokesman);
+        _Image = new Image();
+    }
 
-	@Override
-	public ComponentUIImage remove() {
-		getOwner().removeComponent(ComponentUIWidget.class);
-		Owner.removeComponent(this.getClass(), Id);
-		return this;
-	}
+    @Override
+    public ComponentUIImage remove() {
+        getOwner().removeComponent(ComponentUIWidget.class);
+        owner.removeComponent(this.getClass(), id);
+        return this;
+    }
 
-	@Override
-	protected Actor getActor() {
-		return _Image;
-	}
+    @Override
+    protected Actor getActor() {
+        return _Image;
+    }
 
-	@Override
-	protected ComponentBase Load(Element element) throws Exception {
-		return this;
-	}
+    @Override
+    protected ComponentBase Load(Element element) throws Exception {
+        return this;
+    }
 
-	@Override
-	protected void Save(XmlWriter element) throws Exception {
-		element.element("Component").attribute("Type", this.getClass().getName()).pop();
-	}
+    @Override
+    protected void Save(XmlWriter element) throws Exception {
+        element.element("Component").attribute("Type", this.getClass().getName()).pop();
+    }
 
-	@Override
-	protected void visitComponent(ComponentBase component, ComponentFactory factory) {
-		factory.callComponentNotify(this, component);
-	}
+    @Override
+    protected void visitComponent(ComponentBase component, ComponentFactory factory) {
+        factory.callComponentNotify(this, component);
+    }
 }

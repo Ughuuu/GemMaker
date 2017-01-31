@@ -5,7 +5,7 @@ Need to compile a Java code to either a .class or a .dex while running?
 - [ ] Work In Progress.
 
 **Dependencies**
-- [JavSync](https://github.com/Ughuuu/JavaSync/)
+- [JavaSync](https://github.com/Ughuuu/JavaSync/)
 - [Lombok](https://projectlombok.org/)
 - [JUnit](http://junit.org/junit4/)
 - [libGDX](https://libgdx.badlogicgames.com/)
