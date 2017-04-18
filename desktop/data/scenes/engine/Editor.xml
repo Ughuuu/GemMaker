@@ -1,0 +1,58 @@
+<engine.Editor>
+    <Entity Name="~EDITOR" Parent="null" Order="-1">
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="0" Y="0" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentCamera">
+            <Viewport Width="1024" Height="600" Scaling="Screen"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentScript">
+            <Script Name="scripts.engine.editor.Editor"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentScript">
+            <Script Name="scripts.engine.editor.Draw"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentMaterial">
+            <Shader Name="engine/shaders/PosColor"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentMesh">
+            <MeshType>Lines</MeshType>
+        </Component>
+    </Entity>
+    <Entity Name="~STAGE" Parent="~EDITOR" Order="0">
+        <Component Type="com.gem.component.ui.ComponentUIStage"/>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="0" Y="0" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+    <Entity Name="~LISTER" Parent="~STAGE" Order="0">
+        <Component Type="com.gem.component.ComponentScript">
+            <Script Name="scripts.engine.editor.Lister"/>
+        </Component>
+        <Component Type="com.gem.component.ui.ComponentUILabel">
+            <Label FontName="engine/fonts/roboto_regular.fnt" Text=""/>
+        </Component>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="79.337326" Y="129.0571" Z="0.0"/>
+            <Scale X="1" Y="1" Z="0.4"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+    <Entity Name="~PROPERTIES" Parent="~STAGE" Order="0">
+        <Component Type="com.gem.component.ComponentScript">
+            <Script Name="scripts.engine.editor.Properties"/>
+        </Component>
+        <Component Type="com.gem.component.ui.ComponentUILabel">
+            <Label FontName="engine/fonts/roboto_regular.fnt" Width="300"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="200" Y="129.0571" Z="0.0"/>
+            <Scale X="1" Y="1" Z="0.4"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+</engine.Editor>

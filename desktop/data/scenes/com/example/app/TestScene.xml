@@ -1,0 +1,85 @@
+<com.example.app.TestScene Width="1380.6741" Height="960.0">
+    <Entity Name="~CAMERA" Parent="null" Order="-1">
+        <Component Type="com.ngeen.component.ComponentCamera">
+            <Viewport Fov="-1.0" Width="1380.6741" Height="960.0"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="-13.183471" Y="52.734097" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+        </Component>
+    </Entity>
+    <Entity Name="~UICAMERA" Parent="null" Order="-1">
+        <Component Type="com.ngeen.component.ComponentCamera">
+            <Viewport Fov="-1.0" Width="1152.0" Height="801.0"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="576.0" Y="400.5" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+        </Component>
+    </Entity>
+    <Entity Name="Button" Parent="Stage" Order="0">
+        <Component Type="com.ngeen.component.ui.ComponentUIButton"/>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="314.83337" Y="120.743286" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="-0.2036958" Y="-0.88044655" Z="1.4776064"/>
+        </Component>
+    </Entity>
+    <Entity Name="Label2" Parent="Stage" Order="1">
+        <Component Type="com.ngeen.component.ui.ComponentUILabel">
+            <Label FontName="LoadScene/fonts/impact.fnt" Text="Text"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="279.57898" Y="-12.210535" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+        </Component>
+    </Entity>
+    <Entity Name="Hello" Parent="null" Order="-1">
+        <Component Type="com.ngeen.component.ComponentScript">
+            <Program Name="com.example.app.ExScript"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="193.29172" Y="231.11716" Z="0.0"/>
+            <Scale X="1.7345471" Y="1.8457463" Z="1.0"/>
+            <Rotation X="-0.49292785" Y="-0.9341402" Z="1.3727361"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentSprite">
+            <Sprite TextureAtlas="LoadScene/textures/ok.png"/>
+        </Component>
+    </Entity>
+    <Entity Name="Stage" Parent="null" Order="-1">
+        <Component Type="com.ngeen.component.ComponentScript">
+            <Program Name="com.example.app.ExampleScript"/>
+        </Component>
+        <Component Type="com.ngeen.component.ui.ComponentUIStage"/>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="341.3233" Y="-97.97751" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="1.1958294" Y="-0.996879" Z="0.7590943"/>
+        </Component>
+    </Entity>
+    <Entity Name="Table" Parent="Stage" Order="2">
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="200.0" Y="0.0" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+        </Component>
+        <Component Type="com.ngeen.component.ui.ComponentUITable"/>
+    </Entity>
+    <Entity Name="Widget" Parent="Table" Order="0">
+        <Component Type="com.ngeen.component.ui.ComponentUILabel">
+            <Label FontName="LoadScene/fonts/impact.fnt" Text="Text123"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentPoint">
+            <Position X="199.07513" Y="298.07056" Z="0.0"/>
+            <Scale X="1.0" Y="1.0" Z="1.0"/>
+            <Rotation X="-0.057009257" Y="-1.0715711" Z="1.3595902"/>
+        </Component>
+        <Component Type="com.ngeen.component.ComponentSprite">
+            <Sprite TextureAtlas="LoadScene/textures/ok.png"/>
+        </Component>
+    </Entity>
+</com.example.app.TestScene>

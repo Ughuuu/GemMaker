@@ -1,0 +1,63 @@
+<com.example.app.Main>
+	<Include Name="engine.Editor"/>
+    <Entity Name="1" Parent="P" Order="0">
+        <Component Type="com.gem.component.ComponentSprite">
+            <Sprite Texture="LoadScene/textures/lock.png" Color="fffffffe" Width="9.0" Height="10.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="0" Y="-200" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+    <Entity Name="2" Parent="P" Order="1">
+        <Component Type="com.gem.component.ComponentSprite">
+            <Sprite Texture="LoadScene/textures/lock.png" Color="fffffffe" Width="9.0" Height="10.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="50" Y="-200" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+    <Entity Name="3" Parent="P" Order="2">
+        <Component Type="com.gem.component.ComponentSprite">
+            <Sprite Texture="LoadScene/textures/lock.png" Color="fffffffe" Width="9.0" Height="10.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="100" Y="-200" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+    <Entity Name="P" Parent="CAMERA" Order="0">
+        <Component Type="com.gem.component.ComponentSprite">
+            <Sprite Texture="LoadScene/textures/lock.png" Color="fffffffe" Width="9.0" Height="10.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="0" Y="-200" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+    </Entity>
+    <Entity Name="CAMERA" Parent="null" Order="-1">
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="0.0" Y="0.0" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentCamera">
+            <Viewport Width="1024" Height="600" Scaling="Screen"/>
+        </Component>
+    </Entity>
+    <Entity Name="UICAMERA" Parent="null" Order="-1">
+        <Component Type="com.gem.component.ComponentPoint">
+            <Position X="683.0" Y="380.0" Z="0.0"/>
+            <Scale X="1" Y="1" Z="1"/>
+            <Rotation X="0.0" Y="0.0" Z="0.0"/>
+        </Component>
+        <Component Type="com.gem.component.ComponentCamera">
+            <Viewport Width="1366.0" Height="760.0" Scaling="Screen"/>
+        </Component>
+    </Entity>
+</com.example.app.Main>

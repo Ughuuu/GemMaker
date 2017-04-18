@@ -7,13 +7,21 @@ import com.example.app.Main;
 
 public class HtmlLauncher extends GwtApplication {
 
-        @Override
-        public GwtApplicationConfiguration getConfig () {
-                return new GwtApplicationConfiguration(480, 320);
-        }
+    Main main;
 
-        @Override
-        public ApplicationListener getApplicationListener () {
-                return new Main();
-        }
+    @Override
+    public GwtApplicationConfiguration getConfig() {
+        return new GwtApplicationConfiguration(480, 320);
+    }
+
+    @Override
+    public ApplicationListener getApplicationListener() {
+        return main;
+    }
+
+    @Override
+    public ApplicationListener createApplicationListener() {
+        main = new Main();
+        return main;
+    }
 }
