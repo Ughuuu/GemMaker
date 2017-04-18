@@ -6,8 +6,6 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplet;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.example.app.Main;
-import com.ngeen.engine.EngineInfo;
-import com.sun.xml.internal.ws.api.pipe.Engine;
 
 public class DesktopApplet extends LwjglApplet
 {
@@ -18,7 +16,6 @@ public class DesktopApplet extends LwjglApplet
     public DesktopApplet()
     {
         super(main);
-        EngineInfo.Applet = true;        
     }
 
     @Override

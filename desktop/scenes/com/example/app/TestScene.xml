@@ -1,5 +1,10 @@
-<com.example.app.TestScene Width="1222.2109" Height="680.0">
+<com.example.app.TestScene Width="1181.0042" Height="680.0">
 	<Entity Name="~CAMERA" Parent="null" _Order="-1">
+		<Component _Type="com.ngeen.component.ComponentCamera">
+			<Fov Float="-1.0"/>
+			<ViewportWidth Float="1181.0042"/>
+			<ViewportHeight Float="680.0"/>
+		</Component>
 		<Component _Type="com.ngeen.component.ComponentPoint">
 			<Position.x Float="0.0"/>
 			<Position.y Float="0.0"/>
@@ -11,16 +16,16 @@
 			<Rotation.y Float="0.0"/>
 			<Rotation.z Float="0.0"/>
 		</Component>
-		<Component _Type="com.ngeen.component.ComponentCamera">
-			<Fov Float="-1.0"/>
-			<ViewportWidth Float="1222.2109"/>
-			<ViewportHeight Float="680.0"/>
-		</Component>
 	</Entity>
 	<Entity Name="~UICAMERA" Parent="null" _Order="-1">
+		<Component _Type="com.ngeen.component.ComponentCamera">
+			<Fov Float="-1.0"/>
+			<ViewportWidth Float="1280.0"/>
+			<ViewportHeight Float="737.0"/>
+		</Component>
 		<Component _Type="com.ngeen.component.ComponentPoint">
-			<Position.x Float="683.0"/>
-			<Position.y Float="380.0"/>
+			<Position.x Float="640.0"/>
+			<Position.y Float="368.5"/>
 			<Position.z Float="0.0"/>
 			<Scale.x Float="1.0"/>
 			<Scale.y Float="1.0"/>
@@ -28,33 +33,15 @@
 			<Rotation.x Float="0.0"/>
 			<Rotation.y Float="0.0"/>
 			<Rotation.z Float="0.0"/>
-		</Component>
-		<Component _Type="com.ngeen.component.ComponentCamera">
-			<Fov Float="-1.0"/>
-			<ViewportWidth Float="1366.0"/>
-			<ViewportHeight Float="760.0"/>
 		</Component>
 	</Entity>
 	<Entity Name="aaa" Parent="null" _Order="-1">
-		<Component _Type="com.ngeen.component.ComponentPoint">
-			<Position.x Float="-387.09918"/>
-			<Position.y Float="254.08063"/>
-			<Position.z Float="0.0"/>
-			<Scale.x Float="1.0"/>
-			<Scale.y Float="1.0"/>
-			<Scale.z Float="1.0"/>
-			<Rotation.x Float="0.0"/>
-			<Rotation.y Float="0.0"/>
-			<Rotation.z Float="0.0"/>
-		</Component>
 		<Component _Type="com.ngeen.component.ComponentScript">
 			<_ProgramName String="com.example.app.Test"/>
 		</Component>
-	</Entity>
-	<Entity Name="Hello" Parent="" _Order="-1">
 		<Component _Type="com.ngeen.component.ComponentPoint">
-			<Position.x Float="132.44142"/>
-			<Position.y Float="116.51334"/>
+			<Position.x Float="-389.6509"/>
+			<Position.y Float="-250.15065"/>
 			<Position.z Float="0.0"/>
 			<Scale.x Float="1.0"/>
 			<Scale.y Float="1.0"/>
@@ -62,19 +49,13 @@
 			<Rotation.x Float="0.0"/>
 			<Rotation.y Float="0.0"/>
 			<Rotation.z Float="0.0"/>
-		</Component>
-		<Component _Type="com.ngeen.component.ComponentSprite">
-			<_TextureAsset String="LoadScene/textures/ok.png"/>
-		</Component>
-		<Component _Type="com.ngeen.component.ComponentScript">
-			<_ProgramName String="com.example.app.ExampleScript"/>
 		</Component>
 	</Entity>
 	<Entity Name="Table" Parent="Stage" _Order="0">
 		<Component _Type="com.ngeen.component.ui.ComponentUITable"/>
 		<Component _Type="com.ngeen.component.ComponentPoint">
-			<Position.x Float="120.052414"/>
-			<Position.y Float="203.90298"/>
+			<Position.x Float="118.374435"/>
+			<Position.y Float="-205.69875"/>
 			<Position.z Float="0.0"/>
 			<Scale.x Float="1.0"/>
 			<Scale.y Float="1.0"/>
@@ -87,8 +68,8 @@
 	<Entity Name="Widget" Parent="Table" _Order="0">
 		<Component _Type="com.ngeen.component.ui.ComponentUILabel"/>
 		<Component _Type="com.ngeen.component.ComponentPoint">
-			<Position.x Float="20.052208"/>
-			<Position.y Float="203.90298"/>
+			<Position.x Float="18.37408"/>
+			<Position.y Float="-205.69875"/>
 			<Position.z Float="0.0"/>
 			<Scale.x Float="1.0"/>
 			<Scale.y Float="1.0"/>
@@ -99,9 +80,13 @@
 		</Component>
 	</Entity>
 	<Entity Name="Stage" Parent="null" _Order="-1">
+		<Component _Type="com.ngeen.component.ui.ComponentUIStage"/>
+		<Component _Type="com.ngeen.component.ComponentScript">
+			<_ProgramName String="com.example.app.Test"/>
+		</Component>
 		<Component _Type="com.ngeen.component.ComponentPoint">
-			<Position.x Float="220.05293"/>
-			<Position.y Float="203.90298"/>
+			<Position.x Float="299.50644"/>
+			<Position.y Float="-17.192682"/>
 			<Position.z Float="0.0"/>
 			<Scale.x Float="1.0"/>
 			<Scale.y Float="1.0"/>
@@ -110,9 +95,37 @@
 			<Rotation.y Float="0.0"/>
 			<Rotation.z Float="0.0"/>
 		</Component>
-		<Component _Type="com.ngeen.component.ui.ComponentUIStage"/>
+	</Entity>
+	<Entity Name="Asda" Parent="" _Order="-1">
+		<Component _Type="com.ngeen.component.ComponentPoint">
+			<Position.x Float="-202.36841"/>
+			<Position.y Float="183.30457"/>
+			<Position.z Float="0.0"/>
+			<Scale.x Float="1.0"/>
+			<Scale.y Float="1.0"/>
+			<Scale.z Float="1.0"/>
+			<Rotation.x Float="0.0"/>
+			<Rotation.y Float="0.0"/>
+			<Rotation.z Float="0.0"/>
+		</Component>
+	</Entity>
+	<Entity Name="Hello" Parent="" _Order="-1">
 		<Component _Type="com.ngeen.component.ComponentScript">
-			<_ProgramName String="com.example.app.Test2"/>
+			<_ProgramName String="com.example.app.ExampleScript"/>
+		</Component>
+		<Component _Type="com.ngeen.component.ComponentSprite">
+			<_TextureAsset String="LoadScene/textures/ok.png"/>
+		</Component>
+		<Component _Type="com.ngeen.component.ComponentPoint">
+			<Position.x Float="-30.053316"/>
+			<Position.y Float="95.37717"/>
+			<Position.z Float="0.0"/>
+			<Scale.x Float="1.0"/>
+			<Scale.y Float="1.0"/>
+			<Scale.z Float="1.0"/>
+			<Rotation.x Float="0.0"/>
+			<Rotation.y Float="0.0"/>
+			<Rotation.z Float="0.0"/>
 		</Component>
 	</Entity>
 </com.example.app.TestScene>

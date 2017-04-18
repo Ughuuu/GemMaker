@@ -1,11 +1,10 @@
 package com.example.app;
 
-import com.ngeen.engine.Ngeen;
+import com.gemengine.engine.Gem;
 
-public class Main extends Ngeen {
-
+public class Main extends Gem {
 	@Override
-	public Class<?> getEntry() {
-		return LoadScene.class;
+	public String getEntry() {
+		return "LoadScene";
 	}
 }
