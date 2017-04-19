@@ -19,17 +19,15 @@ public class ManagerSystem extends TimedSystem {
 				".java");
 	}
 
-	private void checkChanges(){
-		assetSystem.
-	}
-	
 	@Override
-	public void onInit(){
-		checkChanges();
+	public void onInit() {
+		assetSystem.loadFolder("assets/");
 	}
-	
+
 	@Override
 	public void onUpdate(float delta) {
-		checkChanges();
+		for (String name : assetSystem.getAssetNames()) {
+			System.out.println(name);
+		}
 	}
 }

@@ -29,7 +29,8 @@ public class AssetSystemHelper {
 		assetSystem.addExtensionMapping(MusicLoader.class, ".mp3");
 		assetSystem.addExtensionMapping(MusicLoader.class, ".ogg");
 		// assetSystem.addLoaderDefault(Sound.class, new SoundLoader(resolver));
-		// assetSystem.addLoaderDefault(Pixmap.class, new PixmapLoader(resolver));
+		// assetSystem.addLoaderDefault(Pixmap.class, new
+		// PixmapLoader(resolver));
 		// assetSystem.addLoaderDefault(TextureAtlas.class, new
 		// TextureAtlasLoader(resolver));
 		assetSystem.addLoaderDefault(Texture.class, new TextureLoader(resolver), ".png");
@@ -45,5 +46,7 @@ public class AssetSystemHelper {
 		assetSystem.addLoaderOverride(Model.class, new G3dModelLoader(new UBJsonReader(), resolver), ".g3db");
 		assetSystem.addLoaderOverride(Model.class, new ObjLoader(resolver), ".obj");
 		assetSystem.addLoaderDefault(ShaderProgram.class, new ShaderProgramLoader(resolver), ".vert");
+
+		assetSystem.addLoaderDefault(String.class, new TextLoader(resolver), ".txt");
 	}
 }
