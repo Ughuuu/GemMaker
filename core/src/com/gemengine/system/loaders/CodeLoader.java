@@ -1,20 +1,4 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
-package com.gemengine.system.helper;
+package com.gemengine.system.loaders;
 
 import org.jsync.sync.Sync;
 
@@ -39,8 +23,6 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<Sync, CodeLoader.Code
 		}
 	}
 
-	private Sync<T> sync;
-
 	public CodeLoader(FileHandleResolver resolver) {
 		super(resolver);
 	}
@@ -52,20 +34,12 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<Sync, CodeLoader.Code
 
 	@Override
 	public void loadAsync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
-		String path = file.path();
-		this.sync = new Sync<T>(parameter.classLoader, path, parameter.sourceFolder,
-				parameter.destinationFolder);
 	}
 
 	@Override
 	public Sync<T> loadSync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
-		String path = file.path();
-		this.sync = new Sync<T>(parameter.classLoader, path, parameter.sourceFolder,
+		String path = file.pathWithoutExtension();
+		return new Sync<T>(parameter.classLoader, path.replace('/', '.'), parameter.sourceFolder,
 				parameter.destinationFolder);
-		return sync;
-	}
-
-	protected T getNewInstance() {
-		return sync.newInstance();
 	}
 }

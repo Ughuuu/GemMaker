@@ -31,6 +31,8 @@ allprojects {
      	lombokVersion = '1.16.16'
      	guiceVersion = '4.1.0'
      	guavaVersion = '21.0'
+     	javaSync = 'b88ed396dc'
+     	jackson = '2.9.0.pr2'
     }
 
     repositories {
@@ -58,8 +60,9 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile 'com.github.Ughuuu:JavaSync:45cbcc9b79'
+        compile "com.github.Ughuuu:JavaSync:$javaSync"
         compile group: 'com.google.inject', name: 'guice', version: guiceVersion
+		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson
         compileOnly "org.projectlombok:lombok:$lombokVersion"
         compile fileTree(dir: '../libs', include: '*.jar')
     }

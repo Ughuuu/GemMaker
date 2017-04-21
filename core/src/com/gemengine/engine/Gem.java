@@ -6,21 +6,25 @@ import com.badlogic.gdx.graphics.GL20;
 import com.gemengine.system.AssetSystem;
 import com.gemengine.system.ComponentSystem;
 import com.gemengine.system.ManagerSystem;
-import com.gemengine.system.helper.SystemManager;
+import com.gemengine.system.manager.SystemManager;
 
-public abstract class Gem implements ApplicationListener{
+public abstract class Gem implements ApplicationListener {
 	private final SystemManager systemManager;
 
-	public Gem(){
+	public Gem() {
 		systemManager = new SystemManager();
 	}
-	
+
 	@Override
 	public void create() {
 		systemManager.addType(AssetSystem.class);
 		systemManager.addType(ManagerSystem.class);
 		systemManager.addType(ComponentSystem.class);
-		systemManager.onInit();
+		try {
+			systemManager.onInit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		System.out.println("ok");
 	}
 
@@ -38,7 +42,11 @@ public abstract class Gem implements ApplicationListener{
 	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		systemManager.onUpdate(Gdx.graphics.getDeltaTime());
+		try {
+			systemManager.onUpdate(Gdx.graphics.getDeltaTime());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
