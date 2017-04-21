@@ -18,7 +18,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 
 	private final List<SystemBase> baseSystems;
 	private final Map<SystemBase, State> systemToState;
-	private int toStart = 0;
+	protected int toStart = 0;
 
 	private final Comparator<SystemBase> priorityComparator = new Comparator<SystemBase>() {
 		@Override
@@ -95,5 +95,19 @@ public class SystemManager extends TypeManager<SystemBase> {
 	@Override
 	protected Module getModule() {
 		return new SystemManagerModule(this);
+	}
+
+	@Override
+	protected void elementCopy(SystemBase oldElement, SystemBase newElement) {
+		State state = systemToState.get(oldElement);
+		if(state == null){
+			elementAdd(newElement);
+		}
+		else{
+			elementDelete(oldElement);
+			elementAdd(newElement);
+			toStart--;
+			systemToState.put(newElement, state);
+		}
 	}
 }

@@ -15,6 +15,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -25,13 +28,16 @@ public abstract class TypeManager<T> {
 	protected final Map<String, T> types;
 	private final List<Class<?>> addList;
 	private final List<String> removeList;
+	private final List<Class<?>> copyList;
 	private final ObjectMapper objectMapper;
 
 	public TypeManager() {
 		types = new HashMap<String, T>();
 		addList = new ArrayList<Class<?>>();
+		copyList = new ArrayList<Class<?>>();
 		removeList = new ArrayList<String>();
 		objectMapper = new ObjectMapper();
+		objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NON_PRIVATE);
 		doMapping();
 	}
 
@@ -39,12 +45,9 @@ public abstract class TypeManager<T> {
 	public void addType(Class<? extends T> typeClass) {
 		addList.add(typeClass);
 	}
-	
-	public <U extends T> void replaceType(Class<U> typeClass){
-		addType(typeClass);
-		U system;
-		objectMapper.readerForUpdating(system).readValue()
-		
+
+	public <U extends T> void replaceType(Class<U> typeClass) {
+		copyList.add(typeClass);
 	}
 
 	public String copyFrom(String typeName) throws Exception {
@@ -92,6 +95,23 @@ public abstract class TypeManager<T> {
 			elementDelete(element);
 		}
 		removeList.clear();
+		for (Class<?> copyingType : copyList) {
+			T type = (T) injector.getInstance(copyingType);
+			T oldType = types.get(copyingType.getName());
+			if (oldType != null) {
+				String oldTypeData;
+				try {
+					oldTypeData = objectMapper.writeValueAsString(oldType);
+					objectMapper.readerForUpdating(type).readValue(oldTypeData);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			types.put(copyingType.getName(), type);
+			doMapping();
+			elementCopy(oldType, type);
+		}
+		copyList.clear();
 	}
 
 	protected void doMapping() {
@@ -101,6 +121,8 @@ public abstract class TypeManager<T> {
 	protected abstract void elementAdd(T element);
 
 	protected abstract void elementDelete(T element);
+
+	protected abstract void elementCopy(T oldElement, T newElement);
 
 	protected abstract Module getModule();
 }

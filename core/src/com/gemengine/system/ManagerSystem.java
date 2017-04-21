@@ -52,8 +52,7 @@ public class ManagerSystem extends TimedSystem {
 			try {
 				cls = (Class<? extends SystemBase>) sync.getClassType();
 				if (cls != null) {
-					systemManager.copyFrom(cls.getName());
-					systemManager.addType(cls);
+					systemManager.replaceType(cls);
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
