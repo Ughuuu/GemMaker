@@ -1,20 +1,18 @@
 package com.gemengine.system;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
+import org.eclipse.jgit.diff.DiffEntry.ChangeType;
+import org.jsync.sync.ClassSync;
+import org.jsync.sync.SourceSync;
 
-import org.jsync.sync.Sync;
-
-import com.badlogic.gdx.audio.Sound;
+import com.gemengine.system.base.AssetListener;
 import com.gemengine.system.base.SystemBase;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.loaders.CodeLoader;
+import com.gemengine.system.loaders.SourceLoader;
 import com.gemengine.system.manager.SystemManager;
 import com.google.inject.Inject;
 
 import lombok.val;
-import lombok.extern.java.Log;
 
 public class ManagerSystem extends TimedSystem {
 	public static final String systemSourceFolder = "system/";
@@ -26,12 +24,16 @@ public class ManagerSystem extends TimedSystem {
 		super(300, true, 1);
 		this.assetSystem = assetSystem;
 		this.systemManager = systemManager;
-		val loaderData = new AssetSystem.LoaderData(Sync.class,
-				new CodeLoader.CodeParameter(SystemBase.class.getClassLoader(), "./assets/", "."));
-		assetSystem.addLoaderDefault(loaderData, new CodeLoader<SystemBase>(assetSystem.getFileHandleResolver()),
-				".java");
-		assetSystem.addTypeFolder(loaderData, "system/");
-		Sync.options = "-8";
+		val sourceData = new AssetSystem.LoaderData(SourceSync.class,
+				new SourceLoader.SourceParameter("./assets/", "."));
+		SourceSync.options = "-8";
+		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.getFileHandleResolver()), ".java");
+		assetSystem.addTypeFolder(sourceData, "system/");
+		val codeData = new AssetSystem.LoaderData(ClassSync.class,
+				new CodeLoader.CodeParameter(SystemBase.class.getClassLoader(), "."));
+		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.getFileHandleResolver()),
+				".class");
+		assetSystem.addTypeFolder(codeData, "system/");
 	}
 
 	@Override
@@ -39,24 +41,47 @@ public class ManagerSystem extends TimedSystem {
 		assetSystem.loadFolder("assets/");
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onUpdate(float delta) {
-		Sync<SystemBase>[] syncs = assetSystem.getAll(Sync.class);
-		if (syncs.length == 0) {
-			return;
-		}
-		Sync.updateAll(syncs);
-		for (val sync : syncs) {
-			Class<? extends SystemBase> cls;
-			try {
-				cls = (Class<? extends SystemBase>) sync.getClassType();
-				if (cls != null) {
-					systemManager.replaceType(cls);
-				}
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+	void compileSources() {
+		SourceSync[] syncs = assetSystem.getAll(SourceSync.class);
+		if (syncs.length != 0) {
+			if (!SourceSync.updateSource(syncs)) {
+				return;
+			}
+			if (!syncs[0].getCompileError().equals("")) {
+				System.out.println(syncs[0].getCompileError());
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	void updateCode() {
+		ClassSync<SystemBase>[] syncs = assetSystem.getAll(ClassSync.class);
+		if (syncs.length != 0) {
+			try {
+				ClassSync.updateClass(syncs);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				return;
+			}
+			for (val sync : syncs) {
+				try {
+					Class<?> cls = sync.getClassType();
+					if (!cls.isAssignableFrom(SystemBase.class)) {
+						continue;
+					}
+					if (cls != null) {
+						systemManager.replaceType((Class<? extends SystemBase>) cls);
+					}
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onUpdate(float delta) {
+		compileSources();
+		updateCode();
 	}
 }

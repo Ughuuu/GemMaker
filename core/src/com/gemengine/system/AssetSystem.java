@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.jsync.sync.Commiter;
 
 import com.badlogic.gdx.Gdx;
@@ -21,36 +22,20 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.LocalFileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.gemengine.system.base.AssetListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Synchronized;
 import lombok.val;
 
 public class AssetSystem extends TimedSystem {
-	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
-	private static final Map<String, LoaderData> folderToLoaderMap = new HashMap<String, LoaderData>();
-	public final static String assetsFolder = "assets/";
-	private List<String> loadFolders;
-	private final Map<String, List<String>> folderToAsset;
-	private final Map<String, String> assetToFolder;
-	private final AssetManager assetManager;
-	private final Commiter commiter;
-
-	private final boolean useBlockingLoad;
-	private final boolean useExternalFiles;
-
 	public static class LoaderData {
 		private final Class<?> type;
 		private final AssetLoaderParameters<?> assetLoaderParameters;
-
-		public <T> Class<T> getType() {
-			return (Class<T>) type;
-		}
 
 		public LoaderData(Class<?> type) {
 			this.type = type;
@@ -62,6 +47,11 @@ public class AssetSystem extends TimedSystem {
 			this.assetLoaderParameters = assetLoaderParameters;
 		}
 
+		@SuppressWarnings("unchecked")
+		public <T> Class<T> getType() {
+			return (Class<T>) type;
+		}
+
 		public void load(AssetManager assetManager, String path) {
 			if (assetLoaderParameters != null) {
 				assetManager.load(path, getType(), assetLoaderParameters);
@@ -69,6 +59,25 @@ public class AssetSystem extends TimedSystem {
 				assetManager.load(path, type);
 			}
 		}
+	}
+
+	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
+	private static final Map<String, LoaderData> folderToLoaderMap = new HashMap<String, LoaderData>();
+	public final static String assetsFolder = "assets/";
+	private List<String> loadFolders;
+	private final Map<String, List<String>> folderToAsset;
+	private final Map<String, String> assetToFolder;
+	private final AssetManager assetManager;
+
+	private final Commiter commiter;
+	private final boolean useBlockingLoad;
+
+	private final boolean useExternalFiles;
+
+	private final List<AssetListener> assetListeners;
+	
+	public void addAssetListener(AssetListener assetListener){
+		assetListeners.add(assetListener);
 	}
 
 	@Inject
@@ -95,6 +104,7 @@ public class AssetSystem extends TimedSystem {
 		folderToAsset = new HashMap<String, List<String>>();
 		assetToFolder = new HashMap<String, String>();
 		loadFolders = new ArrayList<String>();
+		assetListeners = new ArrayList<AssetListener>();
 		loadFolders.add(null);
 	}
 
@@ -225,9 +235,11 @@ public class AssetSystem extends TimedSystem {
 	private void findExternalChanges() throws Exception {
 		List<DiffEntry> entries = commiter.update();
 		for (DiffEntry entry : entries) {
+			String oldPath = assetsFolder + entry.getOldPath();
+			String newPath = assetsFolder + entry.getNewPath();
 			switch (entry.getChangeType()) {
 			case DELETE:
-				unplaceAsset(assetsFolder + entry.getOldPath());
+				unplaceAsset(oldPath);
 				break;
 			case MODIFY:
 			case RENAME:
@@ -249,6 +261,9 @@ public class AssetSystem extends TimedSystem {
 				default:
 					break;
 				}
+			}
+			for (AssetListener assetListener : assetListeners) {
+				assetListener.onChange(entry.getChangeType(), oldPath, newPath);
 			}
 		}
 	}

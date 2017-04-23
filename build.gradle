@@ -31,7 +31,7 @@ allprojects {
      	lombokVersion = '1.16.16'
      	guiceVersion = '4.1.0'
      	guavaVersion = '21.0'
-     	javaSync = 'b88ed396dc'
+     	javaSync = 'd4cce74de3'
      	jackson = '2.9.0.pr2'
     }
 

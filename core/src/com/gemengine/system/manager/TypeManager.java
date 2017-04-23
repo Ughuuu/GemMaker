@@ -17,7 +17,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -41,13 +40,8 @@ public abstract class TypeManager<T> {
 		doMapping();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addType(Class<? extends T> typeClass) {
 		addList.add(typeClass);
-	}
-
-	public <U extends T> void replaceType(Class<U> typeClass) {
-		copyList.add(typeClass);
 	}
 
 	public String copyFrom(String typeName) throws Exception {
@@ -64,7 +58,6 @@ public abstract class TypeManager<T> {
 		return writer.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	public <U extends T> U copyInto(Class<U> typeClass, String source) throws Exception {
 		JAXBContext context = JAXBContext.newInstance(typeClass);
 		Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -73,16 +66,14 @@ public abstract class TypeManager<T> {
 		return type;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <U extends T> U getType(String type) {
 		return (U) types.get(type);
 	}
 
-	public void removeType(String type) {
-		removeList.add(type);
-	}
-
 	public void onUpdate(float delta) {
 		for (Class<?> addingType : addList) {
+			@SuppressWarnings("unchecked")
 			T type = (T) injector.getInstance(addingType);
 			types.put(addingType.getName(), type);
 			doMapping();
@@ -96,6 +87,7 @@ public abstract class TypeManager<T> {
 		}
 		removeList.clear();
 		for (Class<?> copyingType : copyList) {
+			@SuppressWarnings("unchecked")
 			T type = (T) injector.getInstance(copyingType);
 			T oldType = types.get(copyingType.getName());
 			if (oldType != null) {
@@ -114,15 +106,23 @@ public abstract class TypeManager<T> {
 		copyList.clear();
 	}
 
+	public void removeType(String type) {
+		removeList.add(type);
+	}
+
+	public <U extends T> void replaceType(Class<U> typeClass) {
+		copyList.add(typeClass);
+	}
+
 	protected void doMapping() {
 		injector = Guice.createInjector(getModule());
 	}
 
 	protected abstract void elementAdd(T element);
 
-	protected abstract void elementDelete(T element);
-
 	protected abstract void elementCopy(T oldElement, T newElement);
+
+	protected abstract void elementDelete(T element);
 
 	protected abstract Module getModule();
 }

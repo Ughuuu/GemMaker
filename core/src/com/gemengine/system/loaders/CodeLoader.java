@@ -1,6 +1,6 @@
 package com.gemengine.system.loaders;
 
-import org.jsync.sync.Sync;
+import org.jsync.sync.ClassSync;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -10,15 +10,14 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
-public class CodeLoader<T> extends AsynchronousAssetLoader<Sync, CodeLoader.CodeParameter> {
-	static public class CodeParameter extends AssetLoaderParameters<Sync> {
+@SuppressWarnings("rawtypes")
+public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader.CodeParameter> {
+	static public class CodeParameter extends AssetLoaderParameters<ClassSync> {
 		private final ClassLoader classLoader;
 		private final String destinationFolder;
-		private final String sourceFolder;
 
-		public CodeParameter(ClassLoader classLoader, String sourceFolder, String destinationFolder) {
+		public CodeParameter(ClassLoader classLoader, String destinationFolder) {
 			this.classLoader = classLoader;
-			this.sourceFolder = sourceFolder;
 			this.destinationFolder = destinationFolder;
 		}
 	}
@@ -37,9 +36,8 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<Sync, CodeLoader.Code
 	}
 
 	@Override
-	public Sync<T> loadSync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
+	public ClassSync<T> loadSync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
 		String path = file.pathWithoutExtension();
-		return new Sync<T>(parameter.classLoader, path.replace('/', '.'), parameter.sourceFolder,
-				parameter.destinationFolder);
+		return new ClassSync<T>(parameter.classLoader, path.replace('/', '.'), parameter.destinationFolder);
 	}
 }

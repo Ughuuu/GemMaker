@@ -22,7 +22,7 @@ public abstract class Gem implements ApplicationListener {
 		systemManager.addType(ComponentSystem.class);
 		try {
 			systemManager.onInit();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		System.out.println("ok");
@@ -44,7 +44,7 @@ public abstract class Gem implements ApplicationListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		try {
 			systemManager.onUpdate(Gdx.graphics.getDeltaTime());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

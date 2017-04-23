@@ -29,7 +29,7 @@ public class SystemManagerModule extends AbstractModule {
 		bind(Boolean.class).annotatedWith(Names.named("useDefaultLoaders")).toInstance(true);
 		bind(SystemManager.class).toInstance(systemManager);
 		for (val typeEntry : systemManager.types.entrySet()) {
-			String key = typeEntry.getKey();
+			// String key = typeEntry.getKey();
 			SystemBase value = typeEntry.getValue();
 			makeMapping(genericCast(value.getClass()), value);
 		}

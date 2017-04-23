@@ -1,6 +1,8 @@
 package com.gemengine.entity;
 
+import lombok.Getter;
+
 public class Entity {
-	private int id;
-	protected String name;
+	@Getter private int id;
+	@Getter private String name;
 }

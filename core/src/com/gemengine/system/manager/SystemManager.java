@@ -49,6 +49,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 		toStart = 0;
 	}
 
+	@Override
 	public void onUpdate(float delta) {
 		super.onUpdate(delta);
 		for (TimedSystem system : timedSystems) {
@@ -83,6 +84,19 @@ public class SystemManager extends TypeManager<SystemBase> {
 	}
 
 	@Override
+	protected void elementCopy(SystemBase oldElement, SystemBase newElement) {
+		State state = systemToState.get(oldElement);
+		if (state == null) {
+			elementAdd(newElement);
+		} else {
+			elementDelete(oldElement);
+			elementAdd(newElement);
+			toStart--;
+			systemToState.put(newElement, state);
+		}
+	}
+
+	@Override
 	protected void elementDelete(SystemBase element) {
 		baseSystems.remove(element);
 		if (element instanceof TimedSystem) {
@@ -95,19 +109,5 @@ public class SystemManager extends TypeManager<SystemBase> {
 	@Override
 	protected Module getModule() {
 		return new SystemManagerModule(this);
-	}
-
-	@Override
-	protected void elementCopy(SystemBase oldElement, SystemBase newElement) {
-		State state = systemToState.get(oldElement);
-		if(state == null){
-			elementAdd(newElement);
-		}
-		else{
-			elementDelete(oldElement);
-			elementAdd(newElement);
-			toStart--;
-			systemToState.put(newElement, state);
-		}
 	}
 }
