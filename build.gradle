@@ -31,14 +31,8 @@ allprojects {
      	lombokVersion = '1.16.16'
      	guiceVersion = '4.1.0'
      	guavaVersion = '21.0'
-     	javaSync = 'd4cce74de3'
+     	javaSync = '94346b2c91'
      	jackson = '2.9.0.pr2'
-     	///////
-     ecjVersion = "4.6.1"
-     jgitVersion = "4.7.0.201704051617-r"
-     jUnitVersion ="4.12"
-     sfl4jVersion = "1.6.1"
-     //////
     }
 
     repositories {
@@ -66,19 +60,7 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        //compile "com.github.Ughuuu:JavaSync:$javaSync"
-        //
-        
-        
-	compile "org.eclipse.jdt.core.compiler:ecj:$ecjVersion"
-	compile "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
-	compile "org.eclipse.jgit:org.eclipse.jgit.archive:$jgitVersion"
-	compile group: 'org.slf4j', name: 'slf4j-simple', version: sfl4jVersion
-    compileOnly "org.projectlombok:lombok:$lombokVersion"
-    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
-    testCompile "junit:junit:$jUnitVersion"
-        
-        //
+        compile "com.github.Ughuuu:JavaSync:$javaSync"
         compile group: 'com.google.inject', name: 'guice', version: guiceVersion
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson
         compileOnly "org.projectlombok:lombok:$lombokVersion"
