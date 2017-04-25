@@ -4,35 +4,30 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.gemengine.system.AssetSystem;
-import com.gemengine.system.ComponentSystem;
 import com.gemengine.system.ManagerSystem;
 import com.gemengine.system.manager.SystemManager;
 
-public abstract class Gem implements ApplicationListener {
+public class Gem implements ApplicationListener {
 	private final SystemManager systemManager;
 
-	public Gem() {
-		systemManager = new SystemManager();
+	public Gem(GemConfiguration configuration) {
+		systemManager = new SystemManager(configuration);
 	}
 
 	@Override
 	public void create() {
 		systemManager.addType(AssetSystem.class);
 		systemManager.addType(ManagerSystem.class);
-		systemManager.addType(ComponentSystem.class);
 		try {
 			systemManager.onInit();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		System.out.println("ok");
 	}
 
 	@Override
 	public void dispose() {
 	}
-
-	public abstract String getEntry();
 
 	@Override
 	public void pause() {

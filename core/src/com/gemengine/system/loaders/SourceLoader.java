@@ -9,17 +9,15 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.gemengine.system.AssetSystem;
+import com.gemengine.system.ManagerSystem;
 
 @SuppressWarnings("rawtypes")
 public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoader.SourceParameter> {
-	static public class SourceParameter extends AssetLoaderParameters<SourceSync> {
-		private final String destinationFolder;
-		private final String sourceFolder;
+	private final String sourceSystemFolder = AssetSystem.assetsFolder + ManagerSystem.systemSourceFolder;
+	private final String sourceComponentFolder = AssetSystem.assetsFolder + ManagerSystem.componentSourceFolder;
 
-		public SourceParameter(String sourceFolder, String destinationFolder) {
-			this.sourceFolder = sourceFolder;
-			this.destinationFolder = destinationFolder;
-		}
+	static public class SourceParameter extends AssetLoaderParameters<SourceSync> {
 	}
 
 	public SourceLoader(FileHandleResolver resolver) {
@@ -38,6 +36,14 @@ public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoad
 	@Override
 	public SourceSync loadSync(AssetManager manager, String fileName, FileHandle file, SourceParameter parameter) {
 		String path = file.pathWithoutExtension();
-		return new SourceSync(path.replace('/', '.'), parameter.sourceFolder, parameter.destinationFolder);
+		if (path.contains(sourceSystemFolder)) {
+			path = file.pathWithoutExtension().substring(sourceSystemFolder.length());
+			return new SourceSync(path.replace('/', '.'), sourceSystemFolder, sourceSystemFolder);
+		} else if (path.contains(sourceComponentFolder)) {
+			path = file.pathWithoutExtension().substring(sourceComponentFolder.length());
+			return new SourceSync(path.replace('/', '.'), sourceComponentFolder, sourceComponentFolder);
+		}
+		return new SourceSync(path.replace('/', '.').substring(AssetSystem.assetsFolder.length()),
+				AssetSystem.assetsFolder, AssetSystem.assetsFolder);
 	}
 }

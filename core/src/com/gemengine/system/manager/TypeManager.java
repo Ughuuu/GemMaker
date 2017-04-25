@@ -37,7 +37,6 @@ public abstract class TypeManager<T> {
 		removeList = new ArrayList<String>();
 		objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NON_PRIVATE);
-		doMapping();
 	}
 
 	public void addType(Class<? extends T> typeClass) {
@@ -70,14 +69,21 @@ public abstract class TypeManager<T> {
 	public <U extends T> U getType(String type) {
 		return (U) types.get(type);
 	}
+	
+	public <T> T inject(Class<T> type){
+		return (T) injector.getInstance(type);		
+	}
 
 	public void onUpdate(float delta) {
 		for (Class<?> addingType : addList) {
-			@SuppressWarnings("unchecked")
-			T type = (T) injector.getInstance(addingType);
-			types.put(addingType.getName(), type);
-			doMapping();
-			elementAdd(type);
+			try {
+				T type = (T) inject(addingType);
+				doMapping();
+				elementAdd(type);
+				types.put(addingType.getName(), type);
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
 		}
 		addList.clear();
 		for (String type : removeList) {
@@ -87,21 +93,20 @@ public abstract class TypeManager<T> {
 		}
 		removeList.clear();
 		for (Class<?> copyingType : copyList) {
-			@SuppressWarnings("unchecked")
-			T type = (T) injector.getInstance(copyingType);
-			T oldType = types.get(copyingType.getName());
-			if (oldType != null) {
-				String oldTypeData;
-				try {
+			try {
+				T type = (T) inject(copyingType);
+				T oldType = types.get(copyingType.getName());
+				if (oldType != null) {
+					String oldTypeData;
 					oldTypeData = objectMapper.writeValueAsString(oldType);
 					objectMapper.readerForUpdating(type).readValue(oldTypeData);
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
+				doMapping();
+				elementCopy(oldType, type);
+				types.put(copyingType.getName(), type);
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
-			types.put(copyingType.getName(), type);
-			doMapping();
-			elementCopy(oldType, type);
 		}
 		copyList.clear();
 	}

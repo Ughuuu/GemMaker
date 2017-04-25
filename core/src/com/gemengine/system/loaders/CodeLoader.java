@@ -1,6 +1,7 @@
 package com.gemengine.system.loaders;
 
 import org.jsync.sync.ClassSync;
+import org.jsync.sync.SourceSync;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -9,16 +10,19 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.gemengine.system.AssetSystem;
+import com.gemengine.system.ManagerSystem;
 
 @SuppressWarnings("rawtypes")
 public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader.CodeParameter> {
+	private final String sourceSystemFolder = AssetSystem.assetsFolder + ManagerSystem.systemSourceFolder;
+	private final String sourceComponentFolder = AssetSystem.assetsFolder + ManagerSystem.componentSourceFolder;
+
 	static public class CodeParameter extends AssetLoaderParameters<ClassSync> {
 		private final ClassLoader classLoader;
-		private final String destinationFolder;
 
-		public CodeParameter(ClassLoader classLoader, String destinationFolder) {
+		public CodeParameter(ClassLoader classLoader) {
 			this.classLoader = classLoader;
-			this.destinationFolder = destinationFolder;
 		}
 	}
 
@@ -38,6 +42,14 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader
 	@Override
 	public ClassSync<T> loadSync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
 		String path = file.pathWithoutExtension();
-		return new ClassSync<T>(parameter.classLoader, path.replace('/', '.'), parameter.destinationFolder);
+		if (path.contains(sourceSystemFolder)) {
+			path = file.pathWithoutExtension().substring(sourceSystemFolder.length());
+			return new ClassSync<T>(parameter.classLoader, path.replace('/', '.'), sourceSystemFolder);
+		} else if (path.contains(sourceComponentFolder)) {
+			path = file.pathWithoutExtension().substring(sourceComponentFolder.length());
+			return new ClassSync<T>(parameter.classLoader, path.replace('/', '.'), sourceComponentFolder);
+		}
+		return new ClassSync<T>(parameter.classLoader,
+				path.replace('/', '.').substring(AssetSystem.assetsFolder.length()), AssetSystem.assetsFolder);
 	}
 }

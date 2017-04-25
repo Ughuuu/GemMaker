@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gemengine.engine.GemConfiguration;
 import com.gemengine.system.base.SystemBase;
 import com.gemengine.system.base.TimedSystem;
 import com.google.inject.Module;
@@ -33,11 +34,15 @@ public class SystemManager extends TypeManager<SystemBase> {
 		}
 	};
 	private final List<TimedSystem> timedSystems;
+	private final GemConfiguration configuration;
 
-	public SystemManager() {
+	public SystemManager(GemConfiguration configuration) {
+		super();
+		this.configuration = configuration;
 		baseSystems = new ArrayList<SystemBase>();
 		systemToState = new HashMap<SystemBase, State>();
 		timedSystems = new ArrayList<TimedSystem>();
+		doMapping();
 	}
 
 	public void onInit() {
@@ -108,6 +113,6 @@ public class SystemManager extends TypeManager<SystemBase> {
 
 	@Override
 	protected Module getModule() {
-		return new SystemManagerModule(this);
+		return new SystemManagerModule(this, configuration);
 	}
 }

@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.Array;
 import com.gemengine.system.base.AssetListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;
+import com.gemengine.system.loaders.LoaderData;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -33,34 +34,6 @@ import lombok.Synchronized;
 import lombok.val;
 
 public class AssetSystem extends TimedSystem {
-	public static class LoaderData {
-		private final Class<?> type;
-		private final AssetLoaderParameters<?> assetLoaderParameters;
-
-		public LoaderData(Class<?> type) {
-			this.type = type;
-			this.assetLoaderParameters = null;
-		}
-
-		public LoaderData(Class<?> type, AssetLoaderParameters<?> assetLoaderParameters) {
-			this.type = type;
-			this.assetLoaderParameters = assetLoaderParameters;
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> Class<T> getType() {
-			return (Class<T>) type;
-		}
-
-		public void load(AssetManager assetManager, String path) {
-			if (assetLoaderParameters != null) {
-				assetManager.load(path, getType(), assetLoaderParameters);
-			} else {
-				assetManager.load(path, type);
-			}
-		}
-	}
-
 	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
 	private static final Map<String, LoaderData> folderToLoaderMap = new HashMap<String, LoaderData>();
 	public final static String assetsFolder = "assets/";
@@ -68,15 +41,12 @@ public class AssetSystem extends TimedSystem {
 	private final Map<String, List<String>> folderToAsset;
 	private final Map<String, String> assetToFolder;
 	private final AssetManager assetManager;
-
 	private final Commiter commiter;
 	private final boolean useBlockingLoad;
-
 	private final boolean useExternalFiles;
-
 	private final List<AssetListener> assetListeners;
-	
-	public void addAssetListener(AssetListener assetListener){
+
+	public void addAssetListener(AssetListener assetListener) {
 		assetListeners.add(assetListener);
 	}
 
@@ -106,6 +76,7 @@ public class AssetSystem extends TimedSystem {
 		loadFolders = new ArrayList<String>();
 		assetListeners = new ArrayList<AssetListener>();
 		loadFolders.add(null);
+		loadFolder();
 	}
 
 	public <T, P extends AssetLoaderParameters<T>> void addLoaderDefault(LoaderData loaderData,
@@ -177,7 +148,6 @@ public class AssetSystem extends TimedSystem {
 
 	@Override
 	public void onInit() {
-		loadFolder();
 	}
 
 	@Override
@@ -231,7 +201,6 @@ public class AssetSystem extends TimedSystem {
 		types.add(loaderData);
 	}
 
-	@Synchronized
 	private void findExternalChanges() throws Exception {
 		List<DiffEntry> entries = commiter.update();
 		for (DiffEntry entry : entries) {
@@ -298,13 +267,6 @@ public class AssetSystem extends TimedSystem {
 		}
 	}
 
-	private String getExtension(String path) {
-		int extensionStart = path.lastIndexOf('.');
-		if (extensionStart == -1)
-			return "";
-		return path.substring(extensionStart);
-	}
-
 	private Deque<FileHandle> getInternalFilesHandleFrom(String path) {
 		return new ArrayDeque<FileHandle>(Arrays.asList(Gdx.files.internal(path).list()));
 	}
@@ -316,7 +278,7 @@ public class AssetSystem extends TimedSystem {
 	}
 
 	private void loadAsset(String path) {
-		String extension = getExtension(path);
+		String extension = AssetSystemHelper.getExtension(path);
 		val types = extensionToLoaderMap.get(extension);
 		if (types == null)
 			return;

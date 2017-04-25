@@ -1,8 +1,10 @@
 package com.gemengine.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 public class Entity {
-	@Getter private int id;
-	@Getter private String name;
+	@Getter private final int id;
+	@Getter private final String name;
 }
