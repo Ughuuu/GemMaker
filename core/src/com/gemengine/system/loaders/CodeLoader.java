@@ -15,9 +15,6 @@ import com.gemengine.system.ManagerSystem;
 
 @SuppressWarnings("rawtypes")
 public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader.CodeParameter> {
-	private final String sourceSystemFolder = AssetSystem.assetsFolder + ManagerSystem.systemSourceFolder;
-	private final String sourceComponentFolder = AssetSystem.assetsFolder + ManagerSystem.componentSourceFolder;
-
 	static public class CodeParameter extends AssetLoaderParameters<ClassSync> {
 		private final ClassLoader classLoader;
 
@@ -41,15 +38,7 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader
 
 	@Override
 	public ClassSync<T> loadSync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
-		String path = file.pathWithoutExtension();
-		if (path.contains(sourceSystemFolder)) {
-			path = file.pathWithoutExtension().substring(sourceSystemFolder.length());
-			return new ClassSync<T>(parameter.classLoader, path.replace('/', '.'), sourceSystemFolder);
-		} else if (path.contains(sourceComponentFolder)) {
-			path = file.pathWithoutExtension().substring(sourceComponentFolder.length());
-			return new ClassSync<T>(parameter.classLoader, path.replace('/', '.'), sourceComponentFolder);
-		}
-		return new ClassSync<T>(parameter.classLoader,
-				path.replace('/', '.').substring(AssetSystem.assetsFolder.length()), AssetSystem.assetsFolder);
+		String path = file.pathWithoutExtension().substring(AssetSystem.assetsFolder.length()).replace('/', '.');
+		return new ClassSync<T>(parameter.classLoader, path, AssetSystem.assetsFolder);
 	}
 }

@@ -14,9 +14,6 @@ import com.gemengine.system.ManagerSystem;
 
 @SuppressWarnings("rawtypes")
 public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoader.SourceParameter> {
-	private final String sourceSystemFolder = AssetSystem.assetsFolder + ManagerSystem.systemSourceFolder;
-	private final String sourceComponentFolder = AssetSystem.assetsFolder + ManagerSystem.componentSourceFolder;
-
 	static public class SourceParameter extends AssetLoaderParameters<SourceSync> {
 	}
 
@@ -35,15 +32,7 @@ public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoad
 
 	@Override
 	public SourceSync loadSync(AssetManager manager, String fileName, FileHandle file, SourceParameter parameter) {
-		String path = file.pathWithoutExtension();
-		if (path.contains(sourceSystemFolder)) {
-			path = file.pathWithoutExtension().substring(sourceSystemFolder.length());
-			return new SourceSync(path.replace('/', '.'), sourceSystemFolder, sourceSystemFolder);
-		} else if (path.contains(sourceComponentFolder)) {
-			path = file.pathWithoutExtension().substring(sourceComponentFolder.length());
-			return new SourceSync(path.replace('/', '.'), sourceComponentFolder, sourceComponentFolder);
-		}
-		return new SourceSync(path.replace('/', '.').substring(AssetSystem.assetsFolder.length()),
-				AssetSystem.assetsFolder, AssetSystem.assetsFolder);
+		String path = file.pathWithoutExtension().substring(AssetSystem.assetsFolder.length()).replace('/', '.');
+		return new SourceSync(path, AssetSystem.assetsFolder, AssetSystem.assetsFolder);
 	}
 }
