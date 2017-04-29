@@ -4,20 +4,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 public abstract class SystemBase {
+	private static int lastId;
 	@Getter
 	@Setter
 	private boolean enable;
 	@Getter
 	private final int priority;
+	@Getter
+	private final int id;
 
-	public SystemBase() {
-		enable = true;
-		priority = Integer.MAX_VALUE;
+	protected SystemBase() {
+		this(true, Integer.MAX_VALUE);
 	}
 
-	public SystemBase(boolean enable, int priority) {
+	protected SystemBase(boolean enable, int priority) {
 		this.enable = enable;
 		this.priority = priority;
+		id = lastId++;
 	}
 
 	public void onEnd() {

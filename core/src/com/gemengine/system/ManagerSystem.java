@@ -1,8 +1,6 @@
 package com.gemengine.system;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
@@ -24,10 +22,17 @@ import com.google.inject.Inject;
 import lombok.val;
 
 public class ManagerSystem extends TimedSystem implements AssetListener {
+	public static final String codeFolder = "code/";
+	private static boolean extendsType(Class<?> type, Class<?> extendsType) {
+		if (type == null || type.equals(Object.class)) {
+			return false;
+		}
+		return type.equals(extendsType) || extendsType(type.getSuperclass(), extendsType);
+	}
 	private final AssetSystem assetSystem;
 	private final SystemManager systemManager;
 	private boolean reload = true;
-	private ChangeType changeType;
+
 	private final Map<String, ComponentListener> listeners = new HashMap<String, ComponentListener>();
 
 	@Inject
@@ -41,24 +46,39 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		listeners.put(componentListener.getClass().getName(), componentListener);
 	}
 
-	private void setCodeSync(ClassLoader classsLoader, AssetSystem assetSystem, String folder) {
+	@Override
+	public void onChange(ChangeType changeType, String oldName, String newName) {
+		String extension = AssetSystemHelper.getExtension(oldName);
+		System.out.println(extension + " File changed " + changeType.toString());
+		if (extension.equals(".class")) {
+			reload = true;
+		}
+	}
+
+	@Override
+	public void onInit() {
+		setSourceSync(assetSystem);
+		setCodeSync(ManagerSystem.class.getClassLoader(), assetSystem);
+		assetSystem.addAssetListener(this);
+		assetSystem.loadFolder("assets/");
+	}
+
+	@Override
+	public void onUpdate(float delta) {
+		compileSources();
+		updateCode();
+	}
+
+	private void setCodeSync(ClassLoader classsLoader, AssetSystem assetSystem) {
 		val codeData = new LoaderData(ClassSync.class, new CodeLoader.CodeParameter(classsLoader));
 		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.getFileHandleResolver()),
 				".class");
 	}
 
-	private void setSourceSync(AssetSystem assetSystem, String folder) {
+	private void setSourceSync(AssetSystem assetSystem) {
 		val sourceData = new LoaderData(SourceSync.class);
 		SourceSync.options = "-8";
 		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.getFileHandleResolver()), ".java");
-	}
-
-	@Override
-	public void onInit() {
-		setSourceSync(assetSystem, AssetSystem.assetsFolder);
-		setCodeSync(ManagerSystem.class.getClassLoader(), assetSystem, AssetSystem.assetsFolder);
-		assetSystem.addAssetListener(this);
-		assetSystem.loadFolder("assets/system/");
 	}
 
 	void compileSources() {
@@ -72,18 +92,12 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		}
 	}
 
-	private static boolean extendsType(Class<?> type, Class<?> extendsType) {
-		if (type.equals(Object.class)) {
-			return false;
-		}
-		return type.equals(extendsType) || extendsType(type.getSuperclass(), extendsType);
-	}
-
 	@SuppressWarnings("unchecked")
 	void updateCode() {
 		if (!reload) {
 			return;
 		}
+		System.out.println("System Reload Triggered");
 		reload = false;
 		ClassSync<SystemBase>[] syncs = assetSystem.getAll(ClassSync.class);
 		if (syncs.length != 0) {
@@ -103,24 +117,11 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 							listener.getValue().onUpdate(cls);
 						}
 					}
-				} catch (Throwable e) {
+				} catch (Throwable t) {
+					t.printStackTrace();
 					// System.out.println("Class not found.");
 				}
 			}
-		}
-	}
-
-	@Override
-	public void onUpdate(float delta) {
-		compileSources();
-		updateCode();
-	}
-
-	@Override
-	public void onChange(ChangeType changeType, String oldName, String newName) {
-		String extension = AssetSystemHelper.getExtension(oldName);
-		if (extension.equals(".class")) {
-			reload = true;
 		}
 	}
 }

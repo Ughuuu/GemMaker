@@ -9,11 +9,11 @@ public abstract class TimedSystem extends SystemBase {
 	@Getter
 	private final float interval;
 
-	public TimedSystem() {
+	protected TimedSystem() {
 		this.interval = 16;
 	}
 
-	public TimedSystem(float interval, boolean enable, int priority) {
+	protected TimedSystem(float interval, boolean enable, int priority) {
 		super(enable, priority);
 		this.interval = interval;
 	}

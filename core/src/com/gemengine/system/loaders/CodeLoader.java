@@ -1,7 +1,6 @@
 package com.gemengine.system.loaders;
 
 import org.jsync.sync.ClassSync;
-import org.jsync.sync.SourceSync;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -23,6 +22,8 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader
 		}
 	}
 
+	private static final String completeCodeFolder = AssetSystem.assetsFolder + ManagerSystem.codeFolder;
+
 	public CodeLoader(FileHandleResolver resolver) {
 		super(resolver);
 	}
@@ -38,7 +39,12 @@ public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader
 
 	@Override
 	public ClassSync<T> loadSync(AssetManager manager, String fileName, FileHandle file, CodeParameter parameter) {
-		String path = file.pathWithoutExtension().substring(AssetSystem.assetsFolder.length()).replace('/', '.');
-		return new ClassSync<T>(parameter.classLoader, path, AssetSystem.assetsFolder);
+		String completePath = file.pathWithoutExtension();
+		String folder = AssetSystem.assetsFolder;
+		if (completePath.contains(completeCodeFolder)) {
+			folder = completeCodeFolder;
+		}
+		String path = completePath.substring(folder.length()).replace('/', '.');
+		return new ClassSync<T>(parameter.classLoader, path, folder);
 	}
 }

@@ -69,18 +69,18 @@ public abstract class TypeManager<T> {
 	public <U extends T> U getType(String type) {
 		return (U) types.get(type);
 	}
-	
-	public <T> T inject(Class<T> type){
-		return (T) injector.getInstance(type);		
+
+	public <T> T inject(Class<T> type) {
+		return injector.getInstance(type);
 	}
 
 	public void onUpdate(float delta) {
 		for (Class<?> addingType : addList) {
 			try {
 				T type = (T) inject(addingType);
-				doMapping();
 				elementAdd(type);
 				types.put(addingType.getName(), type);
+				doMapping();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -88,8 +88,8 @@ public abstract class TypeManager<T> {
 		addList.clear();
 		for (String type : removeList) {
 			T element = types.remove(type);
-			doMapping();
 			elementDelete(element);
+			doMapping();
 		}
 		removeList.clear();
 		for (Class<?> copyingType : copyList) {
@@ -101,9 +101,9 @@ public abstract class TypeManager<T> {
 					oldTypeData = objectMapper.writeValueAsString(oldType);
 					objectMapper.readerForUpdating(type).readValue(oldTypeData);
 				}
-				doMapping();
 				elementCopy(oldType, type);
 				types.put(copyingType.getName(), type);
+				doMapping();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}

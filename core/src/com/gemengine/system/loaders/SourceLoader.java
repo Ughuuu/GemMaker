@@ -17,6 +17,8 @@ public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoad
 	static public class SourceParameter extends AssetLoaderParameters<SourceSync> {
 	}
 
+	private static final String completeCodeFolder = AssetSystem.assetsFolder + ManagerSystem.codeFolder;
+
 	public SourceLoader(FileHandleResolver resolver) {
 		super(resolver);
 	}
@@ -32,7 +34,12 @@ public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoad
 
 	@Override
 	public SourceSync loadSync(AssetManager manager, String fileName, FileHandle file, SourceParameter parameter) {
-		String path = file.pathWithoutExtension().substring(AssetSystem.assetsFolder.length()).replace('/', '.');
-		return new SourceSync(path, AssetSystem.assetsFolder, AssetSystem.assetsFolder);
+		String completePath = file.pathWithoutExtension();
+		String folder = AssetSystem.assetsFolder;
+		if (completePath.contains(completeCodeFolder)) {
+			folder = completeCodeFolder;
+		}
+		String path = file.pathWithoutExtension().substring(folder.length()).replace('/', '.');
+		return new SourceSync(path, folder, folder);
 	}
 }

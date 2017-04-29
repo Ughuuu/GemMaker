@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.jsync.sync.Commiter;
 
 import com.badlogic.gdx.Gdx;
@@ -30,7 +29,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import lombok.NonNull;
-import lombok.Synchronized;
 import lombok.val;
 
 public class AssetSystem extends TimedSystem {
@@ -44,11 +42,7 @@ public class AssetSystem extends TimedSystem {
 	private final Commiter commiter;
 	private final boolean useBlockingLoad;
 	private final boolean useExternalFiles;
-	private final List<AssetListener> assetListeners;
-
-	public void addAssetListener(AssetListener assetListener) {
-		assetListeners.add(assetListener);
-	}
+	private final Map<String, AssetListener> assetListeners;
 
 	@Inject
 	AssetSystem(@Named("useExternalFiles") boolean useExternalFiles, @Named("useBlockingLoad") boolean useBlockingLoad,
@@ -74,9 +68,13 @@ public class AssetSystem extends TimedSystem {
 		folderToAsset = new HashMap<String, List<String>>();
 		assetToFolder = new HashMap<String, String>();
 		loadFolders = new ArrayList<String>();
-		assetListeners = new ArrayList<AssetListener>();
+		assetListeners = new HashMap<String, AssetListener>();
 		loadFolders.add(null);
 		loadFolder();
+	}
+
+	public void addAssetListener(AssetListener assetListener) {
+		assetListeners.put(assetListener.getClass().getName(), assetListener);
 	}
 
 	public <T, P extends AssetLoaderParameters<T>> void addLoaderDefault(LoaderData loaderData,
@@ -231,8 +229,8 @@ public class AssetSystem extends TimedSystem {
 					break;
 				}
 			}
-			for (AssetListener assetListener : assetListeners) {
-				assetListener.onChange(entry.getChangeType(), oldPath, newPath);
+			for (val assetListener : assetListeners.entrySet()) {
+				assetListener.getValue().onChange(entry.getChangeType(), oldPath, newPath);
 			}
 		}
 	}
