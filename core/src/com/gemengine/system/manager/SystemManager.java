@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.gemengine.engine.GemConfiguration;
 import com.gemengine.system.base.SystemBase;
@@ -17,31 +19,18 @@ public class SystemManager extends TypeManager<SystemBase> {
 		Added, Started, Destroyed
 	}
 
-	private final List<SystemBase> baseSystems;
+	private final Set<SystemBase> baseSystems;
 	private final Map<SystemBase, State> systemToState;
 	protected int toStart = 0;
-
-	private final Comparator<SystemBase> priorityComparator = new Comparator<SystemBase>() {
-		@Override
-		public int compare(SystemBase system1, SystemBase system2) {
-			if (system1.getPriority() < system2.getPriority()) {
-				return -1;
-			}
-			if (system1.getPriority() > system2.getPriority()) {
-				return 1;
-			}
-			return 0;
-		}
-	};
-	private final List<TimedSystem> timedSystems;
+	private final Set<TimedSystem> timedSystems;
 	private final GemConfiguration configuration;
 
 	public SystemManager(GemConfiguration configuration) {
 		super();
 		this.configuration = configuration;
-		baseSystems = new ArrayList<SystemBase>();
+		baseSystems = new TreeSet<SystemBase>();
 		systemToState = new HashMap<SystemBase, State>();
-		timedSystems = new ArrayList<TimedSystem>();
+		timedSystems = new TreeSet<TimedSystem>();
 		doMapping();
 	}
 
@@ -83,9 +72,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 		baseSystems.add(element);
 		if (element instanceof TimedSystem) {
 			timedSystems.add((TimedSystem) element);
-			Collections.sort(timedSystems, priorityComparator);
 		}
-		Collections.sort(baseSystems, priorityComparator);
 	}
 
 	@Override
@@ -106,9 +93,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 		baseSystems.remove(element);
 		if (element instanceof TimedSystem) {
 			timedSystems.remove(element);
-			Collections.sort(timedSystems, priorityComparator);
 		}
-		Collections.sort(baseSystems, priorityComparator);
 	}
 
 	@Override

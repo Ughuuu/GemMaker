@@ -3,7 +3,7 @@ package com.gemengine.system.base;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class SystemBase {
+public abstract class SystemBase implements Comparable<SystemBase> {
 	private static int lastId;
 	@Getter
 	@Setter
@@ -27,5 +27,16 @@ public abstract class SystemBase {
 	}
 
 	public void onInit() {
+	}
+
+	@Override
+	public int compareTo(SystemBase other) {
+		if (this.getPriority() < other.getPriority()) {
+			return -1;
+		}
+		if (this.getPriority() > other.getPriority()) {
+			return 1;
+		}
+		return 0;
 	}
 }

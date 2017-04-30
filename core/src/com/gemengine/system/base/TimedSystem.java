@@ -10,7 +10,7 @@ public abstract class TimedSystem extends SystemBase {
 	private final float interval;
 
 	protected TimedSystem() {
-		this.interval = 16;
+		this(16, true, Integer.MAX_VALUE);
 	}
 
 	protected TimedSystem(float interval, boolean enable, int priority) {

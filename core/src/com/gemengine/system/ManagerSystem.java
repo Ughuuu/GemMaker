@@ -1,5 +1,6 @@
 package com.gemengine.system;
 
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,7 +111,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 			for (val sync : syncs) {
 				try {
 					Class<?> cls = sync.getClassType();
-					if (extendsType(cls, SystemBase.class)) {
+					if (extendsType(cls, SystemBase.class) && !Modifier.isAbstract(cls.getModifiers())) {
 						systemManager.replaceType((Class<? extends SystemBase>) cls);
 					} else if (extendsType(cls, Component.class)) {
 						for (val listener : listeners.entrySet()) {
