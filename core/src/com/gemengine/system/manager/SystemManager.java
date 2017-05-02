@@ -1,6 +1,7 @@
 package com.gemengine.system.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,9 +11,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.gemengine.engine.GemConfiguration;
+import com.gemengine.system.AssetSystem;
+import com.gemengine.system.ManagerSystem;
 import com.gemengine.system.base.SystemBase;
 import com.gemengine.system.base.TimedSystem;
 import com.google.inject.Module;
+
+import lombok.Getter;
 
 public class SystemManager extends TypeManager<SystemBase> {
 	private static enum State {
@@ -24,9 +29,12 @@ public class SystemManager extends TypeManager<SystemBase> {
 	protected int toStart = 0;
 	private final Set<TimedSystem> timedSystems;
 	private final GemConfiguration configuration;
+	@Getter
+	private final List<Class<? extends SystemBase>> excludeList = new ArrayList<>(
+			Arrays.asList(AssetSystem.class, ManagerSystem.class));
 
 	public SystemManager(GemConfiguration configuration) {
-		super();
+		super(SystemBase.class);
 		this.configuration = configuration;
 		baseSystems = new TreeSet<SystemBase>();
 		systemToState = new HashMap<SystemBase, State>();
@@ -35,7 +43,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 	}
 
 	public void onInit() {
-		super.onUpdate(0);
+		super.onInit();
 		for (SystemBase system : baseSystems) {
 			system.onInit();
 			systemToState.put(system, State.Started);

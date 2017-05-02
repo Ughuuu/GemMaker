@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.gemengine.system.AssetSystem;
+import com.gemengine.system.ComponentSystem;
+import com.gemengine.system.EntitySystem;
 import com.gemengine.system.ManagerSystem;
 import com.gemengine.system.manager.SystemManager;
 
@@ -16,8 +18,10 @@ public class Gem implements ApplicationListener {
 
 	@Override
 	public void create() {
-		systemManager.addType(AssetSystem.class);
-		systemManager.addType(ManagerSystem.class);
+		systemManager.replaceType(AssetSystem.class);
+		systemManager.replaceType(ComponentSystem.class);
+		systemManager.replaceType(EntitySystem.class);
+		systemManager.replaceType(ManagerSystem.class);
 		try {
 			systemManager.onInit();
 		} catch (Throwable e) {

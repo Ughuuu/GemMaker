@@ -1,7 +1,9 @@
 package com.gemengine.system;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
@@ -18,18 +20,13 @@ import com.gemengine.system.loaders.CodeLoader;
 import com.gemengine.system.loaders.LoaderData;
 import com.gemengine.system.loaders.SourceLoader;
 import com.gemengine.system.manager.SystemManager;
+import com.gemengine.system.manager.TypeManager;
 import com.google.inject.Inject;
 
 import lombok.val;
 
 public class ManagerSystem extends TimedSystem implements AssetListener {
 	public static final String codeFolder = "code/";
-	private static boolean extendsType(Class<?> type, Class<?> extendsType) {
-		if (type == null || type.equals(Object.class)) {
-			return false;
-		}
-		return type.equals(extendsType) || extendsType(type.getSuperclass(), extendsType);
-	}
 	private final AssetSystem assetSystem;
 	private final SystemManager systemManager;
 	private boolean reload = true;
@@ -82,7 +79,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.getFileHandleResolver()), ".java");
 	}
 
-	void compileSources() {
+	private void compileSources() {
 		SourceSync[] syncs = assetSystem.getAll(SourceSync.class);
 		if (syncs.length != 0) {
 			if (!SourceSync.updateSource(syncs)) {
@@ -111,16 +108,17 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 			for (val sync : syncs) {
 				try {
 					Class<?> cls = sync.getClassType();
-					if (extendsType(cls, SystemBase.class) && !Modifier.isAbstract(cls.getModifiers())) {
+					if (TypeManager.extendsType(cls, SystemBase.class) && !Modifier.isAbstract(cls.getModifiers())) {
+						// For now clean all systems and regenerate them.
+						// Later on only regenerate those that modified.
 						systemManager.replaceType((Class<? extends SystemBase>) cls);
-					} else if (extendsType(cls, Component.class)) {
+					} else if (TypeManager.extendsType(cls, Component.class)) {
 						for (val listener : listeners.entrySet()) {
 							listener.getValue().onUpdate(cls);
 						}
 					}
 				} catch (Throwable t) {
 					t.printStackTrace();
-					// System.out.println("Class not found.");
 				}
 			}
 		}
