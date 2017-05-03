@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public abstract class Component {
+	@Getter
 	private static int lastId;
 	@Getter
 	@Setter
@@ -13,5 +14,8 @@ public abstract class Component {
 
 	public Component() {
 		id = lastId++;
+	}
+	
+	public void onCreate(){
 	}
 }

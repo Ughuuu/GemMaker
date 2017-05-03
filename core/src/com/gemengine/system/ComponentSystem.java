@@ -81,6 +81,9 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		T component = null;
+		int newId = Component.getLastId() + 1;
+		addType(ent, newId, type);
+		componentToEntity.put(newId, ent);
 		try {
 			component = systemManager.inject(type);
 		} catch (Exception e) {
@@ -89,8 +92,8 @@ public class ComponentSystem extends TimedSystem {
 		if (component == null) {
 			return null;
 		}
-		addComponent(ent, component);
-		addType(ent, component);
+		addComponent(component);
+		component.onCreate();
 		return component;
 	}
 
@@ -101,8 +104,12 @@ public class ComponentSystem extends TimedSystem {
 		if (typeToComponent == null) {
 			return null;
 		}
+		List<Integer> types = typeToComponent.get(type.getName());
+		if (types == null) {
+			return null;
+		}
 		List<T> entityComponents = new ArrayList<T>();
-		for (int id : typeToComponent.get(type.getName())) {
+		for (int id : types) {
 			entityComponents.add((T) components.get(id));
 		}
 		return entityComponents;
@@ -171,10 +178,8 @@ public class ComponentSystem extends TimedSystem {
 		remove(ent, component.getId());
 	}
 
-	private <T extends Component> void addComponent(Entity ent, T component) {
+	private <T extends Component> void addComponent(T component) {
 		int id = component.getId();
-		components.put(id, component);
-		componentToEntity.put(id, ent);
 		componentToType.put(id, component.getClass().getName());
 		for (ComponentListener listener : componentListeners) {
 			if (listener.getConfiguration().contains(component.getClass().getName())) {
@@ -183,11 +188,10 @@ public class ComponentSystem extends TimedSystem {
 		}
 	}
 
-	private <T extends Component> void addType(Entity ent, T component) {
+	private <T extends Component> void addType(Entity ent, int componentId, Class<?> componentClass) {
 		int ownerId = ent.getId();
-		int id = component.getId();
 		List<String> supertypes = new ArrayList<String>();
-		getSupertypes(component.getClass(), supertypes);
+		getSupertypes(componentClass, supertypes);
 		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);
 		if (typeToComponentLimited == null) {
 			typeToComponentLimited = new HashMap<String, List<Integer>>();
@@ -199,14 +203,14 @@ public class ComponentSystem extends TimedSystem {
 				typeComponents = new ArrayList<Integer>();
 				typeToComponentLimited.put(supertype, typeComponents);
 			}
-			typeComponents.add(id);
+			typeComponents.add(componentId);
 
 			List<Integer> typeToComponent = typeToComponents.get(supertype);
 			if (typeToComponent == null) {
 				typeToComponent = new ArrayList<Integer>();
 				typeToComponents.put(supertype, typeToComponent);
 			}
-			typeToComponent.add(id);
+			typeToComponent.add(componentId);
 		}
 	}
 
