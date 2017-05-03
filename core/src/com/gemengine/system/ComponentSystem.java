@@ -55,7 +55,9 @@ public class ComponentSystem extends TimedSystem {
 		for (val key : entityToComponent.entrySet()) {
 			Component component = components.remove(key.getValue());
 			for (ComponentListener listener : componentListeners) {
-				listener.onChange(ComponentChangeType.DELETE, component);
+				if (listener.getConfiguration().contains(component.getClass().getName())) {
+					listener.onChange(ComponentChangeType.DELETE, component);
+				}
 			}
 			if (component == null) {
 				continue;
@@ -151,7 +153,9 @@ public class ComponentSystem extends TimedSystem {
 			return;
 		}
 		for (ComponentListener listener : componentListeners) {
-			listener.onChange(ComponentChangeType.DELETE, component);
+			if (listener.getConfiguration().contains(component.getClass().getName())) {
+				listener.onChange(ComponentChangeType.DELETE, component);
+			}
 		}
 		removeFromTypeMap(id, component.getClass());
 		removeFromEntityMap(ent, id, component.getClass());
@@ -167,7 +171,9 @@ public class ComponentSystem extends TimedSystem {
 		componentToEntity.put(id, ent);
 		componentToType.put(id, component.getClass().getName());
 		for (ComponentListener listener : componentListeners) {
-			listener.onChange(ComponentChangeType.ADD, component);
+			if (listener.getConfiguration().contains(component.getClass().getName())) {
+				listener.onChange(ComponentChangeType.ADD, component);
+			}
 		}
 	}
 

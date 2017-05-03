@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
@@ -44,7 +46,7 @@ public class AssetSystem extends TimedSystem {
 	private final Commiter commiter;
 	private final boolean useBlockingLoad;
 	private final boolean useExternalFiles;
-	private final Map<String, AssetListener> assetListeners;
+	private final Set<AssetListener> assetListeners;
 
 	@Inject
 	AssetSystem(@Named("useExternalFiles") boolean useExternalFiles, @Named("useBlockingLoad") boolean useBlockingLoad,
@@ -70,13 +72,13 @@ public class AssetSystem extends TimedSystem {
 		folderToAsset = new HashMap<String, List<String>>();
 		assetToFolder = new HashMap<String, String>();
 		loadFolders = new ArrayList<String>();
-		assetListeners = new HashMap<String, AssetListener>();
+		assetListeners = new HashSet<AssetListener>();
 		loadFolders.add(null);
 		loadFolder();
 	}
 
 	public void addAssetListener(AssetListener assetListener) {
-		assetListeners.put(assetListener.getClass().getName(), assetListener);
+		assetListeners.add(assetListener);
 	}
 
 	public <T, P extends AssetLoaderParameters<T>> void addLoaderDefault(LoaderData loaderData,
@@ -231,8 +233,8 @@ public class AssetSystem extends TimedSystem {
 					break;
 				}
 			}
-			for (val assetListener : assetListeners.entrySet()) {
-				assetListener.getValue().onChange(entry.getChangeType(), oldPath, newPath);
+			for (val assetListener : assetListeners) {
+				assetListener.onChange(entry.getChangeType(), oldPath, newPath);
 			}
 		}
 	}
@@ -242,8 +244,8 @@ public class AssetSystem extends TimedSystem {
 			for (String path : commiter.getFiles()) {
 				for (String loadFolder : loadFolders) {
 					placeAsset(assetsFolder + path, loadFolder);
-					for (val assetListener : assetListeners.entrySet()) {
-						assetListener.getValue().onChange(ChangeType.ADD, assetsFolder + path, assetsFolder + path);
+					for (val assetListener : assetListeners) {
+						assetListener.onChange(ChangeType.ADD, assetsFolder + path, assetsFolder + path);
 					}
 				}
 			}
@@ -264,8 +266,8 @@ public class AssetSystem extends TimedSystem {
 				if (type != null) {
 					for (String loadFolder : loadFolders) {
 						placeAsset(path, loadFolder);
-						for (val assetListener : assetListeners.entrySet()) {
-							assetListener.getValue().onChange(ChangeType.ADD, path, path);
+						for (val assetListener : assetListeners) {
+							assetListener.onChange(ChangeType.ADD, path, path);
 						}
 					}
 				}
