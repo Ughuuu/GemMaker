@@ -25,10 +25,11 @@ public abstract class ComponentUpdaterSystem extends SystemBase {
 		this(componentSystem, new HashSet<String>(), true, Integer.MAX_VALUE);
 	}
 
-	protected ComponentUpdaterSystem(ComponentSystem componentSystem, Set<String> configuration, boolean enable, int priority) {
+	protected ComponentUpdaterSystem(ComponentSystem componentSystem, Set<String> configuration, boolean enable,
+			int priority) {
 		super(enable, priority);
 		this.configuration = configuration;
-		componentSystem.addComponentListener(this);
+		componentSystem.addComponentUpdater(this);
 	}
 
 	public void onAfterEntities() {

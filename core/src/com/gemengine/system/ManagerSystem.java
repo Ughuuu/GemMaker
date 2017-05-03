@@ -1,9 +1,7 @@
 package com.gemengine.system;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
@@ -16,6 +14,7 @@ import com.gemengine.system.base.ComponentListener;
 import com.gemengine.system.base.SystemBase;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;
+import com.gemengine.system.helper.Messages;
 import com.gemengine.system.loaders.CodeLoader;
 import com.gemengine.system.loaders.LoaderData;
 import com.gemengine.system.loaders.SourceLoader;
@@ -26,7 +25,7 @@ import com.google.inject.Inject;
 import lombok.val;
 
 public class ManagerSystem extends TimedSystem implements AssetListener {
-	public static final String codeFolder = "code/";
+	public static final String codeFolder = Messages.getString("ManagerSystem.CodeFolder"); //$NON-NLS-1$
 	private final AssetSystem assetSystem;
 	private final SystemManager systemManager;
 	private boolean reload = true;
@@ -38,6 +37,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		super(300, true, 1);
 		this.assetSystem = assetSystem;
 		this.systemManager = systemManager;
+		assetSystem.addAssetListener(this);
 	}
 
 	public void addListener(ComponentListener componentListener) {
@@ -47,8 +47,8 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 	@Override
 	public void onChange(ChangeType changeType, String oldName, String newName) {
 		String extension = AssetSystemHelper.getExtension(oldName);
-		System.out.println(extension + " File changed " + changeType.toString());
-		if (extension.equals(".class")) {
+		System.out.println(extension + "File changed " + changeType.toString());
+		if (extension.equals(Messages.getString("ManagerSystem.ClassFileExtension"))) { //$NON-NLS-1$
 			reload = true;
 		}
 	}
@@ -57,7 +57,6 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 	public void onInit() {
 		setSourceSync(assetSystem);
 		setCodeSync(ManagerSystem.class.getClassLoader(), assetSystem);
-		assetSystem.addAssetListener(this);
 		assetSystem.loadFolder("assets/");
 	}
 
@@ -65,18 +64,6 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 	public void onUpdate(float delta) {
 		compileSources();
 		updateCode();
-	}
-
-	private void setCodeSync(ClassLoader classsLoader, AssetSystem assetSystem) {
-		val codeData = new LoaderData(ClassSync.class, new CodeLoader.CodeParameter(classsLoader));
-		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.getFileHandleResolver()),
-				".class");
-	}
-
-	private void setSourceSync(AssetSystem assetSystem) {
-		val sourceData = new LoaderData(SourceSync.class);
-		SourceSync.options = "-8";
-		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.getFileHandleResolver()), ".java");
 	}
 
 	private void compileSources() {
@@ -88,6 +75,19 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 				System.out.println(syncs[0].getCompileError());
 			}
 		}
+	}
+
+	private void setCodeSync(ClassLoader classsLoader, AssetSystem assetSystem) {
+		val codeData = new LoaderData(ClassSync.class, new CodeLoader.CodeParameter(classsLoader));
+		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.getFileHandleResolver()),
+				Messages.getString("ManagerSystem.ClassFileExtension")); //$NON-NLS-1$
+	}
+
+	private void setSourceSync(AssetSystem assetSystem) {
+		val sourceData = new LoaderData(SourceSync.class);
+		SourceSync.options = Messages.getString("ManagerSystem.CompileOptions"); //$NON-NLS-1$
+		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.getFileHandleResolver()),
+				Messages.getString("ManagerSystem.SourceFileExtension")); //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 						systemManager.replaceType((Class<? extends SystemBase>) cls);
 					} else if (TypeManager.extendsType(cls, Component.class)) {
 						for (val listener : listeners.entrySet()) {
-							listener.getValue().onUpdate(cls);
+							// listener.getValue().onTypeChange(cls);
 						}
 					}
 				} catch (Throwable t) {

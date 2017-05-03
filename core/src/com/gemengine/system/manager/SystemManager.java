@@ -2,8 +2,6 @@ package com.gemengine.system.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +40,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 		doMapping();
 	}
 
+	@Override
 	public void onInit() {
 		super.onInit();
 		for (SystemBase system : baseSystems) {

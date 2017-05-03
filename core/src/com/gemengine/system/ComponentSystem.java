@@ -10,11 +10,13 @@ import java.util.TreeSet;
 
 import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
+import com.gemengine.system.base.ComponentListener;
+import com.gemengine.system.base.ComponentListener.ComponentChangeType;
+import com.gemengine.system.base.ComponentUpdaterSystem;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.manager.SystemManager;
 import com.google.inject.Inject;
 
-import com.gemengine.system.base.ComponentUpdaterSystem;
 import lombok.val;
 
 public class ComponentSystem extends TimedSystem {
@@ -27,6 +29,7 @@ public class ComponentSystem extends TimedSystem {
 
 	private final SystemManager systemManager;
 	private final Set<ComponentUpdaterSystem> componentUpdaterSystems = new TreeSet<ComponentUpdaterSystem>();
+	private final Set<ComponentListener> componentListeners = new HashSet<ComponentListener>();
 	private final Map<Set<String>, Set<Entity>> configurationToEntities = new HashMap<Set<String>, Set<Entity>>();
 
 	@Inject
@@ -35,63 +38,12 @@ public class ComponentSystem extends TimedSystem {
 		this.systemManager = systemManager;
 	}
 
-	private void getSupertypes(Class<?> cls, List<String> supertypes) {
-		if (cls == null || cls.equals(Object.class)) {
-			return;
-		}
-		supertypes.add(cls.getName());
-		getSupertypes(cls.getSuperclass(), supertypes);
+	public void addComponentListener(ComponentListener componentListener) {
+		componentListeners.add(componentListener);
 	}
 
-	private <T extends Component> void addComponent(Entity ent, T component) {
-		int id = component.getId();
-		components.put(id, component);
-		componentToEntity.put(id, ent);
-		componentToType.put(id, component.getClass().getName());
-	}
-
-	private <T extends Component> void addType(Entity ent, T component) {
-		int ownerId = ent.getId();
-		int id = component.getId();
-		List<String> supertypes = new ArrayList<String>();
-		getSupertypes(component.getClass(), supertypes);
-		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);
-		if (typeToComponentLimited == null) {
-			typeToComponentLimited = new HashMap<String, List<Integer>>();
-			entityToTypeToComponents.put(ownerId, typeToComponentLimited);
-		}
-		for (String supertype : supertypes) {
-			List<Integer> typeComponents = typeToComponentLimited.get(supertype);
-			if (typeComponents == null) {
-				typeComponents = new ArrayList<Integer>();
-				typeToComponentLimited.put(supertype, typeComponents);
-			}
-			typeComponents.add(id);
-
-			List<Integer> typeToComponent = typeToComponents.get(supertype);
-			if (typeToComponent == null) {
-				typeToComponent = new ArrayList<Integer>();
-				typeToComponents.put(supertype, typeToComponent);
-			}
-			typeToComponent.add(id);
-		}
-	}
-
-	public <T extends Component> T create(Entity ent, Class<T> type) {
-		if (ent == null) {
-			return null;
-		}
-		T component = systemManager.inject(type);
-		if (component == null) {
-			return null;
-		}
-		addComponent(ent, component);
-		addType(ent, component);
-		return component;
-	}
-
-	public void addComponentListener(ComponentUpdaterSystem componentListener) {
-		componentUpdaterSystems.add(componentListener);
+	public void addComponentUpdater(ComponentUpdaterSystem componentUpdater) {
+		componentUpdaterSystems.add(componentUpdater);
 	}
 
 	public void clear(Entity ent) {
@@ -102,6 +54,9 @@ public class ComponentSystem extends TimedSystem {
 		val entityToComponent = entityToTypeToComponents.get(ownerId);
 		for (val key : entityToComponent.entrySet()) {
 			Component component = components.remove(key.getValue());
+			for (ComponentListener listener : componentListeners) {
+				listener.onChange(ComponentChangeType.DELETE, component);
+			}
 			if (component == null) {
 				continue;
 			}
@@ -110,6 +65,25 @@ public class ComponentSystem extends TimedSystem {
 			componentToEntity.remove(id);
 		}
 		entityToTypeToComponents.remove(ownerId);
+	}
+
+	public <T extends Component> T create(Entity ent, Class<T> type) {
+		List<Integer> types = typeToComponents.get(type);
+		if (types == null || !types.isEmpty() || ent == null) {
+			return null;
+		}
+		T component = null;
+		try {
+			component = systemManager.inject(type);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (component == null) {
+			return null;
+		}
+		addComponent(ent, component);
+		addType(ent, component);
+		return component;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -123,7 +97,7 @@ public class ComponentSystem extends TimedSystem {
 		for (int id : typeToComponent.get(type.getName())) {
 			entityComponents.add((T) components.get(id));
 		}
-		return (List<T>) entityComponents;
+		return entityComponents;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -176,12 +150,52 @@ public class ComponentSystem extends TimedSystem {
 		if (component == null) {
 			return;
 		}
+		for (ComponentListener listener : componentListeners) {
+			listener.onChange(ComponentChangeType.DELETE, component);
+		}
 		removeFromTypeMap(id, component.getClass());
 		removeFromEntityMap(ent, id, component.getClass());
 	}
 
 	public <T extends Component> void remove(Entity ent, T component) {
 		remove(ent, component.getId());
+	}
+
+	private <T extends Component> void addComponent(Entity ent, T component) {
+		int id = component.getId();
+		components.put(id, component);
+		componentToEntity.put(id, ent);
+		componentToType.put(id, component.getClass().getName());
+		for (ComponentListener listener : componentListeners) {
+			listener.onChange(ComponentChangeType.ADD, component);
+		}
+	}
+
+	private <T extends Component> void addType(Entity ent, T component) {
+		int ownerId = ent.getId();
+		int id = component.getId();
+		List<String> supertypes = new ArrayList<String>();
+		getSupertypes(component.getClass(), supertypes);
+		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);
+		if (typeToComponentLimited == null) {
+			typeToComponentLimited = new HashMap<String, List<Integer>>();
+			entityToTypeToComponents.put(ownerId, typeToComponentLimited);
+		}
+		for (String supertype : supertypes) {
+			List<Integer> typeComponents = typeToComponentLimited.get(supertype);
+			if (typeComponents == null) {
+				typeComponents = new ArrayList<Integer>();
+				typeToComponentLimited.put(supertype, typeComponents);
+			}
+			typeComponents.add(id);
+
+			List<Integer> typeToComponent = typeToComponents.get(supertype);
+			if (typeToComponent == null) {
+				typeToComponent = new ArrayList<Integer>();
+				typeToComponents.put(supertype, typeToComponent);
+			}
+			typeToComponent.add(id);
+		}
 	}
 
 	private Set<Entity> getEntitiesFromConfiguration(Set<String> configuration) {
@@ -201,6 +215,14 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		return entityCollection;
+	}
+
+	private void getSupertypes(Class<?> cls, List<String> supertypes) {
+		if (cls == null || cls.equals(Object.class)) {
+			return;
+		}
+		supertypes.add(cls.getName());
+		getSupertypes(cls.getSuperclass(), supertypes);
 	}
 
 	private void removeFromEntityMap(Entity ent, int id, Class<?> type) {

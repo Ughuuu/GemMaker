@@ -1,7 +1,5 @@
 package com.gemengine.system.base;
 
-import org.eclipse.jdt.internal.compiler.ast.ThisReference;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,12 +24,6 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 		id = lastId++;
 	}
 
-	public void onEnd() {
-	}
-
-	public void onInit() {
-	}
-
 	@Override
 	public int compareTo(SystemBase other) {
 		if (this.getPriority() < other.getPriority()) {
@@ -41,5 +33,11 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 			return 1;
 		}
 		return 0;
+	}
+
+	public void onEnd() {
+	}
+
+	public void onInit() {
 	}
 }

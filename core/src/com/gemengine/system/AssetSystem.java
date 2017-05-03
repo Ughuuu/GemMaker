@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.jsync.sync.Commiter;
 
 import com.badlogic.gdx.Gdx;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.utils.Array;
 import com.gemengine.system.base.AssetListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;
+import com.gemengine.system.helper.Messages;
 import com.gemengine.system.loaders.LoaderData;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -34,7 +36,7 @@ import lombok.val;
 public class AssetSystem extends TimedSystem {
 	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
 	private static final Map<String, LoaderData> folderToLoaderMap = new HashMap<String, LoaderData>();
-	public final static String assetsFolder = "assets/";
+	public final static String assetsFolder = Messages.getString("AssetSystem.AssetsFolder"); //$NON-NLS-1$
 	private List<String> loadFolders;
 	private final Map<String, List<String>> folderToAsset;
 	private final Map<String, String> assetToFolder;
@@ -57,7 +59,7 @@ public class AssetSystem extends TimedSystem {
 		this.useBlockingLoad = useBlockingLoad;
 		Commiter commiter = null;
 		try {
-			commiter = new Commiter(assetsFolder, "master");
+			commiter = new Commiter(assetsFolder, Messages.getString("AssetSystem.GitBranch")); //$NON-NLS-1$
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -240,6 +242,9 @@ public class AssetSystem extends TimedSystem {
 			for (String path : commiter.getFiles()) {
 				for (String loadFolder : loadFolders) {
 					placeAsset(assetsFolder + path, loadFolder);
+					for (val assetListener : assetListeners.entrySet()) {
+						assetListener.getValue().onChange(ChangeType.ADD, assetsFolder + path, assetsFolder + path);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -259,6 +264,9 @@ public class AssetSystem extends TimedSystem {
 				if (type != null) {
 					for (String loadFolder : loadFolders) {
 						placeAsset(path, loadFolder);
+						for (val assetListener : assetListeners.entrySet()) {
+							assetListener.getValue().onChange(ChangeType.ADD, path, path);
+						}
 					}
 				}
 			}
@@ -270,8 +278,8 @@ public class AssetSystem extends TimedSystem {
 	}
 
 	private String getLastFolder(String path) {
-		int folderPosLast = path.lastIndexOf('/');
-		int folderPosFirst = path.indexOf('/');
+		int folderPosLast = path.lastIndexOf(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
+		int folderPosFirst = path.indexOf(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
 		return path.substring(folderPosFirst + 1, folderPosLast + 1);
 	}
 
@@ -313,13 +321,13 @@ public class AssetSystem extends TimedSystem {
 	private void placeAsset(@NonNull String path, String loadFolder) {
 		String folder = assetToFolder.get(path);
 		if (folder == null) {
-			int folderPos = path.lastIndexOf('/');
+			int folderPos = path.lastIndexOf(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
 			folder = path.substring(0, folderPos + 1);
 			assetToFolder.put(path, folder);
 			StringBuilder sb = new StringBuilder();
-			for (String subFolder : folder.split("/")) {
+			for (String subFolder : folder.split(Messages.getString("AssetSystem.FileSeparator"))) { //$NON-NLS-1$
 				sb.append(subFolder);
-				sb.append('/');
+				sb.append(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
 				String subfolderFullPath = sb.toString();
 				List<String> filesInFolder = folderToAsset.get(subfolderFullPath);
 				if (filesInFolder == null) {
@@ -346,9 +354,9 @@ public class AssetSystem extends TimedSystem {
 			return;
 		}
 		StringBuilder sb = new StringBuilder();
-		for (String subFolder : folder.split("/")) {
+		for (String subFolder : folder.split(Messages.getString("AssetSystem.FileSeparator"))) { //$NON-NLS-1$
 			sb.append(subFolder);
-			sb.append('/');
+			sb.append(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
 			String subfolderFullPath = sb.toString();
 			List<String> filesInFolder = folderToAsset.get(subfolderFullPath);
 			filesInFolder.remove(path);

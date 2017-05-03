@@ -50,17 +50,18 @@ public class AssetSystemHelper {
 		assetSystem.addLoaderDefault(new LoaderData(BitmapFont.class), new BitmapFontLoader(resolver), ".fnt");
 		assetSystem.addLoaderDefault(new LoaderData(Music.class), new MusicLoader(resolver), ".wav", ".mp3", ".ogg");
 		assetSystem.addLoaderDefault(new LoaderData(Sound.class), new SoundLoader(resolver), ".wav", ".mp3", ".ogg");
-		assetSystem.addTypeFolder(new LoaderData(Sound.class), "sound/");
-		assetSystem.addTypeFolder(new LoaderData(Music.class), "music/");
+		assetSystem.addTypeFolder(new LoaderData(Sound.class), Messages.getString("AssetSystemHelper.SoundFolder")); //$NON-NLS-1$
+		assetSystem.addTypeFolder(new LoaderData(Music.class), Messages.getString("AssetSystemHelper.MusicFolder")); //$NON-NLS-1$
 		assetSystem.addLoaderDefault(new LoaderData(Pixmap.class), new PixmapLoader(resolver), ".png", ".jpg", ".jpeg",
 				".bmp");
 		assetSystem.addLoaderDefault(new LoaderData(TextureAtlas.class), new TextureAtlasLoader(resolver), ".png",
 				".jpg", ".jpeg", ".bmp");
 		assetSystem.addLoaderDefault(new LoaderData(Texture.class), new TextureLoader(resolver), ".png", ".jpg",
 				".jpeg", ".bmp");
-		assetSystem.addTypeFolder(new LoaderData(Texture.class), "img/");
-		assetSystem.addTypeFolder(new LoaderData(TextureAtlas.class), "atlas/");
-		assetSystem.addTypeFolder(new LoaderData(Pixmap.class), "pixmap/");
+		assetSystem.addTypeFolder(new LoaderData(Texture.class), Messages.getString("AssetSystemHelper.ImageFolder")); //$NON-NLS-1$
+		assetSystem.addTypeFolder(new LoaderData(TextureAtlas.class),
+				Messages.getString("AssetSystemHelper.AtlasFolder")); //$NON-NLS-1$
+		assetSystem.addTypeFolder(new LoaderData(Pixmap.class), Messages.getString("AssetSystemHelper.PixmapFolder")); //$NON-NLS-1$
 		assetSystem.addLoaderDefault(new LoaderData(Skin.class), new SkinLoader(resolver), ".json");
 
 		assetSystem.addLoaderDefault(new LoaderData(ParticleEffect.class), new ParticleEffectLoader(resolver),
