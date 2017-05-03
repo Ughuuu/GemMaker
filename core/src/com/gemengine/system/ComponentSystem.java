@@ -70,9 +70,15 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public <T extends Component> T create(Entity ent, Class<T> type) {
-		List<Integer> types = typeToComponents.get(type);
-		if (types == null || !types.isEmpty() || ent == null) {
+		if (ent == null) {
 			return null;
+		}
+		Map<String, List<Integer>> types = entityToTypeToComponents.get(ent.getId());
+		if (types != null) {
+			List<Integer> componentFromType = types.get(type.getClass().getName());
+			if ((componentFromType != null && !componentFromType.isEmpty())) {
+				return null;
+			}
 		}
 		T component = null;
 		try {

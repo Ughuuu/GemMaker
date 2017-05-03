@@ -10,14 +10,6 @@ import com.gemengine.system.ComponentSystem;
 import lombok.Getter;
 
 public abstract class ComponentUpdaterSystem extends SystemBase {
-	protected static Set<String> createConfiguration(Class<? extends Component>... components) {
-		Set<String> configuration = new HashSet<String>();
-		for (Class<? extends Component> component : components) {
-			configuration.add(component.getName());
-		}
-		return configuration;
-	}
-
 	@Getter
 	private final Set<String> configuration;
 
