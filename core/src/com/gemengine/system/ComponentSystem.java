@@ -75,7 +75,7 @@ public class ComponentSystem extends TimedSystem {
 		}
 		Map<String, List<Integer>> types = entityToTypeToComponents.get(ent.getId());
 		if (types != null) {
-			List<Integer> componentFromType = types.get(type.getClass().getName());
+			List<Integer> componentFromType = types.get(type.getName());
 			if ((componentFromType != null && !componentFromType.isEmpty())) {
 				return null;
 			}
@@ -237,14 +237,14 @@ public class ComponentSystem extends TimedSystem {
 		getSupertypes(cls.getSuperclass(), supertypes);
 	}
 
-	private void removeFromEntityMap(Entity ent, int id, Class<?> type) {
+	private void removeFromEntityMap(Entity ent, Integer id, Class<?> type) {
 		int ownerId = ent.getId();
 		val entityToComponent = entityToTypeToComponents.get(ownerId);
 		entityToComponent.remove(type.getName());
 		componentToEntity.remove(id);
 	}
 
-	private void removeFromTypeMap(int id, Class<?> type) {
+	private void removeFromTypeMap(Integer id, Class<?> type) {
 		componentToType.remove(id);
 		List<String> supertypes = new ArrayList<String>();
 		getSupertypes(type, supertypes);

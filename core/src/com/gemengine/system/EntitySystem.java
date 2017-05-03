@@ -127,6 +127,10 @@ public class EntitySystem extends SystemBase {
 		return entityToParent.get(parent.getId()) != null;
 	}
 
+	public boolean hasParent(Entity child) {
+		return entityToChildren.get(child.getId()) != null;
+	}
+
 	public void parent(Entity parent, Entity child) {
 		int parentId = parent.getId();
 		int childId = child.getId();

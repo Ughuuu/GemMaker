@@ -69,6 +69,10 @@ public class Entity {
 		return entitySystem.isParent(this);
 	}
 
+	public boolean hasParent() {
+		return entitySystem.hasParent(this);
+	}
+
 	public void remove() {
 		entitySystem.remove(this);
 	}
