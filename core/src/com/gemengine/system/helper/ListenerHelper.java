@@ -6,7 +6,7 @@ import java.util.Set;
 import com.gemengine.component.Component;
 
 public class ListenerHelper {
-	protected static Set<String> createConfiguration(Class<? extends Component>... components) {
+	public static Set<String> createConfiguration(Class<? extends Component>... components) {
 		Set<String> configuration = new HashSet<String>();
 		for (Class<? extends Component> component : components) {
 			configuration.add(component.getName());
