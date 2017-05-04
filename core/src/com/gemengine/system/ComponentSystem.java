@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.logging.log4j.MarkerManager;
+
 import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
 import com.gemengine.system.base.ComponentListener;
@@ -18,7 +20,9 @@ import com.gemengine.system.manager.SystemManager;
 import com.google.inject.Inject;
 
 import lombok.val;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class ComponentSystem extends TimedSystem {
 	private final Map<Integer, Component> components = new HashMap<Integer, Component>();
 	private final Map<Integer, Entity> componentToEntity = new HashMap<Integer, Entity>();
@@ -152,7 +156,7 @@ public class ComponentSystem extends TimedSystem {
 					updater.onBeforeEntities();
 				}
 			} catch (Throwable t) {
-				t.printStackTrace();
+				log.warn(MarkerManager.getMarker("gem"), "Component System before update", t);
 				updater.setEnable(false);
 			}
 		}
@@ -165,7 +169,7 @@ public class ComponentSystem extends TimedSystem {
 						updater.onNext(entity);
 					}
 				} catch (Throwable t) {
-					t.printStackTrace();
+					log.warn(MarkerManager.getMarker("gem"), "Component System update", t);
 					updater.setEnable(false);
 				}
 			}
@@ -176,7 +180,7 @@ public class ComponentSystem extends TimedSystem {
 					updater.onAfterEntities();
 				}
 			} catch (Throwable t) {
-				t.printStackTrace();
+				log.warn(MarkerManager.getMarker("gem"), "Component System after update", t);
 				updater.setEnable(false);
 			}
 		}

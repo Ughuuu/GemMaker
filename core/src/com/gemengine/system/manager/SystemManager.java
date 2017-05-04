@@ -8,15 +8,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.logging.log4j.MarkerManager;
+
 import com.gemengine.engine.GemConfiguration;
 import com.gemengine.system.AssetSystem;
 import com.gemengine.system.ManagerSystem;
 import com.gemengine.system.base.SystemBase;
 import com.gemengine.system.base.TimedSystem;
+import com.gemengine.system.helper.Messages;
 import com.google.inject.Module;
 
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class SystemManager extends TypeManager<SystemBase> {
 	private static enum State {
 		Added, Started, Destroyed
@@ -44,8 +49,13 @@ public class SystemManager extends TypeManager<SystemBase> {
 	public void onInit() {
 		super.onInit();
 		for (SystemBase system : baseSystems) {
-			system.onInit();
-			systemToState.put(system, State.Started);
+			try {
+				system.onInit();
+				systemToState.put(system, State.Started);
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "System Manager start", t);
+				system.setEnable(false);
+			}
 		}
 		toStart = 0;
 	}
@@ -59,7 +69,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 				try {
 					system.onUpdate(delta);
 				} catch (Throwable t) {
-					t.printStackTrace();
+					log.warn(MarkerManager.getMarker("gem"), "System Manager update", t);
 					system.setEnable(false);
 				}
 			}
@@ -75,7 +85,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 					system.onInit();
 					systemToState.put(system, State.Started);
 				} catch (Throwable t) {
-					t.printStackTrace();
+					log.warn(MarkerManager.getMarker("gem"), "System Manager init", t);
 					system.setEnable(false);
 				}
 			}

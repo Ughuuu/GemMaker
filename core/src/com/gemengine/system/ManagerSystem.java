@@ -4,6 +4,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.MarkerManager;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.jsync.sync.ClassSync;
 import org.jsync.sync.SourceSync;
@@ -23,7 +24,9 @@ import com.gemengine.system.manager.TypeManager;
 import com.google.inject.Inject;
 
 import lombok.val;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class ManagerSystem extends TimedSystem implements AssetListener {
 	public static final String codeFolder = Messages.getString("ManagerSystem.CodeFolder"); //$NON-NLS-1$
 	private final AssetSystem assetSystem;
@@ -47,7 +50,6 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 	@Override
 	public void onChange(ChangeType changeType, String oldName, String newName) {
 		String extension = AssetSystemHelper.getExtension(oldName);
-		System.out.println(extension + "File changed " + changeType.toString());
 		if (extension.equals(Messages.getString("ManagerSystem.ClassFileExtension"))) { //$NON-NLS-1$
 			reload = true;
 		}
@@ -72,7 +74,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 			if (!SourceSync.updateSource(syncs)) {
 			}
 			if (!syncs[0].getCompileError().equals("")) {
-				System.out.println(syncs[0].getCompileError());
+				log.warn(MarkerManager.getMarker("gem"), "Manager System compile error {}", syncs[0].getCompileError());
 			}
 		}
 	}
@@ -95,7 +97,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		if (!reload) {
 			return;
 		}
-		System.out.println("System Reload Triggered");
+		log.info(MarkerManager.getMarker("gem"), "Manager System reload triggered");
 		reload = false;
 		ClassSync<SystemBase>[] syncs = assetSystem.getAll(ClassSync.class);
 		if (syncs.length != 0) {
@@ -113,7 +115,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 						// Later on only regenerate those that modified.
 						systemManager.replaceType((Class<? extends SystemBase>) cls);
 						SystemBase system = systemManager.getType(cls.getName());
-						if(system != null){
+						if (system != null) {
 							system.setEnable(true);
 						}
 					} else if (TypeManager.extendsType(cls, Component.class)) {
@@ -122,7 +124,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 						}
 					}
 				} catch (Throwable t) {
-					t.printStackTrace();
+					log.warn(MarkerManager.getMarker("gem"), "Manager System update", t);
 				}
 			}
 		}

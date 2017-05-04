@@ -34,7 +34,6 @@ public class SystemManagerModule extends AbstractModule {
 				.toInstance(configuration.isUseDefaultLoaders());
 		bind(SystemManager.class).toInstance(systemManager);
 		for (val typeEntry : systemManager.types.entrySet()) {
-			// String key = typeEntry.getKey();
 			SystemBase value = typeEntry.getValue();
 			makeMapping(genericCast(value.getClass()), value);
 		}

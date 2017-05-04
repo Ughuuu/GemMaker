@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.MarkerManager;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +20,9 @@ import com.google.inject.spi.InjectionPoint;
 import com.google.inject.spi.InstanceBinding;
 
 import lombok.val;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public abstract class TypeManager<T> {
 	public static boolean extendsType(Class<?> type, Class<?> extendsType) {
 		if (type == null || type.equals(Object.class)) {
@@ -114,7 +118,7 @@ public abstract class TypeManager<T> {
 				elementAdd(newObject);
 			}
 		} catch (Throwable t) {
-			t.printStackTrace();
+			log.warn(MarkerManager.getMarker("gem"), "System Manager copy element", t);
 		}
 	}
 
@@ -145,7 +149,7 @@ public abstract class TypeManager<T> {
 				addInstances();
 				doMapping();
 			} catch (Throwable t) {
-				t.printStackTrace();
+				log.warn(MarkerManager.getMarker("gem"), "System Manager inject", t);
 			}
 		}
 		// deserialize old types into new types

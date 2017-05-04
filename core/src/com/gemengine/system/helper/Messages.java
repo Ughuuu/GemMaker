@@ -3,6 +3,13 @@ package com.gemengine.system.helper;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.MarkerManager;
+
+import com.gemengine.system.base.SystemBase;
+
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class Messages {
 	private static final String BUNDLE_NAME = "com.gemengine.system.helper.messages"; //$NON-NLS-1$
 
@@ -12,6 +19,7 @@ public class Messages {
 		try {
 			return RESOURCE_BUNDLE.getString(key);
 		} catch (MissingResourceException e) {
+			log.debug(MarkerManager.getMarker("gem"), "Missing message", e);
 			return '!' + key + '!';
 		}
 	}

@@ -1,8 +1,14 @@
 package com.gemengine.system.base;
 
+import org.apache.logging.log4j.MarkerManager;
+
+import com.gemengine.component.Component;
+
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public abstract class SystemBase implements Comparable<SystemBase> {
 	private static int lastId;
 	@Getter
@@ -18,10 +24,10 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 	}
 
 	protected SystemBase(boolean enable, int priority) {
-		System.out.println(this.getClass().getName());
 		this.enable = enable;
 		this.priority = priority;
 		id = lastId++;
+		log.debug(MarkerManager.getMarker("gem"), "System created: id {} type {}", id, this.getClass());
 	}
 
 	@Override

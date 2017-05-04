@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.logging.log4j.MarkerManager;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.jsync.sync.Commiter;
@@ -34,7 +35,9 @@ import com.google.inject.name.Named;
 
 import lombok.NonNull;
 import lombok.val;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class AssetSystem extends TimedSystem {
 	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
 	private static final Map<String, LoaderData> folderToLoaderMap = new HashMap<String, LoaderData>();
@@ -62,8 +65,8 @@ public class AssetSystem extends TimedSystem {
 		Commiter commiter = null;
 		try {
 			commiter = new Commiter(assetsFolder, Messages.getString("AssetSystem.GitBranch")); //$NON-NLS-1$
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable t) {
+			log.fatal(MarkerManager.getMarker("gem"), "AssetSystem fail git client", t);
 		}
 		this.commiter = commiter;
 		if (useDefaultLoaders) {
@@ -249,8 +252,8 @@ public class AssetSystem extends TimedSystem {
 					}
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable t) {
+			log.fatal(MarkerManager.getMarker("gem"), "AssetSystem find external files", t);
 		}
 	}
 
