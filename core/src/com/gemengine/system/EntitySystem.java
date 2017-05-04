@@ -39,7 +39,11 @@ public class EntitySystem extends SystemBase {
 		entityNameToId.put(name, ent.getId());
 		entities.put(ent.getId(), ent);
 		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.ADD, ent, ent);
+			try {
+				entityListener.onChange(EntityChangeType.ADD, ent, ent);
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
 		}
 		return ent;
 	}

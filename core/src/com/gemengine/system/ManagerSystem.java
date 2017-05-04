@@ -112,6 +112,10 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 						// For now clean all systems and regenerate them.
 						// Later on only regenerate those that modified.
 						systemManager.replaceType((Class<? extends SystemBase>) cls);
+						SystemBase system = systemManager.getType(cls.getName());
+						if(system != null){
+							system.setEnable(true);
+						}
 					} else if (TypeManager.extendsType(cls, Component.class)) {
 						for (val listener : listeners.entrySet()) {
 							// listener.getValue().onTypeChange(cls);

@@ -46,6 +46,16 @@ public class ComponentSystem extends TimedSystem {
 		componentUpdaterSystems.add(componentUpdater);
 	}
 
+	public void notifyFrom(String event, Component component) {
+		for (ComponentListener listener : componentListeners) {
+			if (listener != component) {
+				if (listener.getConfiguration().contains(component.getClass().getName())) {
+					listener.onNotify(event, component);
+				}
+			}
+		}
+	}
+
 	public void clear(Entity ent) {
 		clear(ent.getId());
 	}
@@ -81,9 +91,6 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		T component = null;
-		int newId = Component.getLastId() + 1;
-		addType(ent, newId, type);
-		componentToEntity.put(newId, ent);
 		try {
 			component = systemManager.inject(type);
 		} catch (Exception e) {
@@ -92,7 +99,8 @@ public class ComponentSystem extends TimedSystem {
 		if (component == null) {
 			return null;
 		}
-		addComponent(component);
+		addType(ent, component);
+		addComponent(ent, component);
 		component.onCreate();
 		return component;
 	}
@@ -139,17 +147,38 @@ public class ComponentSystem extends TimedSystem {
 	@Override
 	public void onUpdate(float delta) {
 		for (val updater : componentUpdaterSystems) {
-			updater.onBeforeEntities();
+			try {
+				if (updater.isEnable()) {
+					updater.onBeforeEntities();
+				}
+			} catch (Throwable t) {
+				t.printStackTrace();
+				updater.setEnable(false);
+			}
 		}
 		for (val updater : componentUpdaterSystems) {
 			val configuration = updater.getConfiguration();
 			val entities = getEntitiesFromConfiguration(configuration);
 			for (val entity : entities) {
-				updater.onNext(entity);
+				try {
+					if (updater.isEnable()) {
+						updater.onNext(entity);
+					}
+				} catch (Throwable t) {
+					t.printStackTrace();
+					updater.setEnable(false);
+				}
 			}
 		}
 		for (val updater : componentUpdaterSystems) {
-			updater.onAfterEntities();
+			try {
+				if (updater.isEnable()) {
+					updater.onAfterEntities();
+				}
+			} catch (Throwable t) {
+				t.printStackTrace();
+				updater.setEnable(false);
+			}
 		}
 	}
 
@@ -178,8 +207,10 @@ public class ComponentSystem extends TimedSystem {
 		remove(ent, component.getId());
 	}
 
-	private <T extends Component> void addComponent(T component) {
+	private <T extends Component> void addComponent(Entity ent, T component) {
 		int id = component.getId();
+		components.put(component.getId(), component);
+		componentToEntity.put(component.getId(), ent);
 		componentToType.put(id, component.getClass().getName());
 		for (ComponentListener listener : componentListeners) {
 			if (listener.getConfiguration().contains(component.getClass().getName())) {
@@ -188,8 +219,10 @@ public class ComponentSystem extends TimedSystem {
 		}
 	}
 
-	private <T extends Component> void addType(Entity ent, int componentId, Class<?> componentClass) {
+	private <T extends Component> void addType(Entity ent, T component) {
 		int ownerId = ent.getId();
+		Class<?> componentClass = component.getClass();
+		int componentId = component.getId();
 		List<String> supertypes = new ArrayList<String>();
 		getSupertypes(componentClass, supertypes);
 		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);

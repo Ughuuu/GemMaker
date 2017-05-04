@@ -11,6 +11,8 @@ public interface ComponentListener {
 
 	public <T extends Component> void onChange(ComponentChangeType changeType, T component);
 
+	public <T extends Component> void onNotify(String event, T notifier);
+
 	public <T extends Component> void onTypeChange(Class<T> type);
 
 	public Set<String> getConfiguration();

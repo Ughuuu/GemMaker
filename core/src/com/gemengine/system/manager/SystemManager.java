@@ -56,7 +56,12 @@ public class SystemManager extends TypeManager<SystemBase> {
 		for (TimedSystem system : timedSystems) {
 			State state = systemToState.get(system);
 			if (state == State.Started) {
-				system.onUpdate(delta);
+				try {
+					system.onUpdate(delta);
+				} catch (Throwable t) {
+					t.printStackTrace();
+					system.setEnable(false);
+				}
 			}
 		}
 		if (toStart == 0) {
@@ -66,8 +71,13 @@ public class SystemManager extends TypeManager<SystemBase> {
 		for (SystemBase system : baseSystems) {
 			State state = systemToState.get(system);
 			if (state == State.Added) {
-				system.onInit();
-				systemToState.put(system, State.Started);
+				try {
+					system.onInit();
+					systemToState.put(system, State.Started);
+				} catch (Throwable t) {
+					t.printStackTrace();
+					system.setEnable(false);
+				}
 			}
 		}
 	}
