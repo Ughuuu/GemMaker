@@ -97,6 +97,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		if (!reload) {
 			return;
 		}
+		log.info(MarkerManager.getMarker("gem"), "---------------------------------------------------");
 		log.info(MarkerManager.getMarker("gem"), "Manager System reload triggered");
 		reload = false;
 		ClassSync<SystemBase>[] syncs = assetSystem.getAll(ClassSync.class);

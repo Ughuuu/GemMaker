@@ -16,7 +16,7 @@ public abstract class Component {
 	private static int lastId;
 	@Getter
 	@Setter
-	private boolean enable;
+	private boolean enable = true;
 	@Getter
 	private final int id;
 

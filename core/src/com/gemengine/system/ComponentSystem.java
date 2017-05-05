@@ -1,6 +1,7 @@
 package com.gemengine.system;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
 import com.gemengine.system.base.ComponentListener;
 import com.gemengine.system.base.ComponentListener.ComponentChangeType;
+import com.gemengine.system.base.EntityComponentListener;
 import com.gemengine.system.base.ComponentUpdaterSystem;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.manager.SystemManager;
@@ -32,8 +34,9 @@ public class ComponentSystem extends TimedSystem {
 	private final Map<String, List<Integer>> typeToComponents = new HashMap<String, List<Integer>>();
 
 	private final SystemManager systemManager;
-	private final Set<ComponentUpdaterSystem> componentUpdaterSystems = new TreeSet<ComponentUpdaterSystem>();
-	private final Set<ComponentListener> componentListeners = new HashSet<ComponentListener>();
+	private final List<ComponentUpdaterSystem> componentUpdaterSystems = new ArrayList<ComponentUpdaterSystem>();
+	private final List<ComponentListener> componentListeners = new ArrayList<ComponentListener>();
+	private final List<EntityComponentListener> entityComponentListener = new ArrayList<EntityComponentListener>();
 	private final Map<Set<String>, Set<Entity>> configurationToEntities = new HashMap<Set<String>, Set<Entity>>();
 
 	@Inject
@@ -48,6 +51,7 @@ public class ComponentSystem extends TimedSystem {
 
 	public void addComponentUpdater(ComponentUpdaterSystem componentUpdater) {
 		componentUpdaterSystems.add(componentUpdater);
+		Collections.sort(componentUpdaterSystems);
 	}
 
 	public void notifyFrom(String event, Component component) {
@@ -56,6 +60,11 @@ public class ComponentSystem extends TimedSystem {
 				if (listener.getConfiguration().contains(component.getClass().getName())) {
 					listener.onNotify(event, component);
 				}
+			}
+		}
+		for (EntityComponentListener listener : entityComponentListener) {
+			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
+				listener.onNotify(event, component);
 			}
 		}
 	}
