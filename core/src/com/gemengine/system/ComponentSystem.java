@@ -36,7 +36,7 @@ public class ComponentSystem extends TimedSystem {
 	private final SystemManager systemManager;
 	private final List<ComponentUpdaterSystem> componentUpdaterSystems = new ArrayList<ComponentUpdaterSystem>();
 	private final List<ComponentListener> componentListeners = new ArrayList<ComponentListener>();
-	private final List<EntityComponentListener> entityComponentListener = new ArrayList<EntityComponentListener>();
+	private final List<EntityComponentListener> entityComponentListeners = new ArrayList<EntityComponentListener>();
 	private final Map<Set<String>, Set<Entity>> configurationToEntities = new HashMap<Set<String>, Set<Entity>>();
 
 	@Inject
@@ -45,6 +45,10 @@ public class ComponentSystem extends TimedSystem {
 		this.systemManager = systemManager;
 	}
 
+	public void addEntityComponentListener(EntityComponentListener entityComponentListener) {
+		entityComponentListeners.add(entityComponentListener);
+	}
+	
 	public void addComponentListener(ComponentListener componentListener) {
 		componentListeners.add(componentListener);
 	}
@@ -62,7 +66,7 @@ public class ComponentSystem extends TimedSystem {
 				}
 			}
 		}
-		for (EntityComponentListener listener : entityComponentListener) {
+		for (EntityComponentListener listener : entityComponentListeners) {
 			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
 				listener.onNotify(event, component);
 			}
