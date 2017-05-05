@@ -5,8 +5,6 @@ import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.MarkerManager;
 
-import com.gemengine.system.base.SystemBase;
-
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2

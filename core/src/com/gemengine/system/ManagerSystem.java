@@ -69,7 +69,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 	}
 
 	private void compileSources() {
-		SourceSync[] syncs = assetSystem.getAll(SourceSync.class);
+		SourceSync[] syncs = assetSystem.all(SourceSync.class);
 		if (syncs.length != 0) {
 			if (!SourceSync.updateSource(syncs)) {
 			}
@@ -81,14 +81,14 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 
 	private void setCodeSync(ClassLoader classsLoader, AssetSystem assetSystem) {
 		val codeData = new LoaderData(ClassSync.class, new CodeLoader.CodeParameter(classsLoader));
-		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.getFileHandleResolver()),
+		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.fileHandleResolver()),
 				Messages.getString("ManagerSystem.ClassFileExtension")); //$NON-NLS-1$
 	}
 
 	private void setSourceSync(AssetSystem assetSystem) {
 		val sourceData = new LoaderData(SourceSync.class);
 		SourceSync.options = Messages.getString("ManagerSystem.CompileOptions"); //$NON-NLS-1$
-		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.getFileHandleResolver()),
+		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.fileHandleResolver()),
 				Messages.getString("ManagerSystem.SourceFileExtension")); //$NON-NLS-1$
 	}
 
@@ -100,7 +100,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		log.info(MarkerManager.getMarker("gem"), "---------------------------------------------------");
 		log.info(MarkerManager.getMarker("gem"), "Manager System reload triggered");
 		reload = false;
-		ClassSync<SystemBase>[] syncs = assetSystem.getAll(ClassSync.class);
+		ClassSync<SystemBase>[] syncs = assetSystem.all(ClassSync.class);
 		if (syncs.length != 0) {
 			try {
 				ClassSync.updateClass(syncs);

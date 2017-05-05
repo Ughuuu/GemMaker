@@ -6,7 +6,6 @@ import java.util.Set;
 import org.apache.logging.log4j.MarkerManager;
 
 import com.gemengine.component.Component;
-import com.gemengine.engine.Gem;
 import com.gemengine.system.ComponentSystem;
 import com.gemengine.system.EntitySystem;
 
@@ -39,8 +38,16 @@ public class Entity {
 		return componentSystem.create(this, type);
 	}
 
+	public Set<Entity> children() {
+		return entitySystem.children(this);
+	}
+
 	public void deparent() {
 		entitySystem.deparent(this);
+	}
+
+	public Set<Entity> descendants() {
+		return entitySystem.descendants(this);
 	}
 
 	public <T extends Component> T findComponent(Class<T> type) {
@@ -55,28 +62,20 @@ public class Entity {
 		return componentSystem.find(this, type);
 	}
 
-	public Set<Entity> getChildren() {
-		return entitySystem.getChildren(this);
-	}
-
-	public Set<Entity> getDescendants() {
-		return entitySystem.getDescendants(this);
-	}
-
-	public Entity getParent() {
-		return entitySystem.getParent(this);
-	}
-
-	public Set<Entity> getPredessesors() {
-		return entitySystem.getPredessesors(this);
+	public boolean hasParent() {
+		return entitySystem.hasParent(this);
 	}
 
 	public boolean isParent() {
 		return entitySystem.isParent(this);
 	}
 
-	public boolean hasParent() {
-		return entitySystem.hasParent(this);
+	public Entity parent() {
+		return entitySystem.parent(this);
+	}
+
+	public Set<Entity> predessesors() {
+		return entitySystem.predessesors(this);
 	}
 
 	public void remove() {

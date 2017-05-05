@@ -3,7 +3,6 @@ package com.gemengine.system.base;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
 import com.gemengine.system.ComponentSystem;
 

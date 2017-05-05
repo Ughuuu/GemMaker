@@ -2,8 +2,6 @@ package com.gemengine.system.base;
 
 import org.apache.logging.log4j.MarkerManager;
 
-import com.gemengine.component.Component;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

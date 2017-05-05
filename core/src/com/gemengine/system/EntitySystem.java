@@ -31,6 +31,18 @@ public class EntitySystem extends SystemBase {
 		entityListeners.add(entityListener);
 	}
 
+	public Set<Entity> children(Entity parent) {
+		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
+		Set<Entity> children = new HashSet<Entity>();
+		if (childrenIds == null) {
+			return children;
+		}
+		for (int child : childrenIds) {
+			children.add(find(child));
+		}
+		return children;
+	}
+
 	public Entity create(String name) {
 		if (entityNameToId.get(name) != null) {
 			return null;
@@ -69,6 +81,19 @@ public class EntitySystem extends SystemBase {
 		}
 	}
 
+	public Set<Entity> descendants(Entity parent) {
+		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
+		Set<Entity> children = new HashSet<Entity>();
+		if (childrenIds == null) {
+			return children;
+		}
+		for (int child : childrenIds) {
+			Entity childEntity = find(child);
+			children.addAll(descendants(childEntity));
+		}
+		return children;
+	}
+
 	public Entity find(int id) {
 		Entity ent = entities.get(id);
 		return ent;
@@ -82,57 +107,20 @@ public class EntitySystem extends SystemBase {
 		return find(id);
 	}
 
-	public Set<Entity> getChildren(Entity parent) {
-		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
-		Set<Entity> children = new HashSet<Entity>();
-		if (childrenIds == null) {
-			return children;
-		}
-		for (int child : childrenIds) {
-			children.add(find(child));
-		}
-		return children;
-	}
-
-	public Set<Entity> getDescendants(Entity parent) {
-		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
-		Set<Entity> children = new HashSet<Entity>();
-		if (childrenIds == null) {
-			return children;
-		}
-		for (int child : childrenIds) {
-			Entity childEntity = find(child);
-			children.addAll(getDescendants(childEntity));
-		}
-		return children;
-	}
-
-	public Entity getParent(Entity child) {
-		Integer parentId = entityToParent.get(child.getId());
-		if (parentId == null) {
-			return null;
-		}
-		return find(parentId);
-	}
-
-	public Set<Entity> getPredessesors(Entity child) {
-		Integer parentId = entityToParent.get(child.getId());
-		Set<Entity> parents = new HashSet<Entity>();
-		if (parentId == null) {
-			return parents;
-		}
-		Entity parent = find(parentId);
-		parents.add(parent);
-		parents.addAll(getPredessesors(parent));
-		return parents;
+	public boolean hasParent(Entity child) {
+		return entityToChildren.get(child.getId()) != null;
 	}
 
 	public boolean isParent(Entity parent) {
 		return entityToParent.get(parent.getId()) != null;
 	}
 
-	public boolean hasParent(Entity child) {
-		return entityToChildren.get(child.getId()) != null;
+	public Entity parent(Entity child) {
+		Integer parentId = entityToParent.get(child.getId());
+		if (parentId == null) {
+			return null;
+		}
+		return find(parentId);
 	}
 
 	public void parent(Entity parent, Entity child) {
@@ -148,6 +136,18 @@ public class EntitySystem extends SystemBase {
 		for (val entityListener : entityListeners) {
 			entityListener.onChange(EntityChangeType.PARENTED, parent, child);
 		}
+	}
+
+	public Set<Entity> predessesors(Entity child) {
+		Integer parentId = entityToParent.get(child.getId());
+		Set<Entity> parents = new HashSet<Entity>();
+		if (parentId == null) {
+			return parents;
+		}
+		Entity parent = find(parentId);
+		parents.add(parent);
+		parents.addAll(predessesors(parent));
+		return parents;
 	}
 
 	public void remove(Entity ent) {

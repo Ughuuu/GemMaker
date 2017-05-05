@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.logging.log4j.MarkerManager;
 
@@ -15,8 +14,8 @@ import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
 import com.gemengine.system.base.ComponentListener;
 import com.gemengine.system.base.ComponentListener.ComponentChangeType;
-import com.gemengine.system.base.EntityComponentListener;
 import com.gemengine.system.base.ComponentUpdaterSystem;
+import com.gemengine.system.base.EntityComponentListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.manager.SystemManager;
 import com.google.inject.Inject;
@@ -45,10 +44,6 @@ public class ComponentSystem extends TimedSystem {
 		this.systemManager = systemManager;
 	}
 
-	public void addEntityComponentListener(EntityComponentListener entityComponentListener) {
-		entityComponentListeners.add(entityComponentListener);
-	}
-	
 	public void addComponentListener(ComponentListener componentListener) {
 		componentListeners.add(componentListener);
 	}
@@ -58,19 +53,8 @@ public class ComponentSystem extends TimedSystem {
 		Collections.sort(componentUpdaterSystems);
 	}
 
-	public void notifyFrom(String event, Component component) {
-		for (ComponentListener listener : componentListeners) {
-			if (listener != component) {
-				if (listener.getConfiguration().contains(component.getClass().getName())) {
-					listener.onNotify(event, component);
-				}
-			}
-		}
-		for (EntityComponentListener listener : entityComponentListeners) {
-			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
-				listener.onNotify(event, component);
-			}
-		}
+	public void addEntityComponentListener(EntityComponentListener entityComponentListener) {
+		entityComponentListeners.add(entityComponentListener);
 	}
 
 	public void clear(Entity ent) {
@@ -157,6 +141,21 @@ public class ComponentSystem extends TimedSystem {
 		return componentToEntity.get(id);
 	}
 
+	public void notifyFrom(String event, Component component) {
+		for (ComponentListener listener : componentListeners) {
+			if (listener != component) {
+				if (listener.getConfiguration().contains(component.getClass().getName())) {
+					listener.onNotify(event, component);
+				}
+			}
+		}
+		for (EntityComponentListener listener : entityComponentListeners) {
+			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
+				listener.onNotify(event, component);
+			}
+		}
+	}
+
 	@Override
 	public void onInit() {
 	}
@@ -175,7 +174,7 @@ public class ComponentSystem extends TimedSystem {
 		}
 		for (val updater : componentUpdaterSystems) {
 			val configuration = updater.getConfiguration();
-			val entities = getEntitiesFromConfiguration(configuration);
+			val entities = entitiesFromConfiguration(configuration);
 			for (val entity : entities) {
 				try {
 					if (updater.isEnable()) {
@@ -241,7 +240,7 @@ public class ComponentSystem extends TimedSystem {
 		Class<?> componentClass = component.getClass();
 		int componentId = component.getId();
 		List<String> supertypes = new ArrayList<String>();
-		getSupertypes(componentClass, supertypes);
+		supertypes(componentClass, supertypes);
 		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);
 		if (typeToComponentLimited == null) {
 			typeToComponentLimited = new HashMap<String, List<Integer>>();
@@ -264,7 +263,7 @@ public class ComponentSystem extends TimedSystem {
 		}
 	}
 
-	private Set<Entity> getEntitiesFromConfiguration(Set<String> configuration) {
+	private Set<Entity> entitiesFromConfiguration(Set<String> configuration) {
 		Set<Entity> entityCollection = configurationToEntities.get(configuration);
 		if (entityCollection == null) {
 			entityCollection = new HashSet<Entity>();
@@ -283,14 +282,6 @@ public class ComponentSystem extends TimedSystem {
 		return entityCollection;
 	}
 
-	private void getSupertypes(Class<?> cls, List<String> supertypes) {
-		if (cls == null || cls.equals(Object.class)) {
-			return;
-		}
-		supertypes.add(cls.getName());
-		getSupertypes(cls.getSuperclass(), supertypes);
-	}
-
 	private void removeFromEntityMap(Entity ent, Integer id, Class<?> type) {
 		int ownerId = ent.getId();
 		val entityToComponent = entityToTypeToComponents.get(ownerId);
@@ -301,7 +292,7 @@ public class ComponentSystem extends TimedSystem {
 	private void removeFromTypeMap(Integer id, Class<?> type) {
 		componentToType.remove(id);
 		List<String> supertypes = new ArrayList<String>();
-		getSupertypes(type, supertypes);
+		supertypes(type, supertypes);
 		for (String typeName : supertypes) {
 			val typeToComponent = typeToComponents.get(typeName);
 			if (typeToComponent.size() == 1) {
@@ -310,5 +301,13 @@ public class ComponentSystem extends TimedSystem {
 				typeToComponent.remove(id);
 			}
 		}
+	}
+
+	private void supertypes(Class<?> cls, List<String> supertypes) {
+		if (cls == null || cls.equals(Object.class)) {
+			return;
+		}
+		supertypes.add(cls.getName());
+		supertypes(cls.getSuperclass(), supertypes);
 	}
 }

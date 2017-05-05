@@ -46,7 +46,7 @@ public class AssetSystemHelper {
 	}
 
 	public static void setDefaultLoaders(AssetSystem assetSystem) {
-		FileHandleResolver resolver = assetSystem.getFileHandleResolver();
+		FileHandleResolver resolver = assetSystem.fileHandleResolver();
 		assetSystem.addLoaderDefault(new LoaderData(BitmapFont.class), new BitmapFontLoader(resolver), ".fnt");
 		assetSystem.addLoaderDefault(new LoaderData(Music.class), new MusicLoader(resolver), ".wav", ".mp3", ".ogg");
 		assetSystem.addLoaderDefault(new LoaderData(Sound.class), new SoundLoader(resolver), ".wav", ".mp3", ".ogg");

@@ -9,11 +9,11 @@ public interface ComponentListener {
 		ADD, DELETE
 	}
 
+	public Set<String> getConfiguration();
+
 	public <T extends Component> void onChange(ComponentChangeType changeType, T component);
 
 	public <T extends Component> void onNotify(String event, T notifier);
 
 	public <T extends Component> void onTypeChange(Class<T> type);
-
-	public Set<String> getConfiguration();
 }

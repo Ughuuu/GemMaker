@@ -104,30 +104,26 @@ public class AssetSystem extends TimedSystem {
 		folderToLoaderMap.put(folder, loaderData);
 	}
 
-	public <T> T[] getAll(Class<T> type) {
+	public <T> T[] all(Class<T> type) {
 		Array<T> elements = new Array<T>();
 		assetManager.getAll(type, elements);
 		return elements.toArray(type);
 	}
 
-	public <T> T getAsset(String path) {
+	public <T> T asset(String path) {
 		return assetManager.get(path);
 	}
 
-	public <T> String getAssetFileName(T asset) {
+	public <T> String assetFileName(T asset) {
 		return assetManager.getAssetFileName(asset);
 	}
 
-	public String[] getAssetNames() {
+	public String[] assetNames() {
 		return assetManager.getAssetNames().toArray(String.class);
 	}
 
-	public FileHandleResolver getFileHandleResolver() {
+	public FileHandleResolver fileHandleResolver() {
 		return assetManager.getFileHandleResolver();
-	}
-
-	public float getProgress() {
-		return assetManager.getProgress();
 	}
 
 	public boolean isAssetLoaded(String path) {
@@ -175,6 +171,10 @@ public class AssetSystem extends TimedSystem {
 		if (!useBlockingLoad) {
 			assetManager.update();
 		}
+	}
+
+	public float progress() {
+		return assetManager.getProgress();
 	}
 
 	public void unloadAssets() {
@@ -258,11 +258,11 @@ public class AssetSystem extends TimedSystem {
 	}
 
 	private void findInternalFiles() {
-		Queue<FileHandle> fileQueue = getInternalFilesHandleFrom(assetsFolder);
+		Queue<FileHandle> fileQueue = internalFilesHandleFrom(assetsFolder);
 		FileHandle file;
 		while ((file = fileQueue.poll()) != null) {
 			if (file.isDirectory()) {
-				fileQueue.addAll(getInternalFilesHandleFrom(file.path()));
+				fileQueue.addAll(internalFilesHandleFrom(file.path()));
 			} else {
 				String path = file.path();
 				val type = extensionToLoaderMap.get(file.extension());
@@ -278,14 +278,14 @@ public class AssetSystem extends TimedSystem {
 		}
 	}
 
-	private Deque<FileHandle> getInternalFilesHandleFrom(String path) {
-		return new ArrayDeque<FileHandle>(Arrays.asList(Gdx.files.internal(path).list()));
-	}
-
 	private String getLastFolder(String path) {
 		int folderPosLast = path.lastIndexOf(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
 		int folderPosFirst = path.indexOf(Messages.getString("AssetSystem.FileSeparator")); //$NON-NLS-1$
 		return path.substring(folderPosFirst + 1, folderPosLast + 1);
+	}
+
+	private Deque<FileHandle> internalFilesHandleFrom(String path) {
+		return new ArrayDeque<FileHandle>(Arrays.asList(Gdx.files.internal(path).list()));
 	}
 
 	private void loadAsset(String path) {

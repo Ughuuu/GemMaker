@@ -28,10 +28,10 @@ public abstract class ComponentListenerSystem extends SystemBase implements Comp
 	}
 
 	@Override
-	public <T extends Component> void onTypeChange(Class<T> type) {
+	public <T extends Component> void onNotify(String event, T notifier) {
 	}
 
 	@Override
-	public <T extends Component> void onNotify(String event, T notifier) {
+	public <T extends Component> void onTypeChange(Class<T> type) {
 	}
 }
