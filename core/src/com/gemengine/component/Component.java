@@ -8,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public abstract class Component {
-	@Getter
 	private static int lastId;
 	@Getter
 	@Setter

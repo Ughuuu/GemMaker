@@ -137,7 +137,7 @@ public class ComponentSystem extends TimedSystem {
 		return (T) component;
 	}
 
-	public Entity getOwner(int id) {
+	public Entity findOwner(int id) {
 		return componentToEntity.get(id);
 	}
 
@@ -155,7 +155,7 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		for (EntityComponentListener listener : entityComponentListeners) {
-			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
+			if (listener.owner() == findOwner(component.getId()) && listener != component) {
 				listener.onNotify(event, component);
 			}
 		}
