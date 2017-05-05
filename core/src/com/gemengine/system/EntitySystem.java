@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.MarkerManager;
+
 import com.gemengine.entity.Entity;
 import com.gemengine.system.base.EntityListener;
 import com.gemengine.system.base.EntityListener.EntityChangeType;
@@ -12,7 +14,9 @@ import com.gemengine.system.base.SystemBase;
 import com.google.inject.Inject;
 
 import lombok.val;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class EntitySystem extends SystemBase {
 	private final Map<Integer, Entity> entities = new HashMap<Integer, Entity>();
 	private final Map<String, Integer> entityNameToId = new HashMap<String, Integer>();
@@ -159,6 +163,7 @@ public class EntitySystem extends SystemBase {
 		if (ent == null) {
 			return;
 		}
+		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.getId(), ent.getName());
 		unparent(ent);
 		entityNameToId.remove(ent.getName());
 		for (val entityListener : entityListeners) {

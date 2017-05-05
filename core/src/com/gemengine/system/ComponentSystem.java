@@ -142,10 +142,15 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public void notifyFrom(String event, Component component) {
+		List<String> types = new ArrayList<String>();
+		supertypes(component.getClass(), types);
 		for (ComponentListener listener : componentListeners) {
 			if (listener != component) {
-				if (listener.getConfiguration().contains(component.getClass().getName())) {
-					listener.onNotify(event, component);
+				for (String type : types) {
+					if (listener.getConfiguration().contains(type)) {
+						listener.onNotify(event, component);
+						break;
+					}
 				}
 			}
 		}
@@ -174,7 +179,7 @@ public class ComponentSystem extends TimedSystem {
 		}
 		for (val updater : componentUpdaterSystems) {
 			val configuration = updater.getConfiguration();
-			val entities = entitiesFromConfiguration(configuration);
+			Set<Entity> entities = new HashSet<>(entitiesFromConfiguration(configuration));
 			for (val entity : entities) {
 				try {
 					if (updater.isEnable()) {
@@ -210,9 +215,18 @@ public class ComponentSystem extends TimedSystem {
 		if (component == null) {
 			return;
 		}
+		log.debug(MarkerManager.getMarker("gem"), "Component deleted: id {} type {}", component.getId(),
+				component.getClass());
+		List<String> types = new ArrayList<String>();
+		supertypes(component.getClass(), types);
 		for (ComponentListener listener : componentListeners) {
-			if (listener.getConfiguration().contains(component.getClass().getName())) {
-				listener.onChange(ComponentChangeType.DELETE, component);
+			if (listener != component) {
+				for (String type : types) {
+					if (listener.getConfiguration().contains(type)) {
+						listener.onChange(ComponentChangeType.DELETE, component);
+						break;
+					}
+				}
 			}
 		}
 		removeFromTypeMap(id, component.getClass());
@@ -228,9 +242,14 @@ public class ComponentSystem extends TimedSystem {
 		components.put(component.getId(), component);
 		componentToEntity.put(component.getId(), ent);
 		componentToType.put(id, component.getClass().getName());
+		List<String> types = new ArrayList<String>();
+		supertypes(component.getClass(), types);
 		for (ComponentListener listener : componentListeners) {
-			if (listener.getConfiguration().contains(component.getClass().getName())) {
-				listener.onChange(ComponentChangeType.ADD, component);
+			for (String type : types) {
+				if (listener.getConfiguration().contains(type)) {
+					listener.onChange(ComponentChangeType.ADD, component);
+					break;
+				}
 			}
 		}
 	}
