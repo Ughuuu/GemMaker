@@ -66,7 +66,7 @@ public class Entity {
 		return entitySystem.hasParent(this);
 	}
 
-	public boolean isParent() {
+	public boolean hasChildren() {
 		return entitySystem.isParent(this);
 	}
 
