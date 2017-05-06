@@ -30,9 +30,6 @@ import com.gemengine.system.AssetSystem;
 import com.gemengine.system.loaders.LoaderData;
 import com.gemengine.system.loaders.TextLoader;
 
-import lombok.val;
-import lombok.experimental.var;
-
 public class AssetSystemHelper {
 	public static String getExtension(String path) {
 		int extensionStart = path.lastIndexOf('.');
