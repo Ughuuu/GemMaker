@@ -34,6 +34,7 @@ allprojects {
      	javaSync = '35d2778fefc'
      	jackson = '2.9.0.pr2'
      	log4jVersion = "2.8.2"
+     	jacksonXmlVersion = '0.6.2'
     }
 
     repositories {
@@ -64,6 +65,7 @@ project(":core") {
         compile "com.github.Ughuuu:JavaSync:$javaSync"
         compile group: 'com.google.inject', name: 'guice', version: guiceVersion
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson
+		compile group: 'com.fasterxml', name: 'jackson-xml-databind', version: jacksonXmlVersion
         compileOnly "org.projectlombok:lombok:$lombokVersion"  
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
   		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
