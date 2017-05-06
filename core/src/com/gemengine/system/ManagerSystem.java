@@ -10,8 +10,8 @@ import org.jsync.sync.ClassSync;
 import org.jsync.sync.SourceSync;
 
 import com.gemengine.component.Component;
-import com.gemengine.system.base.AssetListener;
-import com.gemengine.system.base.ComponentListener;
+import com.gemengine.listener.AssetListener;
+import com.gemengine.listener.ComponentListener;
 import com.gemengine.system.base.SystemBase;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;

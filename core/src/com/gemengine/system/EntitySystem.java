@@ -8,8 +8,8 @@ import java.util.Set;
 import org.apache.logging.log4j.MarkerManager;
 
 import com.gemengine.entity.Entity;
-import com.gemengine.system.base.EntityListener;
-import com.gemengine.system.base.EntityListener.EntityChangeType;
+import com.gemengine.listener.EntityListener;
+import com.gemengine.listener.EntityListener.EntityChangeType;
 import com.gemengine.system.base.SystemBase;
 import com.google.inject.Inject;
 

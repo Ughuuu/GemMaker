@@ -12,10 +12,10 @@ import org.apache.logging.log4j.MarkerManager;
 
 import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
-import com.gemengine.system.base.ComponentListener;
-import com.gemengine.system.base.ComponentListener.ComponentChangeType;
+import com.gemengine.listener.ComponentListener;
+import com.gemengine.listener.EntityComponentListener;
+import com.gemengine.listener.ComponentListener.ComponentChangeType;
 import com.gemengine.system.base.ComponentUpdaterSystem;
-import com.gemengine.system.base.EntityComponentListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.manager.SystemManager;
 import com.google.inject.Inject;
@@ -155,7 +155,7 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		for (EntityComponentListener listener : entityComponentListeners) {
-			if (listener.owner() == getOwner(component.getId()) && listener != component) {
+			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
 				listener.onNotify(event, component);
 			}
 		}

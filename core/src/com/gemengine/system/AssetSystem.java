@@ -25,7 +25,7 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.LocalFileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.gemengine.system.base.AssetListener;
+import com.gemengine.listener.AssetListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;
 import com.gemengine.system.helper.Messages;

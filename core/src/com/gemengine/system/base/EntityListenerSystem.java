@@ -1,6 +1,7 @@
 package com.gemengine.system.base;
 
 import com.gemengine.entity.Entity;
+import com.gemengine.listener.EntityListener;
 import com.gemengine.system.EntitySystem;
 
 public abstract class EntityListenerSystem extends SystemBase implements EntityListener {
