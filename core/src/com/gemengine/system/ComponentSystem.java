@@ -58,7 +58,7 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public void clear(Entity ent) {
-		clear(ent.getId());
+		clear(ent.id());
 	}
 
 	public void clear(int ownerId) {
@@ -73,7 +73,7 @@ public class ComponentSystem extends TimedSystem {
 			if (component == null) {
 				continue;
 			}
-			int id = component.getId();
+			int id = component.id();
 			removeFromTypeMap(id, component.getClass());
 			componentToEntity.remove(id);
 		}
@@ -84,7 +84,7 @@ public class ComponentSystem extends TimedSystem {
 		if (ent == null) {
 			return null;
 		}
-		Map<String, List<Integer>> types = entityToTypeToComponents.get(ent.getId());
+		Map<String, List<Integer>> types = entityToTypeToComponents.get(ent.id());
 		if (types != null) {
 			List<Integer> componentFromType = types.get(type.getName());
 			if ((componentFromType != null && !componentFromType.isEmpty())) {
@@ -108,7 +108,7 @@ public class ComponentSystem extends TimedSystem {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Component> List<T> find(Entity ent, Class<T> type) {
-		int ownerId = ent.getId();
+		int ownerId = ent.id();
 		val typeToComponent = entityToTypeToComponents.get(ownerId);
 		if (typeToComponent == null) {
 			return null;
@@ -155,7 +155,7 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		for (EntityComponentListener listener : entityComponentListeners) {
-			if (listener.owner() == findOwner(component.getId()) && listener != component) {
+			if (listener.owner() == findOwner(component.id()) && listener != component) {
 				listener.onNotify(event, component);
 			}
 		}
@@ -206,7 +206,7 @@ public class ComponentSystem extends TimedSystem {
 	public <T extends Component> void remove(Entity ent, Class<T> type) {
 		List<T> components = find(ent, type);
 		for (T component : components) {
-			remove(ent, component.getId());
+			remove(ent, component.id());
 		}
 	}
 
@@ -215,7 +215,7 @@ public class ComponentSystem extends TimedSystem {
 		if (component == null) {
 			return;
 		}
-		log.debug(MarkerManager.getMarker("gem"), "Component deleted: id {} type {}", component.getId(),
+		log.debug(MarkerManager.getMarker("gem"), "Component deleted: id {} type {}", component.id(),
 				component.getClass());
 		List<String> types = new ArrayList<String>();
 		supertypes(component.getClass(), types);
@@ -234,13 +234,13 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public <T extends Component> void remove(Entity ent, T component) {
-		remove(ent, component.getId());
+		remove(ent, component.id());
 	}
 
 	private <T extends Component> void addComponent(Entity ent, T component) {
-		int id = component.getId();
-		components.put(component.getId(), component);
-		componentToEntity.put(component.getId(), ent);
+		int id = component.id();
+		components.put(component.id(), component);
+		componentToEntity.put(component.id(), ent);
 		componentToType.put(id, component.getClass().getName());
 		List<String> types = new ArrayList<String>();
 		supertypes(component.getClass(), types);
@@ -255,9 +255,9 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	private <T extends Component> void addType(Entity ent, T component) {
-		int ownerId = ent.getId();
+		int ownerId = ent.id();
 		Class<?> componentClass = component.getClass();
-		int componentId = component.getId();
+		int componentId = component.id();
 		List<String> supertypes = new ArrayList<String>();
 		supertypes(componentClass, supertypes);
 		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);
@@ -302,7 +302,7 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	private void removeFromEntityMap(Entity ent, Integer id, Class<?> type) {
-		int ownerId = ent.getId();
+		int ownerId = ent.id();
 		val entityToComponent = entityToTypeToComponents.get(ownerId);
 		entityToComponent.remove(type.getName());
 		componentToEntity.remove(id);

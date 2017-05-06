@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.logging.log4j.MarkerManager;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.gemengine.component.Component;
 import com.gemengine.system.ComponentSystem;
@@ -15,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Entity {
 	private static int lastId;
-	@Getter
 	private final int id;
 	@Getter
 	private final String name;
@@ -28,6 +28,10 @@ public class Entity {
 		this.componentSystem = componentSystem;
 		this.entitySystem = entitySystem;
 		log.debug(MarkerManager.getMarker("gem"), "Entity created: id {} name {}", id, name);
+	}
+
+	public int id() {
+		return id;
 	}
 
 	public void addChild(Entity child) {

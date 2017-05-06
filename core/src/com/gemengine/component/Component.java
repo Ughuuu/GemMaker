@@ -2,6 +2,8 @@ package com.gemengine.component;
 
 import org.apache.logging.log4j.MarkerManager;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +14,6 @@ public abstract class Component {
 	@Getter
 	@Setter
 	private boolean enable = true;
-	@Getter
 	private final int id;
 
 	public Component() {
@@ -21,5 +22,9 @@ public abstract class Component {
 	}
 
 	public void onCreate() {
+	}
+
+	public int id() {
+		return id;
 	}
 }

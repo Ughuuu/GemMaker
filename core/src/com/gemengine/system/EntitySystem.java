@@ -36,7 +36,7 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public Set<Entity> children(Entity parent) {
-		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
+		Set<Integer> childrenIds = entityToChildren.get(parent.id());
 		Set<Entity> children = new HashSet<Entity>();
 		if (childrenIds == null) {
 			return children;
@@ -52,8 +52,8 @@ public class EntitySystem extends SystemBase {
 			return null;
 		}
 		Entity ent = new Entity(name, this, componentSystem);
-		entityNameToId.put(name, ent.getId());
-		entities.put(ent.getId(), ent);
+		entityNameToId.put(name, ent.id());
+		entities.put(ent.id(), ent);
 		for (val entityListener : entityListeners) {
 			try {
 				entityListener.onChange(EntityChangeType.ADD, ent, ent);
@@ -68,7 +68,7 @@ public class EntitySystem extends SystemBase {
 		if (child == null) {
 			return;
 		}
-		Integer parentId = entityToParent.remove(child.getId());
+		Integer parentId = entityToParent.remove(child.id());
 		if (parentId == null) {
 			return;
 		}
@@ -78,7 +78,7 @@ public class EntitySystem extends SystemBase {
 		}
 		Set<Integer> children = entityToChildren.get(parentId);
 		if (children != null) {
-			children.remove(child.getId());
+			children.remove(child.id());
 		}
 		for (val entityListener : entityListeners) {
 			entityListener.onChange(EntityChangeType.DEPARENTED, parent, child);
@@ -86,7 +86,7 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public Set<Entity> descendants(Entity parent) {
-		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
+		Set<Integer> childrenIds = entityToChildren.get(parent.id());
 		Set<Entity> children = new HashSet<Entity>();
 		if (childrenIds == null) {
 			return children;
@@ -112,15 +112,15 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public boolean hasParent(Entity child) {
-		return entityToChildren.get(child.getId()) != null;
+		return entityToChildren.get(child.id()) != null;
 	}
 
 	public boolean isParent(Entity parent) {
-		return entityToParent.get(parent.getId()) != null;
+		return entityToParent.get(parent.id()) != null;
 	}
 
 	public Entity parent(Entity child) {
-		Integer parentId = entityToParent.get(child.getId());
+		Integer parentId = entityToParent.get(child.id());
 		if (parentId == null) {
 			return null;
 		}
@@ -128,8 +128,8 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public void parent(Entity parent, Entity child) {
-		int parentId = parent.getId();
-		int childId = child.getId();
+		int parentId = parent.id();
+		int childId = child.id();
 		entityToParent.put(childId, parentId);
 		Set<Integer> children = entityToChildren.get(parentId);
 		if (children == null) {
@@ -143,7 +143,7 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public Set<Entity> predessesors(Entity child) {
-		Integer parentId = entityToParent.get(child.getId());
+		Integer parentId = entityToParent.get(child.id());
 		Set<Entity> parents = new HashSet<Entity>();
 		if (parentId == null) {
 			return parents;
@@ -155,7 +155,7 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public void remove(Entity ent) {
-		remove(ent.getId());
+		remove(ent.id());
 	}
 
 	public void remove(int id) {
@@ -163,7 +163,7 @@ public class EntitySystem extends SystemBase {
 		if (ent == null) {
 			return;
 		}
-		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.getId(), ent.getName());
+		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.id(), ent.getName());
 		unparent(ent);
 		entityNameToId.remove(ent.getName());
 		for (val entityListener : entityListeners) {
@@ -188,7 +188,7 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public void unparent(Entity parent) {
-		Set<Integer> children = entityToChildren.get(parent.getId());
+		Set<Integer> children = entityToChildren.get(parent.id());
 		if (children == null) {
 			return;
 		}
