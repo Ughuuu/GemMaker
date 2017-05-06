@@ -9,7 +9,8 @@ import lombok.Setter;
 public class LoaderData {
 	private final Class<?> type;
 	private final AssetLoaderParameters<?> assetLoaderParameters;
-	@Setter @Getter
+	@Setter
+	@Getter
 	private String folder;
 
 	public LoaderData(Class<?> type) {
