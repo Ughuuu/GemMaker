@@ -101,26 +101,30 @@ public class AssetSystem extends TimedSystem {
 		}
 	}
 
-	public <T> T[] all(Class<T> type) {
+	public <T> T[] getAll(Class<T> type) {
 		Array<T> elements = new Array<T>();
 		assetManager.getAll(type, elements);
 		return elements.toArray(type);
 	}
 
-	public <T> T asset(String path) {
+	public <T> T getAsset(String path) {
 		return assetManager.get(path);
 	}
 
-	public <T> String assetFileName(T asset) {
+	public <T> String getAssetFileName(T asset) {
 		return assetManager.getAssetFileName(asset);
 	}
 
-	public String[] assetNames() {
+	public String[] getAssetNames() {
 		return assetManager.getAssetNames().toArray(String.class);
 	}
 
-	public FileHandleResolver fileHandleResolver() {
+	public FileHandleResolver getFileHandleResolver() {
 		return assetManager.getFileHandleResolver();
+	}
+
+	public float getProgress() {
+		return assetManager.getProgress();
 	}
 
 	public boolean isAssetLoaded(String path) {
@@ -168,10 +172,6 @@ public class AssetSystem extends TimedSystem {
 		if (!useBlockingLoad) {
 			assetManager.update();
 		}
-	}
-
-	public float progress() {
-		return assetManager.getProgress();
 	}
 
 	public void unloadAssets() {

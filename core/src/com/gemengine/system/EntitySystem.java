@@ -35,25 +35,13 @@ public class EntitySystem extends SystemBase {
 		entityListeners.add(entityListener);
 	}
 
-	public Set<Entity> children(Entity parent) {
-		Set<Integer> childrenIds = entityToChildren.get(parent.id());
-		Set<Entity> children = new HashSet<Entity>();
-		if (childrenIds == null) {
-			return children;
-		}
-		for (int child : childrenIds) {
-			children.add(find(child));
-		}
-		return children;
-	}
-
 	public Entity create(String name) {
 		if (entityNameToId.get(name) != null) {
 			return null;
 		}
 		Entity ent = new Entity(name, this, componentSystem);
-		entityNameToId.put(name, ent.id());
-		entities.put(ent.id(), ent);
+		entityNameToId.put(name, ent.getId());
+		entities.put(ent.getId(), ent);
 		for (val entityListener : entityListeners) {
 			try {
 				entityListener.onChange(EntityChangeType.ADD, ent, ent);
@@ -64,11 +52,40 @@ public class EntitySystem extends SystemBase {
 		return ent;
 	}
 
+	public void delete(Entity ent) {
+		delete(ent.getId());
+	}
+
+	public void delete(int id) {
+		Entity ent = entities.remove(id);
+		if (ent == null) {
+			return;
+		}
+		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.getId(), ent.getName());
+		unparent(ent);
+		entityNameToId.remove(ent.getName());
+		for (val entityListener : entityListeners) {
+			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
+		}
+	}
+
+	public void delete(String name) {
+		Integer id = entityNameToId.remove(name);
+		if (id == null) {
+			return;
+		}
+		Entity ent = entities.remove(id);
+		unparent(ent);
+		for (val entityListener : entityListeners) {
+			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
+		}
+	}
+
 	public void deparent(Entity child) {
 		if (child == null) {
 			return;
 		}
-		Integer parentId = entityToParent.remove(child.id());
+		Integer parentId = entityToParent.remove(child.getId());
 		if (parentId == null) {
 			return;
 		}
@@ -78,58 +95,62 @@ public class EntitySystem extends SystemBase {
 		}
 		Set<Integer> children = entityToChildren.get(parentId);
 		if (children != null) {
-			children.remove(child.id());
+			children.remove(child.getId());
 		}
 		for (val entityListener : entityListeners) {
 			entityListener.onChange(EntityChangeType.DEPARENTED, parent, child);
 		}
 	}
 
-	public Set<Entity> descendants(Entity parent) {
-		Set<Integer> childrenIds = entityToChildren.get(parent.id());
+	public Entity get(int id) {
+		Entity ent = entities.get(id);
+		return ent;
+	}
+
+	public Entity get(String name) {
+		Integer id = entityNameToId.get(name);
+		if (id == null) {
+			return null;
+		}
+		return get(id);
+	}
+
+	public Set<Entity> getChildren(Entity parent) {
+		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
 		Set<Entity> children = new HashSet<Entity>();
 		if (childrenIds == null) {
 			return children;
 		}
 		for (int child : childrenIds) {
-			Entity childEntity = find(child);
-			children.addAll(descendants(childEntity));
+			children.add(get(child));
 		}
 		return children;
 	}
 
-	public Entity find(int id) {
-		Entity ent = entities.get(id);
-		return ent;
-	}
-
-	public Entity find(String name) {
-		Integer id = entityNameToId.get(name);
-		if (id == null) {
-			return null;
+	public Set<Entity> getDescendants(Entity parent) {
+		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
+		Set<Entity> children = new HashSet<Entity>();
+		if (childrenIds == null) {
+			return children;
 		}
-		return find(id);
+		for (int child : childrenIds) {
+			Entity childEntity = get(child);
+			children.addAll(getDescendants(childEntity));
+		}
+		return children;
 	}
 
-	public boolean hasParent(Entity child) {
-		return entityToChildren.get(child.id()) != null;
-	}
-
-	public boolean isParent(Entity parent) {
-		return entityToParent.get(parent.id()) != null;
-	}
-
-	public Entity parent(Entity child) {
-		Integer parentId = entityToParent.get(child.id());
+	public Entity getParent(Entity child) {
+		Integer parentId = entityToParent.get(child.getId());
 		if (parentId == null) {
 			return null;
 		}
-		return find(parentId);
+		return get(parentId);
 	}
 
-	public void parent(Entity parent, Entity child) {
-		int parentId = parent.id();
-		int childId = child.id();
+	public void getParent(Entity parent, Entity child) {
+		int parentId = parent.getId();
+		int childId = child.getId();
 		entityToParent.put(childId, parentId);
 		Set<Integer> children = entityToChildren.get(parentId);
 		if (children == null) {
@@ -142,45 +163,24 @@ public class EntitySystem extends SystemBase {
 		}
 	}
 
-	public Set<Entity> predessesors(Entity child) {
-		Integer parentId = entityToParent.get(child.id());
+	public Set<Entity> getPredessesors(Entity child) {
+		Integer parentId = entityToParent.get(child.getId());
 		Set<Entity> parents = new HashSet<Entity>();
 		if (parentId == null) {
 			return parents;
 		}
-		Entity parent = find(parentId);
+		Entity parent = get(parentId);
 		parents.add(parent);
-		parents.addAll(predessesors(parent));
+		parents.addAll(getPredessesors(parent));
 		return parents;
 	}
 
-	public void remove(Entity ent) {
-		remove(ent.id());
+	public boolean hasParent(Entity child) {
+		return entityToChildren.get(child.getId()) != null;
 	}
 
-	public void remove(int id) {
-		Entity ent = entities.remove(id);
-		if (ent == null) {
-			return;
-		}
-		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.id(), ent.getName());
-		unparent(ent);
-		entityNameToId.remove(ent.getName());
-		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
-		}
-	}
-
-	public void remove(String name) {
-		Integer id = entityNameToId.remove(name);
-		if (id == null) {
-			return;
-		}
-		Entity ent = entities.remove(id);
-		unparent(ent);
-		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
-		}
+	public boolean isParent(Entity parent) {
+		return entityToParent.get(parent.getId()) != null;
 	}
 
 	public void removeChild() {
@@ -188,12 +188,12 @@ public class EntitySystem extends SystemBase {
 	}
 
 	public void unparent(Entity parent) {
-		Set<Integer> children = entityToChildren.get(parent.id());
+		Set<Integer> children = entityToChildren.get(parent.getId());
 		if (children == null) {
 			return;
 		}
 		for (int child : children) {
-			deparent(find(child));
+			deparent(get(child));
 		}
 	}
 }

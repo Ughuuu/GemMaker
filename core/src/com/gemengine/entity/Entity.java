@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Entity {
 	private static int lastId;
+	@Getter
 	private final int id;
 	@Getter
 	private final String name;
@@ -29,63 +30,59 @@ public class Entity {
 	}
 
 	public void addChild(Entity child) {
-		entitySystem.parent(this, child);
+		entitySystem.getParent(this, child);
 	}
 
-	public <T extends Component> T addComponent(Class<T> type) {
+	public <T extends Component> T createComponent(Class<T> type) {
 		return componentSystem.create(this, type);
 	}
 
-	public Set<Entity> children() {
-		return entitySystem.children(this);
+	public void delete() {
+		entitySystem.delete(this);
+	}
+
+	public void deleteComponent(Class<? extends Component> type) {
+		componentSystem.remove(this, type);
 	}
 
 	public void deparent() {
 		entitySystem.deparent(this);
 	}
 
-	public Set<Entity> descendants() {
-		return entitySystem.descendants(this);
+	public Set<Entity> getChildren() {
+		return entitySystem.getChildren(this);
 	}
 
-	public <T extends Component> T findComponent(Class<T> type) {
-		List<T> components = componentSystem.find(this, type);
+	public <T extends Component> T getComponent(Class<T> type) {
+		List<T> components = componentSystem.get(this, type);
 		if (components == null || components.isEmpty()) {
 			return null;
 		}
 		return components.get(0);
 	}
 
-	public <T extends Component> List<T> findComponents(Class<T> type) {
-		return componentSystem.find(this, type);
+	public <T extends Component> List<T> getComponents(Class<T> type) {
+		return componentSystem.get(this, type);
 	}
 
-	public boolean hasChildren() {
-		return entitySystem.isParent(this);
+	public Set<Entity> getDescendants() {
+		return entitySystem.getDescendants(this);
 	}
 
-	public boolean hasParent() {
+	public Entity getParent() {
+		return entitySystem.getParent(this);
+	}
+
+	public Set<Entity> getPredessesors() {
+		return entitySystem.getPredessesors(this);
+	}
+
+	public boolean isChild() {
 		return entitySystem.hasParent(this);
 	}
 
-	public int id() {
-		return id;
-	}
-
-	public Entity parent() {
-		return entitySystem.parent(this);
-	}
-
-	public Set<Entity> predessesors() {
-		return entitySystem.predessesors(this);
-	}
-
-	public void remove() {
-		entitySystem.remove(this);
-	}
-
-	public void removeComponent(Class<? extends Component> type) {
-		componentSystem.remove(this, type);
+	public boolean isParent() {
+		return entitySystem.isParent(this);
 	}
 
 	public void unparent() {

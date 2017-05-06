@@ -58,7 +58,7 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public void clear(Entity ent) {
-		clear(ent.id());
+		clear(ent.getId());
 	}
 
 	public void clear(int ownerId) {
@@ -73,7 +73,7 @@ public class ComponentSystem extends TimedSystem {
 			if (component == null) {
 				continue;
 			}
-			int id = component.id();
+			int id = component.getId();
 			removeFromTypeMap(id, component.getClass());
 			componentToEntity.remove(id);
 		}
@@ -84,7 +84,7 @@ public class ComponentSystem extends TimedSystem {
 		if (ent == null) {
 			return null;
 		}
-		Map<String, List<Integer>> types = entityToTypeToComponents.get(ent.id());
+		Map<String, List<Integer>> types = entityToTypeToComponents.get(ent.getId());
 		if (types != null) {
 			List<Integer> componentFromType = types.get(type.getName());
 			if ((componentFromType != null && !componentFromType.isEmpty())) {
@@ -107,8 +107,8 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Component> List<T> find(Entity ent, Class<T> type) {
-		int ownerId = ent.id();
+	public <T extends Component> List<T> get(Entity ent, Class<T> type) {
+		int ownerId = ent.getId();
 		val typeToComponent = entityToTypeToComponents.get(ownerId);
 		if (typeToComponent == null) {
 			return null;
@@ -125,7 +125,7 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Component> T find(Entity ent, int id) {
+	public <T extends Component> T get(Entity ent, int id) {
 		Entity owner = componentToEntity.get(id);
 		if (owner == null || owner != ent) {
 			return null;
@@ -137,7 +137,7 @@ public class ComponentSystem extends TimedSystem {
 		return (T) component;
 	}
 
-	public Entity findOwner(int id) {
+	public Entity getOwner(int id) {
 		return componentToEntity.get(id);
 	}
 
@@ -155,7 +155,7 @@ public class ComponentSystem extends TimedSystem {
 			}
 		}
 		for (EntityComponentListener listener : entityComponentListeners) {
-			if (listener.owner() == findOwner(component.id()) && listener != component) {
+			if (listener.owner() == getOwner(component.getId()) && listener != component) {
 				listener.onNotify(event, component);
 			}
 		}
@@ -204,9 +204,9 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public <T extends Component> void remove(Entity ent, Class<T> type) {
-		List<T> components = find(ent, type);
+		List<T> components = get(ent, type);
 		for (T component : components) {
-			remove(ent, component.id());
+			remove(ent, component.getId());
 		}
 	}
 
@@ -215,7 +215,7 @@ public class ComponentSystem extends TimedSystem {
 		if (component == null) {
 			return;
 		}
-		log.debug(MarkerManager.getMarker("gem"), "Component deleted: id {} type {}", component.id(),
+		log.debug(MarkerManager.getMarker("gem"), "Component deleted: id {} type {}", component.getId(),
 				component.getClass());
 		List<String> types = new ArrayList<String>();
 		supertypes(component.getClass(), types);
@@ -234,13 +234,13 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	public <T extends Component> void remove(Entity ent, T component) {
-		remove(ent, component.id());
+		remove(ent, component.getId());
 	}
 
 	private <T extends Component> void addComponent(Entity ent, T component) {
-		int id = component.id();
-		components.put(component.id(), component);
-		componentToEntity.put(component.id(), ent);
+		int id = component.getId();
+		components.put(component.getId(), component);
+		componentToEntity.put(component.getId(), ent);
 		componentToType.put(id, component.getClass().getName());
 		List<String> types = new ArrayList<String>();
 		supertypes(component.getClass(), types);
@@ -255,9 +255,9 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	private <T extends Component> void addType(Entity ent, T component) {
-		int ownerId = ent.id();
+		int ownerId = ent.getId();
 		Class<?> componentClass = component.getClass();
-		int componentId = component.id();
+		int componentId = component.getId();
 		List<String> supertypes = new ArrayList<String>();
 		supertypes(componentClass, supertypes);
 		Map<String, List<Integer>> typeToComponentLimited = entityToTypeToComponents.get(ownerId);
@@ -302,7 +302,7 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	private void removeFromEntityMap(Entity ent, Integer id, Class<?> type) {
-		int ownerId = ent.id();
+		int ownerId = ent.getId();
 		val entityToComponent = entityToTypeToComponents.get(ownerId);
 		entityToComponent.remove(type.getName());
 		componentToEntity.remove(id);

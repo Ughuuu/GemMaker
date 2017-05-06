@@ -12,15 +12,12 @@ public abstract class Component {
 	@Getter
 	@Setter
 	private boolean enable = true;
+	@Getter
 	private final int id;
 
 	public Component() {
 		id = lastId++;
 		log.debug(MarkerManager.getMarker("gem"), "Component created: id {} type {}", id, this.getClass());
-	}
-
-	public int id() {
-		return id;
 	}
 
 	public void onCreate() {

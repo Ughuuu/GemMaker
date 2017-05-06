@@ -46,6 +46,8 @@ public abstract class TypeManager<T> {
 		removeList = new ArrayList<String>();
 		objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NON_PRIVATE);
+		objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+		objectMapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
 	}
 
 	@SuppressWarnings("unchecked")
