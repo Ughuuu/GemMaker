@@ -40,7 +40,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class AssetSystem extends TimedSystem {
 	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
-	private static final Map<String, LoaderData> folderToLoaderMap = new HashMap<String, LoaderData>();
 	public final static String assetsFolder = Messages.getString("AssetSystem.AssetsFolder"); //$NON-NLS-1$
 	private List<String> loadFolders;
 	private final Map<String, List<String>> folderToAsset;
@@ -84,24 +83,22 @@ public class AssetSystem extends TimedSystem {
 		assetListeners.add(assetListener);
 	}
 
-	public <T, P extends AssetLoaderParameters<T>> void addLoaderDefault(LoaderData loaderData,
+	public <T, P extends AssetLoaderParameters<T>> void addLoaderDefault(LoaderData loaderData, String folder,
 			AssetLoader<T, P> assetLoader, String... extensions) {
+		loaderData.setFolder(folder);
 		assetManager.setLoader(loaderData.getType(), assetLoader);
 		for (String extension : extensions) {
 			addExtensionMapping(loaderData, extension);
 		}
 	}
 
-	public <T, P extends AssetLoaderParameters<T>> void addLoaderOverride(LoaderData loaderData,
+	public <T, P extends AssetLoaderParameters<T>> void addLoaderOverride(LoaderData loaderData, String folder,
 			AssetLoader<T, P> assetLoader, String... extensions) {
+		loaderData.setFolder(folder);
 		for (String extension : extensions) {
 			assetManager.setLoader(loaderData.getType(), extension, assetLoader);
 			addExtensionMapping(loaderData, extension);
 		}
-	}
-
-	public void addTypeFolder(LoaderData loaderData, String folder) {
-		folderToLoaderMap.put(folder, loaderData);
 	}
 
 	public <T> T[] all(Class<T> type) {
@@ -293,14 +290,27 @@ public class AssetSystem extends TimedSystem {
 		val types = extensionToLoaderMap.get(extension);
 		if (types == null)
 			return;
-		if (types.size() != 1) {
-			final String folder = getLastFolder(path);
-			LoaderData loaderData = folderToLoaderMap.get(folder);
-			if (loaderData != null) {
-				loaderData.load(assetManager, path);
+		final String folder = getLastFolder(path);
+		LoaderData defaultLoaderData = null;
+		for (LoaderData loaderData : types) {
+			String loaderFolder = loaderData.getFolder();
+			if (loaderFolder == null) {
+				defaultLoaderData = loaderData;
+				continue;
 			}
-		} else if (types.size() == 1) {
-			types.get(0).load(assetManager, path);
+			if (loaderData.getFolder().equals(folder)) {
+				loaderData.load(assetManager, path);
+				log.debug(MarkerManager.getMarker("gem"), "Asset System load file {} ---> {}", path,
+						loaderData.getType().getName());
+				return;
+			}
+		}
+		if (defaultLoaderData != null) {
+			defaultLoaderData.load(assetManager, path);
+			log.debug(MarkerManager.getMarker("gem"), "Asset System load file {} ---> {}", path,
+					defaultLoaderData.getType().getName());
+		} else {
+			log.warn(MarkerManager.getMarker("gem"), "Asset System no loader for file {} {}", path, types);
 		}
 	}
 
@@ -349,8 +359,10 @@ public class AssetSystem extends TimedSystem {
 	}
 
 	private void unloadAsset(String path) {
-		if (isAssetLoaded(path))
+		if (isAssetLoaded(path)) {
 			assetManager.unload(path);
+			log.debug(MarkerManager.getMarker("gem"), "Asset System unload {}", path);
+		}
 	}
 
 	private void unplaceAsset(@NonNull String path) {

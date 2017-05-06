@@ -30,6 +30,9 @@ import com.gemengine.system.AssetSystem;
 import com.gemengine.system.loaders.LoaderData;
 import com.gemengine.system.loaders.TextLoader;
 
+import lombok.val;
+import lombok.experimental.var;
+
 public class AssetSystemHelper {
 	public static String getExtension(String path) {
 		int extensionStart = path.lastIndexOf('.');
@@ -47,35 +50,33 @@ public class AssetSystemHelper {
 
 	public static void setDefaultLoaders(AssetSystem assetSystem) {
 		FileHandleResolver resolver = assetSystem.fileHandleResolver();
-		assetSystem.addLoaderDefault(new LoaderData(BitmapFont.class), new BitmapFontLoader(resolver), ".fnt");
-		assetSystem.addLoaderDefault(new LoaderData(Music.class), new MusicLoader(resolver), ".wav", ".mp3", ".ogg");
-		assetSystem.addLoaderDefault(new LoaderData(Sound.class), new SoundLoader(resolver), ".wav", ".mp3", ".ogg");
-		assetSystem.addTypeFolder(new LoaderData(Sound.class), Messages.getString("AssetSystemHelper.SoundFolder")); //$NON-NLS-1$
-		assetSystem.addTypeFolder(new LoaderData(Music.class), Messages.getString("AssetSystemHelper.MusicFolder")); //$NON-NLS-1$
-		assetSystem.addLoaderDefault(new LoaderData(Pixmap.class), new PixmapLoader(resolver), ".png", ".jpg", ".jpeg",
-				".bmp");
-		assetSystem.addLoaderDefault(new LoaderData(TextureAtlas.class), new TextureAtlasLoader(resolver), ".png",
-				".jpg", ".jpeg", ".bmp");
-		assetSystem.addLoaderDefault(new LoaderData(Texture.class), new TextureLoader(resolver), ".png", ".jpg",
+		assetSystem.addLoaderDefault(new LoaderData(BitmapFont.class), null, new BitmapFontLoader(resolver), ".fnt");
+		assetSystem.addLoaderDefault(new LoaderData(Music.class), Messages.getString("AssetSystemHelper.MusicFolder"),
+				new MusicLoader(resolver), ".wav", ".mp3", ".ogg"); //$NON-NLS-1$
+		assetSystem.addLoaderDefault(new LoaderData(Sound.class), Messages.getString("AssetSystemHelper.SoundFolder"),
+				new SoundLoader(resolver), ".wav", ".mp3", ".ogg"); //$NON-NLS-1$
+		assetSystem.addLoaderDefault(new LoaderData(Pixmap.class), Messages.getString("AssetSystemHelper.PixmapFolder"),
+				new PixmapLoader(resolver), ".png", ".jpg", ".jpeg", ".bmp"); //$NON-NLS-4$
+		assetSystem.addLoaderDefault(new LoaderData(TextureAtlas.class),
+				Messages.getString("AssetSystemHelper.AtlasFolder"), new TextureAtlasLoader(resolver), ".png", ".jpg", //$NON-NLS-3$
 				".jpeg", ".bmp");
-		assetSystem.addTypeFolder(new LoaderData(Texture.class), Messages.getString("AssetSystemHelper.ImageFolder")); //$NON-NLS-1$
-		assetSystem.addTypeFolder(new LoaderData(TextureAtlas.class),
-				Messages.getString("AssetSystemHelper.AtlasFolder")); //$NON-NLS-1$
-		assetSystem.addTypeFolder(new LoaderData(Pixmap.class), Messages.getString("AssetSystemHelper.PixmapFolder")); //$NON-NLS-1$
-		assetSystem.addLoaderDefault(new LoaderData(Skin.class), new SkinLoader(resolver), ".json");
-		assetSystem.addTypeFolder(new LoaderData(Skin.class), "uiskin/");
-		assetSystem.addLoaderDefault(new LoaderData(ParticleEffect.class), new ParticleEffectLoader(resolver),
+		assetSystem.addLoaderDefault(new LoaderData(Texture.class), Messages.getString("AssetSystemHelper.ImageFolder"),
+				new TextureLoader(resolver), ".png", ".jpg", ".jpeg", ".bmp"); //$NON-NLS-3$
+		assetSystem.addLoaderDefault(new LoaderData(Skin.class), "uiskin/", new SkinLoader(resolver), ".json");
+		assetSystem.addLoaderDefault(new LoaderData(ParticleEffect.class), null, new ParticleEffectLoader(resolver),
 				".2dparticle");
-		assetSystem.addLoaderDefault(new LoaderData(com.badlogic.gdx.graphics.g3d.particles.ParticleEffect.class),
+		assetSystem.addLoaderDefault(new LoaderData(com.badlogic.gdx.graphics.g3d.particles.ParticleEffect.class), null,
 				new com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader(resolver), ".3dparticle");
-		assetSystem.addLoaderDefault(new LoaderData(PolygonRegion.class), new PolygonRegionLoader(resolver), ".psh");
-		assetSystem.addLoaderOverride(new LoaderData(Model.class), new G3dModelLoader(new JsonReader(), resolver),
+		assetSystem.addLoaderDefault(new LoaderData(PolygonRegion.class), null, new PolygonRegionLoader(resolver),
+				".psh");
+		assetSystem.addLoaderOverride(new LoaderData(Model.class), null, new G3dModelLoader(new JsonReader(), resolver),
 				".g3dj");
-		assetSystem.addLoaderOverride(new LoaderData(Model.class), new G3dModelLoader(new UBJsonReader(), resolver),
-				".g3db");
-		assetSystem.addLoaderOverride(new LoaderData(Model.class), new ObjLoader(resolver), ".obj");
-		assetSystem.addLoaderDefault(new LoaderData(ShaderProgram.class), new ShaderProgramLoader(resolver), ".vert");
+		assetSystem.addLoaderOverride(new LoaderData(Model.class), null,
+				new G3dModelLoader(new UBJsonReader(), resolver), ".g3db");
+		assetSystem.addLoaderOverride(new LoaderData(Model.class), null, new ObjLoader(resolver), ".obj");
+		assetSystem.addLoaderDefault(new LoaderData(ShaderProgram.class), null, new ShaderProgramLoader(resolver),
+				".vert");
 
-		assetSystem.addLoaderDefault(new LoaderData(String.class), new TextLoader(resolver), ".txt", ".json");
+		assetSystem.addLoaderDefault(new LoaderData(String.class), null, new TextLoader(resolver), ".txt", ".json");
 	}
 }

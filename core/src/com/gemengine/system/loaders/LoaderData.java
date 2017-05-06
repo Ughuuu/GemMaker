@@ -3,9 +3,14 @@ package com.gemengine.system.loaders;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class LoaderData {
 	private final Class<?> type;
 	private final AssetLoaderParameters<?> assetLoaderParameters;
+	@Setter @Getter
+	private String folder;
 
 	public LoaderData(Class<?> type) {
 		this.type = type;

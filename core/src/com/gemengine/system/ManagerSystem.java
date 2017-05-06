@@ -81,14 +81,14 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 
 	private void setCodeSync(ClassLoader classsLoader, AssetSystem assetSystem) {
 		val codeData = new LoaderData(ClassSync.class, new CodeLoader.CodeParameter(classsLoader));
-		assetSystem.addLoaderDefault(codeData, new CodeLoader<SystemBase>(assetSystem.fileHandleResolver()),
+		assetSystem.addLoaderDefault(codeData, null, new CodeLoader<SystemBase>(assetSystem.fileHandleResolver()),
 				Messages.getString("ManagerSystem.ClassFileExtension")); //$NON-NLS-1$
 	}
 
 	private void setSourceSync(AssetSystem assetSystem) {
 		val sourceData = new LoaderData(SourceSync.class);
 		SourceSync.options = Messages.getString("ManagerSystem.CompileOptions"); //$NON-NLS-1$
-		assetSystem.addLoaderDefault(sourceData, new SourceLoader(assetSystem.fileHandleResolver()),
+		assetSystem.addLoaderDefault(sourceData, null, new SourceLoader(assetSystem.fileHandleResolver()),
 				Messages.getString("ManagerSystem.SourceFileExtension")); //$NON-NLS-1$
 	}
 
