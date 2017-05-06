@@ -63,7 +63,7 @@ public class AssetSystemHelper {
 				Messages.getString("AssetSystemHelper.AtlasFolder")); //$NON-NLS-1$
 		assetSystem.addTypeFolder(new LoaderData(Pixmap.class), Messages.getString("AssetSystemHelper.PixmapFolder")); //$NON-NLS-1$
 		assetSystem.addLoaderDefault(new LoaderData(Skin.class), new SkinLoader(resolver), ".json");
-
+		assetSystem.addTypeFolder(new LoaderData(Skin.class), "uiskin/");
 		assetSystem.addLoaderDefault(new LoaderData(ParticleEffect.class), new ParticleEffectLoader(resolver),
 				".2dparticle");
 		assetSystem.addLoaderDefault(new LoaderData(com.badlogic.gdx.graphics.g3d.particles.ParticleEffect.class),
@@ -76,6 +76,6 @@ public class AssetSystemHelper {
 		assetSystem.addLoaderOverride(new LoaderData(Model.class), new ObjLoader(resolver), ".obj");
 		assetSystem.addLoaderDefault(new LoaderData(ShaderProgram.class), new ShaderProgramLoader(resolver), ".vert");
 
-		assetSystem.addLoaderDefault(new LoaderData(String.class), new TextLoader(resolver), ".txt");
+		assetSystem.addLoaderDefault(new LoaderData(String.class), new TextLoader(resolver), ".txt", ".json");
 	}
 }
