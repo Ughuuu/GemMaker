@@ -20,7 +20,7 @@ public abstract class TimedSystem extends SystemBase {
 	 * Create a new timed system with an update interval of 16 ms and priority
 	 * max(will be called last in the update).
 	 */
-	protected TimedSystem() {
+	public TimedSystem() {
 		this(16, true, Integer.MAX_VALUE);
 	}
 
@@ -36,7 +36,7 @@ public abstract class TimedSystem extends SystemBase {
 	 *            Lower means the update is called before other systems that
 	 *            have this number higher
 	 */
-	protected TimedSystem(float interval, boolean enable, int priority) {
+	public TimedSystem(float interval, boolean enable, int priority) {
 		super(enable, priority);
 		this.interval = interval;
 	}

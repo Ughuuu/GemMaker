@@ -39,7 +39,7 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 	/**
 	 * Create a system with priority as Integer.MAX_VALUE(will be called last).
 	 */
-	protected SystemBase() {
+	public SystemBase() {
 		this(true, Integer.MAX_VALUE);
 	}
 
@@ -51,7 +51,7 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 	 * @param priority
 	 *            Priority of sytem.
 	 */
-	protected SystemBase(boolean enable, int priority) {
+	public SystemBase(boolean enable, int priority) {
 		this.enable = enable;
 		this.priority = priority;
 		id = lastId++;

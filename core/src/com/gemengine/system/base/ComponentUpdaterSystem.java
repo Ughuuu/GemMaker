@@ -42,7 +42,7 @@ public abstract class ComponentUpdaterSystem extends SystemBase {
 	 * @param componentSystem
 	 *            ComponentSystem
 	 */
-	ComponentUpdaterSystem(ComponentSystem componentSystem) {
+	public ComponentUpdaterSystem(ComponentSystem componentSystem) {
 		this(componentSystem, new HashSet<String>(), true, Integer.MAX_VALUE);
 	}
 
@@ -65,7 +65,8 @@ public abstract class ComponentUpdaterSystem extends SystemBase {
 	 * @param priority
 	 *            the order on which this system is called.
 	 */
-	ComponentUpdaterSystem(ComponentSystem componentSystem, Set<String> configuration, boolean enable, int priority) {
+	public ComponentUpdaterSystem(ComponentSystem componentSystem, Set<String> configuration, boolean enable,
+			int priority) {
 		super(enable, priority);
 		this.configuration = configuration;
 		componentSystem.addComponentUpdater(this);
