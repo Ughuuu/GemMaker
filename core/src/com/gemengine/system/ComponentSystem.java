@@ -263,7 +263,7 @@ public class ComponentSystem extends TimedSystem {
 		}
 		for (val updater : componentUpdaterSystems) {
 			val configuration = updater.getConfiguration();
-			Set<Entity> entities = new HashSet<>(entitiesFromConfiguration(configuration));
+			Set<Entity> entities = entitiesFromConfiguration(configuration);
 			for (val entity : entities) {
 				try {
 					if (updater.isEnable()) {

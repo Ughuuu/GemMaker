@@ -167,6 +167,9 @@ public class AssetSystem extends TimedSystem {
 	 * @return The asset or null
 	 */
 	public <T> T getAsset(String path) {
+		if (!isAssetLoaded(path)) {
+			return null;
+		}
 		return assetManager.get(path);
 	}
 

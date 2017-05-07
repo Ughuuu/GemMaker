@@ -2,6 +2,7 @@ package com.gemengine.system.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +41,10 @@ public class SystemManager extends TypeManager<SystemBase> {
 		Added, Started, Destroyed
 	}
 
-	private final Set<SystemBase> baseSystems;
+	private final List<SystemBase> baseSystems;
 	private final Map<SystemBase, State> systemToState;
 	protected int toStart = 0;
-	private final Set<TimedSystem> timedSystems;
+	private final List<TimedSystem> timedSystems;
 	private final GemConfiguration configuration;
 	@Getter
 	private final List<Class<? extends SystemBase>> excludeList = new ArrayList<>(
@@ -53,11 +54,10 @@ public class SystemManager extends TypeManager<SystemBase> {
 	public SystemManager(GemConfiguration configuration) {
 		super(SystemBase.class);
 		this.configuration = configuration;
-		baseSystems = new TreeSet<SystemBase>();
+		baseSystems = new ArrayList<SystemBase>();
 		systemToState = new HashMap<SystemBase, State>();
-		timedSystems = new TreeSet<TimedSystem>();
+		timedSystems = new ArrayList<TimedSystem>();
 		doMapping();
-		Gdx.input.setInputProcessor(inputMultiplexer);
 	}
 
 	@Override
@@ -174,17 +174,27 @@ public class SystemManager extends TypeManager<SystemBase> {
 		}
 	}
 
+	public void addInputProcessor(InputProcessor inputProcessor) {
+		inputMultiplexer.addProcessor((InputProcessor) inputProcessor);
+		Gdx.input.setInputProcessor(inputMultiplexer);
+	}
+
+	public void removeInputProcessor(InputProcessor inputProcessor) {
+		inputMultiplexer.removeProcessor((InputProcessor) inputProcessor);
+		if (inputMultiplexer.getProcessors().size == 0) {
+			inputMultiplexer.setProcessors(null);
+		}
+	}
+
 	@Override
 	protected void elementAdd(SystemBase element) {
-		if (element instanceof InputProcessor) {
-			inputMultiplexer.addProcessor((InputProcessor) element);
-			Sort.instance().sort(inputMultiplexer.getProcessors());
-		}
 		systemToState.put(element, State.Added);
 		toStart++;
 		baseSystems.add(element);
+		Collections.sort(baseSystems);
 		if (element instanceof TimedSystem) {
 			timedSystems.add((TimedSystem) element);
+			Collections.sort(timedSystems);
 		}
 	}
 
@@ -203,13 +213,11 @@ public class SystemManager extends TypeManager<SystemBase> {
 
 	@Override
 	protected void elementDelete(SystemBase element) {
-		if (element instanceof InputProcessor) {
-			inputMultiplexer.removeProcessor((InputProcessor) element);
-			Sort.instance().sort(inputMultiplexer.getProcessors());
-		}
 		baseSystems.remove(element);
+		Collections.sort(baseSystems);
 		if (element instanceof TimedSystem) {
 			timedSystems.remove(element);
+			Collections.sort(timedSystems);
 		}
 	}
 

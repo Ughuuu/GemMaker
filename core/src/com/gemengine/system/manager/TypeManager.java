@@ -207,7 +207,10 @@ public abstract class TypeManager<T> {
 		for (val copyItem : toRemoveList) {
 			String key = copyItem.getName();
 			T oldElement = oldTypes.get(key);
-			copyElement(oldElement, newTypes.get(key));
+			T newElement = newTypes.get(key);
+			if (newElement != null) {
+				copyElement(oldElement, newElement);
+			}
 		}
 		copyList.clear();
 	}
