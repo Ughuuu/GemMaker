@@ -1,5 +1,6 @@
 package com.gemengine.entity;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -184,6 +185,46 @@ public class Entity {
 	 */
 	public Set<Entity> getPredecessors() {
 		return entitySystem.getPredecessors(this);
+	}
+
+	/**
+	 * Get the predecessors of this entity that contain a component of the given
+	 * type. This is a collection of this entities parent and the parent of that
+	 * one, recursively until no more parents are found.
+	 * 
+	 * @param type
+	 *            the component type
+	 * @return The predecessors.
+	 */
+	public <T extends Component> Set<Entity> getPredecessorsOf(Class<T> type) {
+		Set<Entity> entities = entitySystem.getPredecessors(this);
+		Set<Entity> filteredEntities = new HashSet<Entity>();
+		for (Entity ent : entities) {
+			if (ent.getComponent(type) == null) {
+				filteredEntities.add(ent);
+			}
+		}
+		return filteredEntities;
+	}
+
+	/**
+	 * Get the children of this entity and the children of those, recursively,
+	 * until there are no more children found. Then filters them to contain a
+	 * component of the given type.
+	 * 
+	 * @param type
+	 *            the component type
+	 * @return The descendants.
+	 */
+	public <T extends Component> Set<Entity> getDescendantsOf(Class<T> type) {
+		Set<Entity> entities = entitySystem.getDescendants(this);
+		Set<Entity> filteredEntities = new HashSet<Entity>();
+		for (Entity ent : entities) {
+			if (ent.getComponent(type) == null) {
+				filteredEntities.add(ent);
+			}
+		}
+		return filteredEntities;
 	}
 
 	/**
