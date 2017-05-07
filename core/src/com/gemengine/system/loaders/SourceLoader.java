@@ -13,6 +13,14 @@ import com.gemengine.system.AssetSystem;
 import com.gemengine.system.ManagerSystem;
 
 @SuppressWarnings("rawtypes")
+/**
+ * Source loader class. This generates an instance of
+ * {@link org.jsync.sync.SourceSync} from a .java file
+ * 
+ * @author Dragos
+ *
+ * @param <T>
+ */
 public class SourceLoader extends AsynchronousAssetLoader<SourceSync, SourceLoader.SourceParameter> {
 	static public class SourceParameter extends AssetLoaderParameters<SourceSync> {
 	}

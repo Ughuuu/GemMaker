@@ -27,6 +27,13 @@ import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+/**
+ * The Manager System is used to compile new systems and add them to the
+ * existing ones. It may also receive errors from them, which it logs.
+ * 
+ * @author Dragos
+ *
+ */
 public class ManagerSystem extends TimedSystem implements AssetListener {
 	public static final String codeFolder = Messages.getString("ManagerSystem.CodeFolder"); //$NON-NLS-1$
 	private final AssetSystem assetSystem;
@@ -43,6 +50,12 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		assetSystem.addAssetListener(this);
 	}
 
+	/**
+	 * Add a listener here if you want to listen for component type class
+	 * change.
+	 * 
+	 * @param componentListener
+	 */
 	public void addListener(ComponentListener componentListener) {
 		listeners.put(componentListener.getClass().getName(), componentListener);
 	}

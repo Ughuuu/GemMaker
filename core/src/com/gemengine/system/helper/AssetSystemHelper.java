@@ -30,7 +30,20 @@ import com.gemengine.system.AssetSystem;
 import com.gemengine.system.loaders.LoaderData;
 import com.gemengine.system.loaders.TextLoader;
 
+/**
+ * Helper class used in asset system.
+ * 
+ * @author Dragos
+ *
+ */
 public class AssetSystemHelper {
+	/**
+	 * Get the extension of a path.
+	 * 
+	 * @param path
+	 *            Path to get extension from
+	 * @return The extension of the path, or empty string.
+	 */
 	public static String getExtension(String path) {
 		int extensionStart = path.lastIndexOf('.');
 		if (extensionStart == -1)
@@ -38,6 +51,13 @@ public class AssetSystemHelper {
 		return path.substring(extensionStart);
 	}
 
+	/**
+	 * Get the path without the extension
+	 * 
+	 * @param path
+	 *            Path to get path without extension from
+	 * @return The path without extension or same path if no extension is found.
+	 */
 	public static String getWithoutExtension(String path) {
 		int extensionStart = path.lastIndexOf('.');
 		if (extensionStart == -1)
@@ -45,6 +65,13 @@ public class AssetSystemHelper {
 		return path.substring(0, extensionStart);
 	}
 
+	/**
+	 * Sets the default loaders to the asset systems. This is done by default if
+	 * it is set in the {@link com.gemengine.engine.GemConfiguration} when
+	 * constructing the {@link com.gemengine.engine.Gem}.
+	 * 
+	 * @param assetSystem
+	 */
 	public static void setDefaultLoaders(AssetSystem assetSystem) {
 		FileHandleResolver resolver = assetSystem.getFileHandleResolver();
 		assetSystem.addLoaderDefault(new LoaderData(BitmapFont.class), null, new BitmapFontLoader(resolver), ".fnt");

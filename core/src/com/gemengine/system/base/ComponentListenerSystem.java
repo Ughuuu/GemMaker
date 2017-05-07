@@ -9,6 +9,13 @@ import com.gemengine.system.ComponentSystem;
 
 import lombok.Getter;
 
+/**
+ * Convenience class that extends {@link com.gemengine.system.base.SystemBase}
+ * and implements the {@link com.gemengine.system.listener.ComponentListener}.
+ * 
+ * @author Dragos
+ *
+ */
 public abstract class ComponentListenerSystem extends SystemBase implements ComponentListener {
 	@Getter
 	private final Set<String> configuration;

@@ -7,6 +7,12 @@ import com.google.inject.name.Names;
 
 import lombok.val;
 
+/**
+ * The module given to guice injector
+ * 
+ * @author Dragos
+ *
+ */
 public class SystemManagerModule extends AbstractModule {
 	private final SystemManager systemManager;
 	private final GemConfiguration configuration;

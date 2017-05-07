@@ -8,6 +8,12 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
+/**
+ * Loads a file text into memory, as a {@link String}
+ * 
+ * @author Dragos
+ *
+ */
 public class TextLoader extends AsynchronousAssetLoader<String, TextLoader.TextParameter> {
 	static public class TextParameter extends AssetLoaderParameters<String> {
 	}

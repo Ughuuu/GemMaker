@@ -23,6 +23,13 @@ import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+/**
+ * A type manager handles types, instantiates them and copies them.
+ * 
+ * @author Dragos
+ *
+ * @param <T>
+ */
 public abstract class TypeManager<T> {
 	public static boolean extendsType(Class<?> type, Class<?> extendsType) {
 		if (type == null || type.equals(Object.class)) {
@@ -39,6 +46,12 @@ public abstract class TypeManager<T> {
 
 	private final Class<T> classType;
 
+	/**
+	 * Construct a new Type Manager with the given generic class. Used because
+	 * of type erasure.
+	 * 
+	 * @param type
+	 */
 	public TypeManager(Class<T> type) {
 		classType = type;
 		types = new HashMap<String, T>();
@@ -51,20 +64,45 @@ public abstract class TypeManager<T> {
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Get a type of given name. The name is the type class name.
+	 * 
+	 * @param type
+	 *            The type name
+	 * @return The type requested or null.
+	 */
 	public <U extends T> U getType(String type) {
 		return (U) types.get(type);
 	}
 
+	/**
+	 * Inject a given type.
+	 * 
+	 * @param type
+	 *            The type to inject.
+	 * @return The injected type.
+	 * @throws Exception
+	 */
 	public <T> T inject(Class<T> type) throws Exception {
 		return injector.getInstance(type);
 	}
 
+	/**
+	 * Event called on start. This instantiates the types given at start.
+	 */
 	public void onInit() {
-		doCopySystemsLogic(new ArrayList<>());
+		doCopyLogic(new ArrayList<>());
 	}
 
+	/**
+	 * Event called on update. This instantiates the types that were added
+	 * between last update event. This does not instantiate the types that are
+	 * excluded.
+	 * 
+	 * @param delta
+	 */
 	public void onUpdate(float delta) {
-		doCopySystemsLogic(getExcludeList());
+		doCopyLogic(getExcludeList());
 		for (String type : removeList) {
 			T element = types.remove(type);
 			elementDelete(element);
@@ -73,10 +111,21 @@ public abstract class TypeManager<T> {
 		removeList.clear();
 	}
 
+	/**
+	 * Remove a given type. This occurs on onUpdate event. It is not instant.
+	 * 
+	 * @param type
+	 */
 	public void removeType(String type) {
 		removeList.add(type);
 	}
 
+	/**
+	 * Copy a given type. This occurs on onUpdate event. It is not instant. Use
+	 * this for add event also.
+	 * 
+	 * @param typeClass
+	 */
 	public <U extends T> void replaceType(Class<U> typeClass) {
 		copyList.add(typeClass);
 	}
@@ -124,7 +173,7 @@ public abstract class TypeManager<T> {
 		}
 	}
 
-	private void doCopySystemsLogic(List<Class<? extends T>> excludeList) {
+	private void doCopyLogic(List<Class<? extends T>> excludeList) {
 		List<Class<? extends T>> toInstantiateList = getAllSystems(copyList);
 		Collections.reverse(toInstantiateList);
 		List<Class<? extends T>> toRemoveList = new ArrayList<Class<? extends T>>(toInstantiateList);

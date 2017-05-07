@@ -17,6 +17,12 @@ import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+/**
+ * The entity system, used to create, destroy and query entities.
+ * 
+ * @author Dragos
+ *
+ */
 public class EntitySystem extends SystemBase {
 	private final Map<Integer, Entity> entities = new HashMap<Integer, Entity>();
 	private final Map<String, Integer> entityNameToId = new HashMap<String, Integer>();
@@ -31,10 +37,23 @@ public class EntitySystem extends SystemBase {
 		this.componentSystem = componentSystem;
 	}
 
+	/**
+	 * Add an {@link EntityListener}. This listens to all entity
+	 * changes(add/remove).
+	 * 
+	 * @param entityListener
+	 */
 	public void addEntityListener(EntityListener entityListener) {
 		entityListeners.add(entityListener);
 	}
 
+	/**
+	 * Create a new entity with the given name. It has to be unique.
+	 * 
+	 * @param name
+	 *            The name of the entity
+	 * @return A new entity or null
+	 */
 	public Entity create(String name) {
 		if (entityNameToId.get(name) != null) {
 			return null;
@@ -52,36 +71,60 @@ public class EntitySystem extends SystemBase {
 		return ent;
 	}
 
+	/**
+	 * Delete the given entity.
+	 * 
+	 * @param ent
+	 *            the entity to delete
+	 */
 	public void delete(Entity ent) {
 		delete(ent.getId());
 	}
 
+	/**
+	 * Delete the given entity.
+	 * 
+	 * @param id
+	 *            the id of the entity to delete
+	 */
 	public void delete(int id) {
 		Entity ent = entities.remove(id);
 		if (ent == null) {
 			return;
 		}
 		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.getId(), ent.getName());
-		unparent(ent);
+		unlinkChildren(ent);
 		entityNameToId.remove(ent.getName());
 		for (val entityListener : entityListeners) {
 			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
 		}
 	}
 
+	/**
+	 * Delete the given entity.
+	 * 
+	 * @param name
+	 *            the name of the entity to delete
+	 */
 	public void delete(String name) {
 		Integer id = entityNameToId.remove(name);
 		if (id == null) {
 			return;
 		}
 		Entity ent = entities.remove(id);
-		unparent(ent);
+		unlinkChildren(ent);
 		for (val entityListener : entityListeners) {
 			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
 		}
 	}
 
-	public void deparent(Entity child) {
+	/**
+	 * Unlink the child from its parent. Does not throw.
+	 * 
+	 * @param child
+	 *            The child to be removed from its parent logical list.
+	 */
+	public void unlinkParent(Entity child) {
 		if (child == null) {
 			return;
 		}
@@ -102,11 +145,24 @@ public class EntitySystem extends SystemBase {
 		}
 	}
 
+	/**
+	 * Get the entity by its id.
+	 * 
+	 * @param id
+	 *            The id of the entity.
+	 * @return The entity or null
+	 */
 	public Entity get(int id) {
-		Entity ent = entities.get(id);
-		return ent;
+		return entities.get(id);
 	}
 
+	/**
+	 * Get the entity by its name
+	 * 
+	 * @param name
+	 *            The name of the entity
+	 * @return The entity or null
+	 */
 	public Entity get(String name) {
 		Integer id = entityNameToId.get(name);
 		if (id == null) {
@@ -115,6 +171,13 @@ public class EntitySystem extends SystemBase {
 		return get(id);
 	}
 
+	/**
+	 * Get the children of an entity
+	 * 
+	 * @param parent
+	 *            The parent entity
+	 * @return A non null value representing the children of this entity.
+	 */
 	public Set<Entity> getChildren(Entity parent) {
 		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
 		Set<Entity> children = new HashSet<Entity>();
@@ -127,6 +190,14 @@ public class EntitySystem extends SystemBase {
 		return children;
 	}
 
+	/**
+	 * Get the children of this entity and the children of those, recursively,
+	 * until there are no more children found.
+	 * 
+	 * @param parent
+	 *            the parent entity
+	 * @return The descendants.
+	 */
 	public Set<Entity> getDescendants(Entity parent) {
 		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
 		Set<Entity> children = new HashSet<Entity>();
@@ -140,6 +211,13 @@ public class EntitySystem extends SystemBase {
 		return children;
 	}
 
+	/**
+	 * Get the parent of this entity or null.
+	 * 
+	 * @param child
+	 *            the child entity
+	 * @return An entity or null.
+	 */
 	public Entity getParent(Entity child) {
 		Integer parentId = entityToParent.get(child.getId());
 		if (parentId == null) {
@@ -148,7 +226,15 @@ public class EntitySystem extends SystemBase {
 		return get(parentId);
 	}
 
-	public void getParent(Entity parent, Entity child) {
+	/**
+	 * Set the parent entity to be the parent of the child entity.
+	 * 
+	 * @param parent
+	 *            The parent entity
+	 * @param child
+	 *            The child entity
+	 */
+	public void setParent(Entity parent, Entity child) {
 		int parentId = parent.getId();
 		int childId = child.getId();
 		entityToParent.put(childId, parentId);
@@ -163,7 +249,16 @@ public class EntitySystem extends SystemBase {
 		}
 	}
 
-	public Set<Entity> getPredessesors(Entity child) {
+	/**
+	 * Get the predecessors of this entity. This is a collection of this
+	 * entities parent and the parent of that one, recursively until no more
+	 * parents are found.
+	 * 
+	 * @param child
+	 *            the child to get the predecessors from
+	 * @return The predecessors.
+	 */
+	public Set<Entity> getPredecessors(Entity child) {
 		Integer parentId = entityToParent.get(child.getId());
 		Set<Entity> parents = new HashSet<Entity>();
 		if (parentId == null) {
@@ -171,29 +266,45 @@ public class EntitySystem extends SystemBase {
 		}
 		Entity parent = get(parentId);
 		parents.add(parent);
-		parents.addAll(getPredessesors(parent));
+		parents.addAll(getPredecessors(parent));
 		return parents;
 	}
 
+	/**
+	 * Whether this entity has a parent or not.
+	 * 
+	 * @param child
+	 *            the child entity to check the parent of
+	 * @return True if this entity is a child.
+	 */
 	public boolean hasParent(Entity child) {
 		return entityToChildren.get(child.getId()) != null;
 	}
 
+	/**
+	 * Whether this entity has children or not.
+	 * 
+	 * @param parent
+	 *            the parent entity to check that has children
+	 * @return True if this entity is a parent.
+	 */
 	public boolean isParent(Entity parent) {
 		return entityToParent.get(parent.getId()) != null;
 	}
 
-	public void removeChild() {
-
-	}
-
-	public void unparent(Entity parent) {
+	/**
+	 * Remove all the logical links between this entity and its children.
+	 * 
+	 * @param parent
+	 *            the parent entity to unlink the children from
+	 */
+	public void unlinkChildren(Entity parent) {
 		Set<Integer> children = entityToChildren.get(parent.getId());
 		if (children == null) {
 			return;
 		}
 		for (int child : children) {
-			deparent(get(child));
+			unlinkParent(get(child));
 		}
 	}
 }

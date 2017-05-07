@@ -24,6 +24,13 @@ import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+/**
+ * The basic system that handles component creation, handling, querying and
+ * destruction.
+ * 
+ * @author Dragos
+ *
+ */
 public class ComponentSystem extends TimedSystem {
 	private final Map<Integer, Component> components = new HashMap<Integer, Component>();
 	private final Map<Integer, Entity> componentToEntity = new HashMap<Integer, Entity>();
@@ -44,24 +51,48 @@ public class ComponentSystem extends TimedSystem {
 		this.systemManager = systemManager;
 	}
 
+	/**
+	 * Add a {@link ComponentListener} listener. This listens for all component
+	 * changes of given type.
+	 * 
+	 * @param componentListener
+	 */
 	public void addComponentListener(ComponentListener componentListener) {
 		componentListeners.add(componentListener);
 	}
 
+	/**
+	 * Add a {@link ComponentUpdaterSystem}. This receives all components of
+	 * requested type.
+	 * 
+	 * @param componentUpdater
+	 */
 	public void addComponentUpdater(ComponentUpdaterSystem componentUpdater) {
 		componentUpdaterSystems.add(componentUpdater);
 		Collections.sort(componentUpdaterSystems);
 	}
 
+	/**
+	 * Add a {@link EntityComponentListener}. This listens for changes in
+	 * components from the entity chosen.
+	 * 
+	 * @param entityComponentListener
+	 */
 	public void addEntityComponentListener(EntityComponentListener entityComponentListener) {
 		entityComponentListeners.add(entityComponentListener);
 	}
 
+	/**
+	 * Clear all the components from an entity.
+	 * 
+	 * @param ent
+	 *            The entity to clear components from
+	 */
 	public void clear(Entity ent) {
 		clear(ent.getId());
 	}
 
-	public void clear(int ownerId) {
+	private void clear(int ownerId) {
 		val entityToComponent = entityToTypeToComponents.get(ownerId);
 		for (val key : entityToComponent.entrySet()) {
 			Component component = components.remove(key.getValue());
@@ -80,6 +111,15 @@ public class ComponentSystem extends TimedSystem {
 		entityToTypeToComponents.remove(ownerId);
 	}
 
+	/**
+	 * Create a component on a given entity.
+	 * 
+	 * @param ent
+	 *            The entity to make the component on
+	 * @param type
+	 *            The type of the component
+	 * @return The created component
+	 */
 	public <T extends Component> T create(Entity ent, Class<T> type) {
 		if (ent == null) {
 			return null;
@@ -106,6 +146,15 @@ public class ComponentSystem extends TimedSystem {
 		return component;
 	}
 
+	/**
+	 * Get a component from an entity.
+	 * 
+	 * @param ent
+	 *            The entity to get component from
+	 * @param type
+	 *            The type of the component
+	 * @return The component or null
+	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Component> List<T> get(Entity ent, Class<T> type) {
 		int ownerId = ent.getId();
@@ -124,6 +173,15 @@ public class ComponentSystem extends TimedSystem {
 		return entityComponents;
 	}
 
+	/**
+	 * Get a component from an entity.
+	 * 
+	 * @param ent
+	 *            The entity to get component from
+	 * @param id
+	 *            The id of the component
+	 * @return The component or null
+	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Component> T get(Entity ent, int id) {
 		Entity owner = componentToEntity.get(id);
@@ -137,10 +195,36 @@ public class ComponentSystem extends TimedSystem {
 		return (T) component;
 	}
 
+	/**
+	 * Get the owner of a component
+	 * 
+	 * @param id
+	 *            the id of the component
+	 * @return The owner of this component
+	 */
 	public Entity getOwner(int id) {
 		return componentToEntity.get(id);
 	}
 
+	/**
+	 * Get the owner of a component
+	 * 
+	 * @param component
+	 *            The component to get the owner from
+	 * @return The owner of this component
+	 */
+	public <T extends Component> Entity getOwner(T component) {
+		return componentToEntity.get(component.getId());
+	}
+
+	/**
+	 * Used by components to notify events.
+	 * 
+	 * @param event
+	 *            the event name
+	 * @param component
+	 *            the component initiating the event
+	 */
 	public void notifyFrom(String event, Component component) {
 		List<String> types = new ArrayList<String>();
 		supertypes(component.getClass(), types);
@@ -203,6 +287,14 @@ public class ComponentSystem extends TimedSystem {
 		}
 	}
 
+	/**
+	 * Remove the given component type from the given entity
+	 * 
+	 * @param ent
+	 *            The entity to remove the component from
+	 * @param type
+	 *            The type of the component
+	 */
 	public <T extends Component> void remove(Entity ent, Class<T> type) {
 		List<T> components = get(ent, type);
 		for (T component : components) {
@@ -210,6 +302,14 @@ public class ComponentSystem extends TimedSystem {
 		}
 	}
 
+	/**
+	 * Remove the given component type from the given entity
+	 * 
+	 * @param ent
+	 *            The entity to remove the component from
+	 * @param id
+	 *            The id of the component
+	 */
 	public void remove(Entity ent, int id) {
 		Component component = components.remove(id);
 		if (component == null) {
@@ -222,7 +322,7 @@ public class ComponentSystem extends TimedSystem {
 		for (ComponentListener listener : componentListeners) {
 			if (listener != component) {
 				for (String type : types) {
-					if (listener.getConfiguration().contains(type)) {
+					if (listener.getConfiguration().contains(type) && listener != component) {
 						listener.onChange(ComponentChangeType.DELETE, component);
 						break;
 					}
@@ -233,6 +333,14 @@ public class ComponentSystem extends TimedSystem {
 		removeFromEntityMap(ent, id, component.getClass());
 	}
 
+	/**
+	 * Remove the given component type from the given entity
+	 * 
+	 * @param ent
+	 *            The entity to remove the component from
+	 * @param component
+	 *            The component
+	 */
 	public <T extends Component> void remove(Entity ent, T component) {
 		remove(ent, component.getId());
 	}
@@ -246,7 +354,7 @@ public class ComponentSystem extends TimedSystem {
 		supertypes(component.getClass(), types);
 		for (ComponentListener listener : componentListeners) {
 			for (String type : types) {
-				if (listener.getConfiguration().contains(type)) {
+				if (listener.getConfiguration().contains(type) && listener != component) {
 					listener.onChange(ComponentChangeType.ADD, component);
 					break;
 				}

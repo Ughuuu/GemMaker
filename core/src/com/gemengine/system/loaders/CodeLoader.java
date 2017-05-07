@@ -13,6 +13,14 @@ import com.gemengine.system.AssetSystem;
 import com.gemengine.system.ManagerSystem;
 
 @SuppressWarnings("rawtypes")
+/**
+ * Code loader class. This generates an instance of
+ * {@link org.jsync.sync.ClassSync} from a .class file
+ * 
+ * @author Dragos
+ *
+ * @param <T>
+ */
 public class CodeLoader<T> extends AsynchronousAssetLoader<ClassSync, CodeLoader.CodeParameter> {
 	static public class CodeParameter extends AssetLoaderParameters<ClassSync> {
 		private final ClassLoader classLoader;

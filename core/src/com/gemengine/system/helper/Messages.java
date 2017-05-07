@@ -8,6 +8,12 @@ import org.apache.logging.log4j.MarkerManager;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+/**
+ * String constants used in engine are contained here.
+ * 
+ * @author Dragos
+ *
+ */
 public class Messages {
 	private static final String BUNDLE_NAME = "com.gemengine.system.helper.messages"; //$NON-NLS-1$
 

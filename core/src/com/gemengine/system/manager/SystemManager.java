@@ -10,6 +10,11 @@ import java.util.TreeSet;
 
 import org.apache.logging.log4j.MarkerManager;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Sort;
 import com.gemengine.engine.GemConfiguration;
 import com.gemengine.system.AssetSystem;
 import com.gemengine.system.ManagerSystem;
@@ -21,6 +26,15 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+/**
+ * Implementation of {@link com.gemengine.system.manager.TypeManager} with
+ * generic parameter {@link com.gemengine.system.base.SystemBase}. This is used
+ * by calling replaceType with the system you want to replace by a new system.
+ * This is done in {@link com.gemengine.system.ManagerSystem}
+ * 
+ * @author Dragos
+ *
+ */
 public class SystemManager extends TypeManager<SystemBase> {
 	private static enum State {
 		Added, Started, Destroyed
@@ -34,6 +48,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 	@Getter
 	private final List<Class<? extends SystemBase>> excludeList = new ArrayList<>(
 			Arrays.asList(AssetSystem.class, ManagerSystem.class));
+	private final InputMultiplexer inputMultiplexer = new InputMultiplexer();
 
 	public SystemManager(GemConfiguration configuration) {
 		super(SystemBase.class);
@@ -42,6 +57,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 		systemToState = new HashMap<SystemBase, State>();
 		timedSystems = new TreeSet<TimedSystem>();
 		doMapping();
+		Gdx.input.setInputProcessor(inputMultiplexer);
 	}
 
 	@Override
@@ -91,8 +107,79 @@ public class SystemManager extends TypeManager<SystemBase> {
 		}
 	}
 
+	/**
+	 * Called when the system is disposed of. Preceded by a call to
+	 * {@link #onPause()}.
+	 */
+	public void onDispose() {
+		for (SystemBase system : baseSystems) {
+			try {
+				system.onExit();
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "System Manager init", t);
+				system.setEnable(false);
+			}
+		}
+	}
+
+	/**
+	 * Called when the {@link Application} is paused, usually when it's not
+	 * active or visible on screen. An Application is also paused before it is
+	 * destroyed.
+	 */
+	public void onPause() {
+		for (SystemBase system : baseSystems) {
+			try {
+				system.onPause();
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "System Manager init", t);
+				system.setEnable(false);
+			}
+		}
+	}
+
+	/**
+	 * Called when the {@link Application} is resumed from a paused state,
+	 * usually when it regains focus.
+	 */
+	public void onResume() {
+		for (SystemBase system : baseSystems) {
+			try {
+				system.onResume();
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "System Manager init", t);
+				system.setEnable(false);
+			}
+		}
+	}
+
+	/**
+	 * Called when the {@link Application} is resized. This can happen at any
+	 * point during a non-paused state but will never happen before a call to
+	 * {@link #onInit()}.
+	 * 
+	 * @param width
+	 *            the new width in pixels
+	 * @param height
+	 *            the new height in pixels
+	 */
+	public void onResize(int width, int height) {
+		for (SystemBase system : baseSystems) {
+			try {
+				system.onResize(width, height);
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "System Manager init", t);
+				system.setEnable(false);
+			}
+		}
+	}
+
 	@Override
 	protected void elementAdd(SystemBase element) {
+		if (element instanceof InputProcessor) {
+			inputMultiplexer.addProcessor((InputProcessor) element);
+			Sort.instance().sort(inputMultiplexer.getProcessors());
+		}
 		systemToState.put(element, State.Added);
 		toStart++;
 		baseSystems.add(element);
@@ -116,6 +203,10 @@ public class SystemManager extends TypeManager<SystemBase> {
 
 	@Override
 	protected void elementDelete(SystemBase element) {
+		if (element instanceof InputProcessor) {
+			inputMultiplexer.removeProcessor((InputProcessor) element);
+			Sort.instance().sort(inputMultiplexer.getProcessors());
+		}
 		baseSystems.remove(element);
 		if (element instanceof TimedSystem) {
 			timedSystems.remove(element);
