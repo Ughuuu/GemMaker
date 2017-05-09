@@ -52,11 +52,12 @@ public class EntitySystem extends SystemBase {
 	 * 
 	 * @param name
 	 *            The name of the entity
-	 * @return A new entity or null
+	 * @return A new entity or old entity
 	 */
 	public Entity create(String name) {
-		if (entityNameToId.get(name) != null) {
-			return null;
+		Integer oldEntity = entityNameToId.get(name);
+		if (oldEntity != null) {
+			return get(oldEntity);
 		}
 		Entity ent = new Entity(name, this, componentSystem);
 		entityNameToId.put(name, ent.getId());
@@ -65,7 +66,7 @@ public class EntitySystem extends SystemBase {
 			try {
 				entityListener.onChange(EntityChangeType.ADD, ent, ent);
 			} catch (Throwable t) {
-				t.printStackTrace();
+				log.warn(MarkerManager.getMarker("gem"), "Entity event", t);
 			}
 		}
 		return ent;
@@ -88,16 +89,23 @@ public class EntitySystem extends SystemBase {
 	 *            the id of the entity to delete
 	 */
 	public void delete(int id) {
-		Entity ent = entities.remove(id);
+		Entity ent = entities.get(id);
+		if (!entityListeners.isEmpty()) {
+			for (val entityListener : entityListeners) {
+				try {
+					entityListener.onChange(EntityChangeType.DELETE, ent, ent);
+				} catch (Throwable t) {
+					log.warn(MarkerManager.getMarker("gem"), "Entity event", t);
+				}
+			}
+		}
+		componentSystem.clear(ent);
+		entities.remove(id);
 		if (ent == null) {
 			return;
 		}
-		log.debug(MarkerManager.getMarker("gem"), "Entity deleted: id {} name {}", ent.getId(), ent.getName());
 		unlinkChildren(ent);
 		entityNameToId.remove(ent.getName());
-		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
-		}
 	}
 
 	/**
@@ -107,15 +115,23 @@ public class EntitySystem extends SystemBase {
 	 *            the name of the entity to delete
 	 */
 	public void delete(String name) {
+		Entity ent = get(name);
+		if (!entityListeners.isEmpty()) {
+			for (val entityListener : entityListeners) {
+				try {
+					entityListener.onChange(EntityChangeType.DELETE, ent, ent);
+				} catch (Throwable t) {
+					log.warn(MarkerManager.getMarker("gem"), "Entity event", t);
+				}
+			}
+		}
+		componentSystem.clear(ent);
 		Integer id = entityNameToId.remove(name);
 		if (id == null) {
 			return;
 		}
-		Entity ent = entities.remove(id);
+		entities.remove(id);
 		unlinkChildren(ent);
-		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.DELETE, ent, ent);
-		}
 	}
 
 	/**
@@ -141,7 +157,11 @@ public class EntitySystem extends SystemBase {
 			children.remove(child.getId());
 		}
 		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.DEPARENTED, parent, child);
+			try {
+				entityListener.onChange(EntityChangeType.DEPARENTED, parent, child);
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "Entity event", t);
+			}
 		}
 	}
 
@@ -206,6 +226,7 @@ public class EntitySystem extends SystemBase {
 		}
 		for (int child : childrenIds) {
 			Entity childEntity = get(child);
+			children.add(childEntity);
 			children.addAll(getDescendants(childEntity));
 		}
 		return children;
@@ -245,7 +266,11 @@ public class EntitySystem extends SystemBase {
 		}
 		children.add(childId);
 		for (val entityListener : entityListeners) {
-			entityListener.onChange(EntityChangeType.PARENTED, parent, child);
+			try {
+				entityListener.onChange(EntityChangeType.PARENTED, parent, child);
+			} catch (Throwable t) {
+				log.warn(MarkerManager.getMarker("gem"), "Entity event", t);
+			}
 		}
 	}
 

@@ -93,17 +93,24 @@ public class ComponentSystem extends TimedSystem {
 	}
 
 	private void clear(int ownerId) {
-		val entityToComponent = entityToTypeToComponents.get(ownerId);
-		for (val key : entityToComponent.entrySet()) {
-			Component component = components.remove(key.getValue());
-			for (ComponentListener listener : componentListeners) {
-				if (listener.getConfiguration().contains(component.getClass().getName())) {
-					listener.onChange(ComponentChangeType.DELETE, component);
+		val entityToComponent = get(ownerId, Component.class);
+		if (!componentListeners.isEmpty()) {
+			for (val component : entityToComponent) {
+				List<String> types = new ArrayList<String>();
+				supertypes(component.getClass(), types);
+				for (ComponentListener listener : componentListeners) {
+					if (listener != component) {
+						for (String type : types) {
+							if (listener.getConfiguration().contains(type)) {
+								listener.onChange(ComponentChangeType.DELETE, component);
+								break;
+							}
+						}
+					}
 				}
 			}
-			if (component == null) {
-				continue;
-			}
+		}
+		for (val component : entityToComponent) {
 			int id = component.getId();
 			removeFromTypeMap(id, component.getClass());
 			componentToEntity.remove(id);
@@ -157,7 +164,11 @@ public class ComponentSystem extends TimedSystem {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Component> List<T> get(Entity ent, Class<T> type) {
-		int ownerId = ent.getId();
+		return get(ent.getId(), type);
+	}
+
+	private <T extends Component> List<T> get(int entityId, Class<T> type) {
+		int ownerId = entityId;
 		val typeToComponent = entityToTypeToComponents.get(ownerId);
 		if (typeToComponent == null) {
 			return null;
@@ -311,23 +322,24 @@ public class ComponentSystem extends TimedSystem {
 	 *            The id of the component
 	 */
 	public void remove(Entity ent, int id) {
-		Component component = components.remove(id);
-		if (component == null) {
-			return;
-		}
-		log.debug(MarkerManager.getMarker("gem"), "Component deleted: id {} type {}", component.getId(),
-				component.getClass());
-		List<String> types = new ArrayList<String>();
-		supertypes(component.getClass(), types);
-		for (ComponentListener listener : componentListeners) {
-			if (listener != component) {
-				for (String type : types) {
-					if (listener.getConfiguration().contains(type) && listener != component) {
-						listener.onChange(ComponentChangeType.DELETE, component);
-						break;
+		if (!componentListeners.isEmpty()) {
+			Component component = components.get(id);
+			List<String> types = new ArrayList<String>();
+			supertypes(component.getClass(), types);
+			for (ComponentListener listener : componentListeners) {
+				if (listener != component) {
+					for (String type : types) {
+						if (listener.getConfiguration().contains(type) && listener != component) {
+							listener.onChange(ComponentChangeType.DELETE, component);
+							break;
+						}
 					}
 				}
 			}
+		}
+		Component component = components.remove(id);
+		if (component == null) {
+			return;
 		}
 		removeFromTypeMap(id, component.getClass());
 		removeFromEntityMap(ent, id, component.getClass());

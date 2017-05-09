@@ -200,7 +200,7 @@ public class Entity {
 		Set<Entity> entities = entitySystem.getPredecessors(this);
 		Set<Entity> filteredEntities = new HashSet<Entity>();
 		for (Entity ent : entities) {
-			if (ent.getComponent(type) == null) {
+			if (ent.getComponent(type) != null) {
 				filteredEntities.add(ent);
 			}
 		}
@@ -220,7 +220,7 @@ public class Entity {
 		Set<Entity> entities = entitySystem.getDescendants(this);
 		Set<Entity> filteredEntities = new HashSet<Entity>();
 		for (Entity ent : entities) {
-			if (ent.getComponent(type) == null) {
+			if (ent.getComponent(type) != null) {
 				filteredEntities.add(ent);
 			}
 		}
@@ -250,5 +250,10 @@ public class Entity {
 	 */
 	public void unlinkChildren() {
 		entitySystem.unlinkChildren(this);
+	}
+
+	@Override
+	public String toString() {
+		return "Entity [id=" + id + ", name=" + name + "]";
 	}
 }
