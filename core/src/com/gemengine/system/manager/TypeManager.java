@@ -190,7 +190,7 @@ public abstract class TypeManager<T> {
 		doMapping();
 		// instantiate new types
 		for (val copyItem : toInstantiateList) {
-			if (types.containsKey(copyItem)) {
+			if (types.containsKey(copyItem.getName())) {
 				continue;
 			}
 			try {

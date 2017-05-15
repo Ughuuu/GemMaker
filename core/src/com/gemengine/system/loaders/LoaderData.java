@@ -2,9 +2,11 @@ package com.gemengine.system.loaders;
 
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
+import com.gemengine.system.AssetSystem;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * This is used to hold data about loaders.
@@ -12,10 +14,12 @@ import lombok.Setter;
  * @author Dragos
  *
  */
+@Log4j2
 public class LoaderData<T> {
 	@Getter
 	private final Class<T> type;
-	private final AssetLoaderParameters<T> assetLoaderParameters;
+	@Setter
+	private AssetLoaderParameters<T> assetLoaderParameters;
 	@Setter
 	@Getter
 	private String folder;

@@ -74,7 +74,7 @@ public class Gem implements ApplicationListener {
 	 * {@inheritDoc}
 	 */
 	public void render() {
-		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClearColor(0.262f, 0.129f, 0.262f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		try {
 			systemManager.onUpdate(Gdx.graphics.getDeltaTime());

@@ -12,7 +12,7 @@ import com.gemengine.entity.Entity;
  * @author Dragos
  *
  */
-public interface EntityComponentListener {
+public interface EntityComponentListener extends PriorityListener{
 	/**
 	 * Notifications triggered by components when something changed.
 	 * 

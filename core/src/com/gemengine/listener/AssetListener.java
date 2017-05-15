@@ -10,7 +10,7 @@ import org.eclipse.jgit.diff.DiffEntry.ChangeType;
  * @author Dragos
  *
  */
-public interface AssetListener {
+public interface AssetListener extends PriorityListener{
 	/**
 	 * Triggered when an asset has changed externally or interanlly(add only).
 	 * For delete, add, modify events, both names are the same. For copy and

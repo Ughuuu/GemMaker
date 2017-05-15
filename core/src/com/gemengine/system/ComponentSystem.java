@@ -10,10 +10,12 @@ import java.util.Set;
 
 import org.apache.logging.log4j.MarkerManager;
 
+import com.badlogic.gdx.utils.TimeUtils;
 import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
 import com.gemengine.listener.ComponentListener;
 import com.gemengine.listener.EntityComponentListener;
+import com.gemengine.listener.PriorityListener;
 import com.gemengine.listener.ComponentListener.ComponentChangeType;
 import com.gemengine.system.base.ComponentUpdaterSystem;
 import com.gemengine.system.base.TimedSystem;
@@ -23,7 +25,6 @@ import com.google.inject.Inject;
 import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 /**
  * The basic system that handles component creation, handling, querying and
  * destruction.
@@ -31,6 +32,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Dragos
  *
  */
+@Log4j2
 public class ComponentSystem extends TimedSystem {
 	private final Map<Integer, Component> components = new HashMap<Integer, Component>();
 	private final Map<Integer, Entity> componentToEntity = new HashMap<Integer, Entity>();
@@ -42,13 +44,17 @@ public class ComponentSystem extends TimedSystem {
 	private final SystemManager systemManager;
 	private final List<ComponentUpdaterSystem> componentUpdaterSystems = new ArrayList<ComponentUpdaterSystem>();
 	private final List<ComponentListener> componentListeners = new ArrayList<ComponentListener>();
-	private final List<EntityComponentListener> entityComponentListeners = new ArrayList<EntityComponentListener>();
+	private final Map<Integer, List<EntityComponentListener>> entityComponentListeners = new HashMap<Integer, List<EntityComponentListener>>();
 	private final Map<Set<String>, Set<Entity>> configurationToEntities = new HashMap<Set<String>, Set<Entity>>();
 
+	private boolean dirty = false;
+	private final TimingSystem timingSystem;
+
 	@Inject
-	public ComponentSystem(SystemManager systemManager) {
+	public ComponentSystem(SystemManager systemManager, TimingSystem timingSystem) {
 		super(1600, true, 3);
 		this.systemManager = systemManager;
+		this.timingSystem = timingSystem;
 	}
 
 	/**
@@ -59,6 +65,7 @@ public class ComponentSystem extends TimedSystem {
 	 */
 	public void addComponentListener(ComponentListener componentListener) {
 		componentListeners.add(componentListener);
+		Collections.sort(componentListeners, PriorityListener.getComparator());
 	}
 
 	/**
@@ -79,7 +86,14 @@ public class ComponentSystem extends TimedSystem {
 	 * @param entityComponentListener
 	 */
 	public void addEntityComponentListener(EntityComponentListener entityComponentListener) {
-		entityComponentListeners.add(entityComponentListener);
+		Entity owner = entityComponentListener.getOwner();
+		List<EntityComponentListener> listeners = entityComponentListeners.get(owner.getId());
+		if (listeners == null) {
+			listeners = new ArrayList<EntityComponentListener>();
+			entityComponentListeners.put(owner.getId(), listeners);
+		}
+		listeners.add(entityComponentListener);
+		Collections.sort(listeners, PriorityListener.getComparator());
 	}
 
 	/**
@@ -116,6 +130,7 @@ public class ComponentSystem extends TimedSystem {
 			componentToEntity.remove(id);
 		}
 		entityToTypeToComponents.remove(ownerId);
+		dirty = true;
 	}
 
 	/**
@@ -150,6 +165,7 @@ public class ComponentSystem extends TimedSystem {
 		addType(ent, component);
 		addComponent(ent, component);
 		component.onCreate();
+		dirty = true;
 		return component;
 	}
 
@@ -237,21 +253,26 @@ public class ComponentSystem extends TimedSystem {
 	 *            the component initiating the event
 	 */
 	public void notifyFrom(String event, Component component) {
-		List<String> types = new ArrayList<String>();
-		supertypes(component.getClass(), types);
-		for (ComponentListener listener : componentListeners) {
-			if (listener != component) {
-				for (String type : types) {
-					if (listener.getConfiguration().contains(type)) {
-						listener.onNotify(event, component);
-						break;
+		if (componentListeners != null) {
+			List<String> types = new ArrayList<String>();
+			supertypes(component.getClass(), types);
+			for (ComponentListener listener : componentListeners) {
+				if (listener != component) {
+					for (String type : types) {
+						if (listener.getConfiguration().contains(type)) {
+							listener.onNotify(event, component);
+							break;
+						}
 					}
 				}
 			}
 		}
-		for (EntityComponentListener listener : entityComponentListeners) {
-			if (listener.getOwner() == getOwner(component.getId()) && listener != component) {
-				listener.onNotify(event, component);
+		List<EntityComponentListener> listeners = entityComponentListeners.get(getOwner(component.getId()).getId());
+		if (listeners != null) {
+			for (EntityComponentListener listener : listeners) {
+				if (listener != component) {
+					listener.onNotify(event, component);
+				}
 			}
 		}
 	}
@@ -262,7 +283,9 @@ public class ComponentSystem extends TimedSystem {
 
 	@Override
 	public void onUpdate(float delta) {
+		long startUpdate = TimeUtils.millis();
 		for (val updater : componentUpdaterSystems) {
+			long start = TimeUtils.millis();
 			try {
 				if (updater.isEnable()) {
 					updater.onBeforeEntities();
@@ -271,8 +294,11 @@ public class ComponentSystem extends TimedSystem {
 				log.warn(MarkerManager.getMarker("gem"), "Component System before update", t);
 				updater.setEnable(false);
 			}
+			timingSystem.addTiming(updater.getClass().getName() + "#onBeforeEntities", TimeUtils.millis() - start,
+					getInterval());
 		}
 		for (val updater : componentUpdaterSystems) {
+			long start = TimeUtils.millis();
 			val configuration = updater.getConfiguration();
 			Set<Entity> entities = entitiesFromConfiguration(configuration);
 			for (val entity : entities) {
@@ -285,8 +311,10 @@ public class ComponentSystem extends TimedSystem {
 					updater.setEnable(false);
 				}
 			}
+			timingSystem.addTiming(updater.getClass().getName() + "#onNext", TimeUtils.millis() - start, getInterval());
 		}
 		for (val updater : componentUpdaterSystems) {
+			long start = TimeUtils.millis();
 			try {
 				if (updater.isEnable()) {
 					updater.onAfterEntities();
@@ -295,7 +323,10 @@ public class ComponentSystem extends TimedSystem {
 				log.warn(MarkerManager.getMarker("gem"), "Component System after update", t);
 				updater.setEnable(false);
 			}
+			timingSystem.addTiming(updater.getClass().getName() + "#onBeforeEntities", TimeUtils.millis() - start,
+					getInterval());
 		}
+		timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - startUpdate, getInterval());
 	}
 
 	/**
@@ -343,6 +374,7 @@ public class ComponentSystem extends TimedSystem {
 		}
 		removeFromTypeMap(id, component.getClass());
 		removeFromEntityMap(ent, id, component.getClass());
+		dirty = true;
 	}
 
 	/**
@@ -408,14 +440,16 @@ public class ComponentSystem extends TimedSystem {
 			entityCollection = new HashSet<Entity>();
 			configurationToEntities.put(configuration, entityCollection);
 		}
-		entityCollection.clear();
-		for (String type : configuration) {
-			List<Integer> components = typeToComponents.get(type);
-			if (components == null) {
-				continue;
-			}
-			for (Integer component : components) {
-				entityCollection.add(componentToEntity.get(component));
+		if (dirty) {
+			entityCollection.clear();
+			for (String type : configuration) {
+				List<Integer> components = typeToComponents.get(type);
+				if (components == null) {
+					continue;
+				}
+				for (Integer component : components) {
+					entityCollection.add(componentToEntity.get(component));
+				}
 			}
 		}
 		return entityCollection;

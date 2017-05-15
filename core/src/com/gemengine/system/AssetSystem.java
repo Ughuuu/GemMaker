@@ -3,6 +3,7 @@ package com.gemengine.system;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,7 +26,9 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.LocalFileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.gemengine.listener.AssetListener;
+import com.gemengine.listener.PriorityListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.helper.AssetSystemHelper;
 import com.gemengine.system.helper.Messages;
@@ -37,13 +40,13 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 /**
  * Asset System, used by the engine to collect assets.
  * 
  * @author Dragos
  *
  */
+@Log4j2
 public class AssetSystem extends TimedSystem {
 	private static final Map<String, List<LoaderData>> extensionToLoaderMap = new HashMap<String, List<LoaderData>>();
 	public final static String assetsFolder = Messages.getString("AssetSystem.AssetsFolder"); //$NON-NLS-1$
@@ -54,12 +57,14 @@ public class AssetSystem extends TimedSystem {
 	private final Commiter commiter;
 	private final boolean useBlockingLoad;
 	private final boolean useExternalFiles;
-	private final Set<AssetListener> assetListeners;
+	private final List<AssetListener> assetListeners;
+	private final TimingSystem timingSystem;
 
 	@Inject
 	AssetSystem(@Named("useExternalFiles") boolean useExternalFiles, @Named("useBlockingLoad") boolean useBlockingLoad,
-			@Named("useDefaultLoaders") boolean useDefaultLoaders) {
+			@Named("useDefaultLoaders") boolean useDefaultLoaders, TimingSystem timingSystem) {
 		super(300, true, 0);
+		this.timingSystem = timingSystem;
 		this.useExternalFiles = useExternalFiles;
 		if (useExternalFiles) {
 			assetManager = new AssetManager(new InternalFileHandleResolver(), false);
@@ -80,7 +85,7 @@ public class AssetSystem extends TimedSystem {
 		folderToAsset = new HashMap<String, List<String>>();
 		assetToFolder = new HashMap<String, String>();
 		loadFolders = new ArrayList<String>();
-		assetListeners = new HashSet<AssetListener>();
+		assetListeners = new ArrayList<AssetListener>();
 		loadFolders.add(null);
 		loadFolder();
 	}
@@ -93,6 +98,7 @@ public class AssetSystem extends TimedSystem {
 	 */
 	public void addAssetListener(AssetListener assetListener) {
 		assetListeners.add(assetListener);
+		Collections.sort(assetListeners, PriorityListener.getComparator());
 	}
 
 	/**
@@ -213,6 +219,15 @@ public class AssetSystem extends TimedSystem {
 	}
 
 	/**
+	 * Get the loading progress.
+	 * 
+	 * @return Wether all assets are loaded or not.
+	 */
+	public boolean isLoaded() {
+		return assetManager.update();
+	}
+
+	/**
 	 * @param fileName
 	 *            the file name of the asset
 	 * @return whether the asset is loaded
@@ -250,6 +265,7 @@ public class AssetSystem extends TimedSystem {
 
 	@Override
 	public void onUpdate(float delta) {
+		long start = TimeUtils.millis();
 		if (useExternalFiles) {
 			try {
 				// always check file changes
@@ -268,6 +284,7 @@ public class AssetSystem extends TimedSystem {
 		if (!useBlockingLoad) {
 			assetManager.update();
 		}
+		timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - start, getInterval());
 	}
 
 	/**
@@ -310,17 +327,20 @@ public class AssetSystem extends TimedSystem {
 
 	private void findExternalChanges() throws Exception {
 		List<DiffEntry> entries = commiter.update();
+		if (entries.size() != 0) {
+			log.debug(entries);
+		}
 		for (DiffEntry entry : entries) {
 			String oldPath = assetsFolder + entry.getOldPath();
 			String newPath = assetsFolder + entry.getNewPath();
 			boolean success = false;
 			switch (entry.getChangeType()) {
 			case DELETE:
-				success = unplaceAsset(oldPath);
+				success = unplaceAsset(oldPath) || success;
 				break;
 			case MODIFY:
 			case RENAME:
-				success = unplaceAsset(assetsFolder + entry.getOldPath());
+				success = unplaceAsset(assetsFolder + entry.getOldPath()) || success;
 				break;
 			default:
 				break;
@@ -329,11 +349,11 @@ public class AssetSystem extends TimedSystem {
 				switch (entry.getChangeType()) {
 				case ADD:
 				case COPY:
-					success = placeAsset(assetsFolder + entry.getNewPath(), loadFolder);
+					success = placeAsset(assetsFolder + entry.getNewPath(), loadFolder) || success;
 					break;
 				case MODIFY:
 				case RENAME:
-					success = placeAsset(assetsFolder + entry.getNewPath(), loadFolder);
+					success = placeAsset(assetsFolder + entry.getNewPath(), loadFolder) || success;
 					break;
 				default:
 					break;

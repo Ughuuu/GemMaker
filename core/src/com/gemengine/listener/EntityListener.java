@@ -10,7 +10,7 @@ import com.gemengine.entity.Entity;
  * @author Dragos
  *
  */
-public interface EntityListener {
+public interface EntityListener extends PriorityListener{
 	/**
 	 * The entity change event.
 	 * 

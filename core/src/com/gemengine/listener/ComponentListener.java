@@ -13,7 +13,7 @@ import com.gemengine.system.helper.ListenerHelper;
  * @author Dragos
  *
  */
-public interface ComponentListener {
+public interface ComponentListener extends PriorityListener{
 	/**
 	 * The component change type. The cases are described in the enum.
 	 * 

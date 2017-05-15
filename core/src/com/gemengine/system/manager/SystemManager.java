@@ -16,6 +16,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.gemengine.engine.GemConfiguration;
 import com.gemengine.system.AssetSystem;
 import com.gemengine.system.ManagerSystem;
@@ -82,6 +83,7 @@ public class SystemManager extends TypeManager<SystemBase> {
 			State state = systemToState.get(system);
 			if (state == State.Started) {
 				try {
+					long start = TimeUtils.millis();
 					system.onUpdate(delta);
 				} catch (Throwable t) {
 					log.warn(MarkerManager.getMarker("gem"), "System Manager update", t);
@@ -206,13 +208,12 @@ public class SystemManager extends TypeManager<SystemBase> {
 		} else {
 			elementDelete(oldElement);
 			elementAdd(newElement);
-			toStart--;
-			systemToState.put(newElement, state);
 		}
 	}
 
 	@Override
 	protected void elementDelete(SystemBase element) {
+		systemToState.remove(element);
 		baseSystems.remove(element);
 		Collections.sort(baseSystems);
 		if (element instanceof TimedSystem) {

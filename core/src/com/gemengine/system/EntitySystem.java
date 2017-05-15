@@ -1,7 +1,10 @@
 package com.gemengine.system;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +12,7 @@ import org.apache.logging.log4j.MarkerManager;
 
 import com.gemengine.entity.Entity;
 import com.gemengine.listener.EntityListener;
+import com.gemengine.listener.PriorityListener;
 import com.gemengine.listener.EntityListener.EntityChangeType;
 import com.gemengine.system.base.SystemBase;
 import com.google.inject.Inject;
@@ -16,25 +20,27 @@ import com.google.inject.Inject;
 import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 /**
  * The entity system, used to create, destroy and query entities.
  * 
  * @author Dragos
  *
  */
+@Log4j2
 public class EntitySystem extends SystemBase {
 	private final Map<Integer, Entity> entities = new HashMap<Integer, Entity>();
 	private final Map<String, Integer> entityNameToId = new HashMap<String, Integer>();
 	private final Map<Integer, Integer> entityToParent = new HashMap<Integer, Integer>();
 	private final Map<Integer, Set<Integer>> entityToChildren = new HashMap<Integer, Set<Integer>>();
-	private final Set<EntityListener> entityListeners = new HashSet<EntityListener>();
+	private final List<EntityListener> entityListeners = new ArrayList<EntityListener>();
 	private final ComponentSystem componentSystem;
+	private final TimingSystem timingSystem;
 
 	@Inject
-	public EntitySystem(ComponentSystem componentSystem) {
+	public EntitySystem(ComponentSystem componentSystem, TimingSystem timingSystem) {
 		super(true, 2);
 		this.componentSystem = componentSystem;
+		this.timingSystem = timingSystem;
 	}
 
 	/**
@@ -45,6 +51,7 @@ public class EntitySystem extends SystemBase {
 	 */
 	public void addEntityListener(EntityListener entityListener) {
 		entityListeners.add(entityListener);
+		Collections.sort(entityListeners, PriorityListener.getComparator());
 	}
 
 	/**
