@@ -17,7 +17,7 @@ import com.gemengine.listener.ComponentListener;
 import com.gemengine.listener.EntityComponentListener;
 import com.gemengine.listener.PriorityListener;
 import com.gemengine.listener.ComponentListener.ComponentChangeType;
-import com.gemengine.system.base.ComponentUpdaterSystem;
+import com.gemengine.listener.ComponentUpdaterListener;
 import com.gemengine.system.base.TimedSystem;
 import com.gemengine.system.manager.SystemManager;
 import com.google.inject.Inject;
@@ -42,7 +42,7 @@ public class ComponentSystem extends TimedSystem {
 	private final Map<String, List<Integer>> typeToComponents = new HashMap<String, List<Integer>>();
 
 	private final SystemManager systemManager;
-	private final List<ComponentUpdaterSystem> componentUpdaterSystems = new ArrayList<ComponentUpdaterSystem>();
+	private final List<ComponentUpdaterListener> componentUpdaterSystems = new ArrayList<ComponentUpdaterListener>();
 	private final List<ComponentListener> componentListeners = new ArrayList<ComponentListener>();
 	private final Map<Integer, List<EntityComponentListener>> entityComponentListeners = new HashMap<Integer, List<EntityComponentListener>>();
 	private final Map<Set<String>, Set<Entity>> configurationToEntities = new HashMap<Set<String>, Set<Entity>>();
@@ -74,9 +74,9 @@ public class ComponentSystem extends TimedSystem {
 	 * 
 	 * @param componentUpdater
 	 */
-	public void addComponentUpdater(ComponentUpdaterSystem componentUpdater) {
+	public void addComponentUpdater(ComponentUpdaterListener componentUpdater) {
 		componentUpdaterSystems.add(componentUpdater);
-		Collections.sort(componentUpdaterSystems);
+		Collections.sort(componentUpdaterSystems, PriorityListener.getComparator());
 	}
 
 	/**
@@ -287,12 +287,9 @@ public class ComponentSystem extends TimedSystem {
 		for (val updater : componentUpdaterSystems) {
 			long start = TimeUtils.millis();
 			try {
-				if (updater.isEnable()) {
-					updater.onBeforeEntities();
-				}
+				updater.onBeforeEntities();
 			} catch (Throwable t) {
 				log.warn(MarkerManager.getMarker("gem"), "Component System before update", t);
-				updater.setEnable(false);
 			}
 			timingSystem.addTiming(updater.getClass().getName() + "#onBeforeEntities", TimeUtils.millis() - start,
 					getInterval());
@@ -303,12 +300,9 @@ public class ComponentSystem extends TimedSystem {
 			Set<Entity> entities = entitiesFromConfiguration(configuration);
 			for (val entity : entities) {
 				try {
-					if (updater.isEnable()) {
-						updater.onNext(entity);
-					}
+					updater.onNext(entity);
 				} catch (Throwable t) {
 					log.warn(MarkerManager.getMarker("gem"), "Component System update", t);
-					updater.setEnable(false);
 				}
 			}
 			timingSystem.addTiming(updater.getClass().getName() + "#onNext", TimeUtils.millis() - start, getInterval());
@@ -316,12 +310,9 @@ public class ComponentSystem extends TimedSystem {
 		for (val updater : componentUpdaterSystems) {
 			long start = TimeUtils.millis();
 			try {
-				if (updater.isEnable()) {
-					updater.onAfterEntities();
-				}
+				updater.onAfterEntities();
 			} catch (Throwable t) {
 				log.warn(MarkerManager.getMarker("gem"), "Component System after update", t);
-				updater.setEnable(false);
 			}
 			timingSystem.addTiming(updater.getClass().getName() + "#onBeforeEntities", TimeUtils.millis() - start,
 					getInterval());
