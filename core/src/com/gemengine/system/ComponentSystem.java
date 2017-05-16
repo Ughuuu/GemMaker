@@ -113,9 +113,10 @@ public class ComponentSystem extends TimedSystem {
 				List<String> types = new ArrayList<String>();
 				supertypes(component.getClass(), types);
 				for (ComponentListener listener : componentListeners) {
-					if (listener != component) {
+					if (listener.isEnable() && listener != component) {
 						for (String type : types) {
-							if (listener.getConfiguration().contains(type)) {
+							val configuration = listener.getConfiguration();
+							if (configuration != null && configuration.contains(type)) {
 								listener.onChange(ComponentChangeType.DELETE, component);
 								break;
 							}
@@ -257,9 +258,10 @@ public class ComponentSystem extends TimedSystem {
 			List<String> types = new ArrayList<String>();
 			supertypes(component.getClass(), types);
 			for (ComponentListener listener : componentListeners) {
-				if (listener != component) {
+				if (listener.isEnable() && listener != component) {
 					for (String type : types) {
-						if (listener.getConfiguration().contains(type)) {
+						val configuration = listener.getConfiguration();
+						if (configuration != null && configuration.contains(type)) {
 							listener.onNotify(event, component);
 							break;
 						}
@@ -270,7 +272,7 @@ public class ComponentSystem extends TimedSystem {
 		List<EntityComponentListener> listeners = entityComponentListeners.get(getOwner(component.getId()).getId());
 		if (listeners != null) {
 			for (EntityComponentListener listener : listeners) {
-				if (listener != component) {
+				if (listener.isEnable() && listener != component) {
 					listener.onNotify(event, component);
 				}
 			}
@@ -285,6 +287,9 @@ public class ComponentSystem extends TimedSystem {
 	public void onUpdate(float delta) {
 		long startUpdate = TimeUtils.millis();
 		for (val updater : componentUpdaterSystems) {
+			if (!updater.isEnable()) {
+				continue;
+			}
 			long start = TimeUtils.millis();
 			try {
 				updater.onBeforeEntities();
@@ -295,8 +300,14 @@ public class ComponentSystem extends TimedSystem {
 					getInterval());
 		}
 		for (val updater : componentUpdaterSystems) {
+			if (!updater.isEnable()) {
+				continue;
+			}
 			long start = TimeUtils.millis();
 			val configuration = updater.getConfiguration();
+			if (configuration == null) {
+				continue;
+			}
 			Set<Entity> entities = entitiesFromConfiguration(configuration);
 			for (val entity : entities) {
 				try {
@@ -308,6 +319,9 @@ public class ComponentSystem extends TimedSystem {
 			timingSystem.addTiming(updater.getClass().getName() + "#onNext", TimeUtils.millis() - start, getInterval());
 		}
 		for (val updater : componentUpdaterSystems) {
+			if (!updater.isEnable()) {
+				continue;
+			}
 			long start = TimeUtils.millis();
 			try {
 				updater.onAfterEntities();
@@ -349,9 +363,10 @@ public class ComponentSystem extends TimedSystem {
 			List<String> types = new ArrayList<String>();
 			supertypes(component.getClass(), types);
 			for (ComponentListener listener : componentListeners) {
-				if (listener != component) {
+				if (listener.isEnable() && listener != component) {
 					for (String type : types) {
-						if (listener.getConfiguration().contains(type) && listener != component) {
+						val configuration = listener.getConfiguration();
+						if (configuration != null && configuration.contains(type) && listener != component) {
 							listener.onChange(ComponentChangeType.DELETE, component);
 							break;
 						}
@@ -388,10 +403,13 @@ public class ComponentSystem extends TimedSystem {
 		List<String> types = new ArrayList<String>();
 		supertypes(component.getClass(), types);
 		for (ComponentListener listener : componentListeners) {
-			for (String type : types) {
-				if (listener.getConfiguration().contains(type) && listener != component) {
-					listener.onChange(ComponentChangeType.ADD, component);
-					break;
+			if (listener.isEnable()) {
+				for (String type : types) {
+					val configuration = listener.getConfiguration();
+					if (configuration != null && configuration.contains(type) && listener != component) {
+						listener.onChange(ComponentChangeType.ADD, component);
+						break;
+					}
 				}
 			}
 		}

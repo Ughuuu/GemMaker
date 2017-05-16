@@ -361,7 +361,9 @@ public class AssetSystem extends TimedSystem {
 			}
 			if (success) {
 				for (val assetListener : assetListeners) {
-					assetListener.onChange(entry.getChangeType(), oldPath, newPath);
+					if (assetListener.isEnable()) {
+						assetListener.onChange(entry.getChangeType(), oldPath, newPath);
+					}
 				}
 			}
 		}
@@ -373,7 +375,9 @@ public class AssetSystem extends TimedSystem {
 				for (String loadFolder : loadFolders) {
 					if (placeAsset(assetsFolder + path, loadFolder)) {
 						for (val assetListener : assetListeners) {
-							assetListener.onChange(ChangeType.ADD, assetsFolder + path, assetsFolder + path);
+							if (assetListener.isEnable()) {
+								assetListener.onChange(ChangeType.ADD, assetsFolder + path, assetsFolder + path);
+							}
 						}
 					}
 				}
@@ -396,7 +400,9 @@ public class AssetSystem extends TimedSystem {
 					for (String loadFolder : loadFolders) {
 						if (placeAsset(path, loadFolder)) {
 							for (val assetListener : assetListeners) {
-								assetListener.onChange(ChangeType.ADD, path, path);
+								if (assetListener.isEnable()) {
+									assetListener.onChange(ChangeType.ADD, path, path);
+								}
 							}
 						}
 					}

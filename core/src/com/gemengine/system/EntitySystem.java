@@ -70,6 +70,9 @@ public class EntitySystem extends SystemBase {
 		entityNameToId.put(name, ent.getId());
 		entities.put(ent.getId(), ent);
 		for (val entityListener : entityListeners) {
+			if (!entityListener.isEnable()) {
+				continue;
+			}
 			try {
 				entityListener.onChange(EntityChangeType.ADD, ent, ent);
 			} catch (Throwable t) {
@@ -99,6 +102,9 @@ public class EntitySystem extends SystemBase {
 		Entity ent = entities.get(id);
 		if (!entityListeners.isEmpty()) {
 			for (val entityListener : entityListeners) {
+				if (!entityListener.isEnable()) {
+					continue;
+				}
 				try {
 					entityListener.onChange(EntityChangeType.DELETE, ent, ent);
 				} catch (Throwable t) {
@@ -125,6 +131,9 @@ public class EntitySystem extends SystemBase {
 		Entity ent = get(name);
 		if (!entityListeners.isEmpty()) {
 			for (val entityListener : entityListeners) {
+				if (!entityListener.isEnable()) {
+					continue;
+				}
 				try {
 					entityListener.onChange(EntityChangeType.DELETE, ent, ent);
 				} catch (Throwable t) {
@@ -164,6 +173,9 @@ public class EntitySystem extends SystemBase {
 			children.remove(child.getId());
 		}
 		for (val entityListener : entityListeners) {
+			if (!entityListener.isEnable()) {
+				continue;
+			}
 			try {
 				entityListener.onChange(EntityChangeType.DEPARENTED, parent, child);
 			} catch (Throwable t) {
@@ -273,6 +285,9 @@ public class EntitySystem extends SystemBase {
 		}
 		children.add(childId);
 		for (val entityListener : entityListeners) {
+			if (!entityListener.isEnable()) {
+				continue;
+			}
 			try {
 				entityListener.onChange(EntityChangeType.PARENTED, parent, child);
 			} catch (Throwable t) {
