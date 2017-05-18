@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.MarkerManager;
 
+import com.gemengine.component.Component;
 import com.gemengine.entity.Entity;
 import com.gemengine.listener.EntityListener;
 import com.gemengine.listener.PriorityListener;
@@ -252,6 +253,31 @@ public class EntitySystem extends SystemBase {
 	}
 
 	/**
+	 * Get the children of this entity and the children of those, recursively,
+	 * until there are no more children found.
+	 * 
+	 * @param parent
+	 *            the parent entity
+	 * @return The descendants.
+	 */
+	public <T extends Component> Set<Entity> getFirstDescendantsOf(Entity parent, Class<T> componentType) {
+		Set<Integer> childrenIds = entityToChildren.get(parent.getId());
+		Set<Entity> children = new HashSet<Entity>();
+		if (childrenIds == null) {
+			return children;
+		}
+		for (int child : childrenIds) {
+			Entity childEntity = get(child);
+			if (childEntity.getComponent(componentType) != null) {
+				children.add(childEntity);
+			} else {
+				children.addAll(getDescendants(childEntity));
+			}
+		}
+		return children;
+	}
+
+	/**
 	 * Get the parent of this entity or null.
 	 * 
 	 * @param child
@@ -315,6 +341,19 @@ public class EntitySystem extends SystemBase {
 		parents.add(parent);
 		parents.addAll(getPredecessors(parent));
 		return parents;
+	}
+
+	public <T extends Component> Entity getFirstPredecessorOf(Entity child, Class<T> componentType) {
+		Integer parentId = entityToParent.get(child.getId());
+		if (parentId == null) {
+			return null;
+		}
+		Entity parent = get(parentId);
+		if (parent.getComponent(componentType) != null) {
+			return parent;
+		} else {
+			return getFirstPredecessorOf(parent, componentType);
+		}
 	}
 
 	/**

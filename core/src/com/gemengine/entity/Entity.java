@@ -208,6 +208,18 @@ public class Entity {
 	}
 
 	/**
+	 * Get the first predecessor of this entity that contain a component of the
+	 * given type.
+	 * 
+	 * @param type
+	 *            the component type
+	 * @return The predecessors.
+	 */
+	public <T extends Component> Entity getFirstPredecessorOf(Class<T> type) {
+		return entitySystem.getFirstPredecessorOf(this, type);
+	}
+
+	/**
 	 * Get the children of this entity and the children of those, recursively,
 	 * until there are no more children found. Then filters them to contain a
 	 * component of the given type.
@@ -225,6 +237,18 @@ public class Entity {
 			}
 		}
 		return filteredEntities;
+	}
+
+	/**
+	 * Get the first descendants(by rank) of this entity that contains a component of the
+	 * given type.
+	 * 
+	 * @param type
+	 *            the component type
+	 * @return The descendants.
+	 */
+	public <T extends Component> Set<Entity> getFirstDescendantsOf(Class<T> type) {
+		return entitySystem.getFirstDescendantsOf(this, type);
 	}
 
 	/**
