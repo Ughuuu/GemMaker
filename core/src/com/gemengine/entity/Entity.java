@@ -240,8 +240,8 @@ public class Entity {
 	}
 
 	/**
-	 * Get the first descendants(by rank) of this entity that contains a component of the
-	 * given type.
+	 * Get the first descendants(by rank) of this entity that contains a
+	 * component of the given type.
 	 * 
 	 * @param type
 	 *            the component type

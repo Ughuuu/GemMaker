@@ -15,6 +15,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:2.2.0'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.2.0'
         classpath 'org.multi-os-engine:moe-gradle:1.1.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M4'
         // TODO classpath 'me.tatarka:gradle-retrolambda:3.4.0'
     }
 }
@@ -27,13 +28,13 @@ allprojects {
     ext {
         appName = 'example'
         gdxVersion = '1.9.6'
-        roboVMVersion = '1.1.0'
+        roboVMVersion = '2.3.0'
      	lombokVersion = '1.16.16'
      	guiceVersion = '4.1.0'
-     	guavaVersion = '21.0'
      	javaSync = 'f4e4cdd19ce'
      	jackson = '2.9.0.pr2'
      	log4jVersion = "2.8.2"
+     	junitVersion = "4.4"
     }
 
     repositories {
@@ -64,7 +65,8 @@ project(":core") {
         compile "com.github.Ughuuu:JavaSync:$javaSync"
         compile group: 'com.google.inject', name: 'guice', version: guiceVersion
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson
-        compileOnly "org.projectlombok:lombok:$lombokVersion"  
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        // log4j
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
   		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
         compile fileTree(dir: '../libs', include: '*.jar')
@@ -81,6 +83,17 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
+
+project(":test") {
+    apply plugin: "java"
+
+
+    dependencies {
+        compile project(":desktop")
+    	testCompile group: 'junit', name: 'junit', version: junitVersion
+    }
+}
+
 
 tasks.eclipse.doLast {
     delete ".project"

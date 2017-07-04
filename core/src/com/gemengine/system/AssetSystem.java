@@ -284,7 +284,7 @@ public class AssetSystem extends TimedSystem {
 		if (!useBlockingLoad) {
 			assetManager.update();
 		}
-		timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - start, getInterval());
+		timingSystem.addTiming(getClass().getName(), TimeUtils.millis() - start);
 	}
 
 	/**

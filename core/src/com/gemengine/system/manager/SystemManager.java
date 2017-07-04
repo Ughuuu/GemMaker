@@ -83,7 +83,6 @@ public class SystemManager extends TypeManager<SystemBase> {
 			State state = systemToState.get(system);
 			if (state == State.Started) {
 				try {
-					long start = TimeUtils.millis();
 					system.onUpdate(delta);
 				} catch (Throwable t) {
 					log.warn(MarkerManager.getMarker("gem"), "System Manager update", t);

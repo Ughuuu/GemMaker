@@ -102,24 +102,20 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		if (!reloadJava && !reloadJar && !reloadClass || !assetSystem.isLoaded()) {
 			return;
 		}
-		long start = TimeUtils.millis();
 		log.info(MarkerManager.getMarker("gem"), "---------------------------------------------------");
 		if (reloadJar) {
 			reloadJar = false;
 			updateJars();
-			timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - start, getInterval());
 			return;
 		}
 		if (reloadJava) {
 			reloadJava = false;
 			compileSources();
-			timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - start, getInterval());
 			return;
 		}
 		if (reloadClass) {
 			reloadClass = false;
 			updateCode();
-			timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - start, getInterval());
 			return;
 		}
 	}

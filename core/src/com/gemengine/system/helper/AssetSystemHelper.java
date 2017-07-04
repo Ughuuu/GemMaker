@@ -82,8 +82,8 @@ public class AssetSystemHelper {
 		assetSystem.addLoaderDefault(new LoaderData(Pixmap.class), Messages.getString("AssetSystemHelper.PixmapFolder"),
 				new PixmapLoader(resolver), ".png", ".jpg", ".jpeg", ".bmp"); //$NON-NLS-4$
 		assetSystem.addLoaderDefault(new LoaderData(TextureAtlas.class),
-				Messages.getString("AssetSystemHelper.AtlasFolder"), new TextureAtlasLoader(resolver), ".png", ".jpg", //$NON-NLS-3$
-				".jpeg", ".bmp");
+				Messages.getString("AssetSystemHelper.AtlasFolder"), new TextureAtlasLoader(resolver), ".atlas");// $NON-NLS-3$
+
 		assetSystem.addLoaderDefault(new LoaderData(Texture.class), Messages.getString("AssetSystemHelper.ImageFolder"),
 				new TextureLoader(resolver), ".png", ".jpg", ".jpeg", ".bmp"); //$NON-NLS-3$
 		assetSystem.addLoaderDefault(new LoaderData(Skin.class), "uiskin/", new SkinLoader(resolver), ".json");

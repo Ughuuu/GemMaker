@@ -54,8 +54,7 @@ public class JarLoader extends AsynchronousAssetLoader<JarFile, JarLoader.JarPar
 		try {
 			return new JarFile(fileName);
 		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+			throw new IllegalStateException(e.getMessage());
 		}
 	}
 }

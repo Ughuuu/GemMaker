@@ -296,14 +296,6 @@ public class ComponentSystem extends TimedSystem {
 			} catch (Throwable t) {
 				log.warn(MarkerManager.getMarker("gem"), "Component System before update", t);
 			}
-			timingSystem.addTiming(updater.getClass().getName() + "#onBeforeEntities", TimeUtils.millis() - start,
-					getInterval());
-		}
-		for (val updater : componentUpdaterSystems) {
-			if (!updater.isEnable()) {
-				continue;
-			}
-			long start = TimeUtils.millis();
 			val configuration = updater.getConfiguration();
 			if (configuration == null) {
 				continue;
@@ -316,22 +308,14 @@ public class ComponentSystem extends TimedSystem {
 					log.warn(MarkerManager.getMarker("gem"), "Component System update", t);
 				}
 			}
-			timingSystem.addTiming(updater.getClass().getName() + "#onNext", TimeUtils.millis() - start, getInterval());
-		}
-		for (val updater : componentUpdaterSystems) {
-			if (!updater.isEnable()) {
-				continue;
-			}
-			long start = TimeUtils.millis();
 			try {
 				updater.onAfterEntities();
 			} catch (Throwable t) {
 				log.warn(MarkerManager.getMarker("gem"), "Component System after update", t);
 			}
-			timingSystem.addTiming(updater.getClass().getName() + "#onBeforeEntities", TimeUtils.millis() - start,
-					getInterval());
+			timingSystem.addTiming(updater.getClass().getName(), TimeUtils.millis() - start);
 		}
-		timingSystem.addTiming(getClass().getName() + "#onUpdate", TimeUtils.millis() - startUpdate, getInterval());
+		timingSystem.addTiming(getClass().getName(), TimeUtils.millis() - startUpdate);
 	}
 
 	/**
