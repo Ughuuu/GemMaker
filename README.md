@@ -1,5 +1,7 @@
 # GemMaker
+
 ![logo](https://github.com/Ughuuu/GemMaker/blob/master/android/assets/gem.png)
+
 Game Engine with real time code recompiling and pulg-in architecture.
 
 Take it from Jitpack!
