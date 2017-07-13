@@ -18,6 +18,3 @@ Take it from Jitpack!
 - [JavaSync](https://github.com/Ughuuu/JavaSync/)
 - [Lombok](https://projectlombok.org/)
 - [libGDX](https://libgdx.badlogicgames.com/)
-
-Want to know more?
-- This project is used in [GemMaker](https://github.com/Ughuuu/GemMaker)
