@@ -84,17 +84,6 @@ project(":desktop") {
     }
 }
 
-project(":test") {
-    apply plugin: "java"
-
-
-    dependencies {
-        compile project(":desktop")
-    	testCompile group: 'junit', name: 'junit', version: junitVersion
-    }
-}
-
-
 tasks.eclipse.doLast {
     delete ".project"
 }
