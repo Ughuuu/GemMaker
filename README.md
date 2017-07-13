@@ -18,3 +18,12 @@ Take it from Jitpack!
 - [JavaSync](https://github.com/Ughuuu/JavaSync/)
 - [Lombok](https://projectlombok.org/)
 - [libGDX](https://libgdx.badlogicgames.com/)
+
+**Official Plug-ins**
+- [Base Pack](https://github.com/Ughuuu/GemEngineBasePack/)
+- [2d Pack](https://github.com/Ughuuu/GemEngine2dPack/)
+- [UI Pack](https://github.com/Ughuuu/GemEngineUIPack/)
+- [ ] 3d Pack
+- [ ] Sound Pack
+- [ ] 2d Physics Pack
+- [ ] 3d Physics Pack
