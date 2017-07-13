@@ -1,13 +1,16 @@
 # GemMaker
-Need to compile a Java code to either a .class or a .dex while running?
+Game Engine with real time code recompiling and pulg-in architecture.
+Take it from Jitpack!
+[![](https://jitpack.io/v/Ughuuu/GemMaker.svg)](https://jitpack.io/#Ughuuu/GemMaker)
 
 **Features**
-- [ ] Work In Progress.
+- [x] Entity Component System Architecture
+- [x] Real Time Recompiling Code
+- [x] Support to Plug-in Components or Systems
 
 **Dependencies**
 - [JavaSync](https://github.com/Ughuuu/JavaSync/)
 - [Lombok](https://projectlombok.org/)
-- [JUnit](http://junit.org/junit4/)
 - [libGDX](https://libgdx.badlogicgames.com/)
 
 Want to know more?
