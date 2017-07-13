@@ -20,9 +20,9 @@ Take it from Jitpack!
 - [libGDX](https://libgdx.badlogicgames.com/)
 
 **Official Plug-ins**
-- [Base Pack](https://github.com/Ughuuu/GemEngineBasePack/)
-- [2d Pack](https://github.com/Ughuuu/GemEngine2dPack/)
-- [UI Pack](https://github.com/Ughuuu/GemEngineUIPack/)
+- [Base Pack](https://github.com/Ughuuu/GemEngineBasePack/)[![](https://jitpack.io/v/Ughuuu/GemEngineBasePack.svg)](https://jitpack.io/#Ughuuu/GemEngineBasePack)
+- [2d Pack](https://github.com/Ughuuu/GemEngine2dPack/)[![](https://jitpack.io/v/Ughuuu/GemEngine2dPack.svg)](https://jitpack.io/#Ughuuu/GemEngine2dPack)
+- [UI Pack](https://github.com/Ughuuu/GemEngineUIPack/)[![](https://jitpack.io/v/Ughuuu/GemEngineUIPack.svg)](https://jitpack.io/#Ughuuu/GemEngineUIPack)
 - [ ] 3d Pack
 - [ ] Sound Pack
 - [ ] 2d Physics Pack
