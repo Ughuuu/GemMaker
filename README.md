@@ -1,12 +1,13 @@
-# GemMaker
+# GemMaker 
 
-![logo](https://github.com/Ughuuu/GemMaker/blob/master/android/assets/gem.png)
+![](https://github.com/Ughuuu/GemMaker/blob/master/android/assets/gem.png)
+
+[![](https://jitpack.io/v/Ughuuu/GemMaker.svg)](https://jitpack.io/#Ughuuu/GemMaker)
 
 Game Engine with real time code recompiling and pulg-in architecture.
 
 Take it from Jitpack!
 
-[![](https://jitpack.io/v/Ughuuu/GemMaker.svg)](https://jitpack.io/#Ughuuu/GemMaker)
 
 **Features**
 - [x] Entity Component System Architecture
