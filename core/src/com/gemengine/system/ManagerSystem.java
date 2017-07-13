@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 
@@ -62,8 +63,7 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 	}
 
 	/**
-	 * Add a listener here if you want to listen for component type class
-	 * change.
+	 * Add a listener here if you want to listen for component type class change.
 	 * 
 	 * @param componentListener
 	 */
@@ -94,7 +94,8 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 		setCodeSync(ManagerSystem.class.getClassLoader(), assetSystem);
 		setJarSync(assetSystem);
 		// assetSystem.loadFolder("assets/libs/");
-		assetSystem.loadFolder("assets/");
+		assetSystem.loadFolder("assets/libs/");
+		assetSystem.loadFolder("assets/code/");
 	}
 
 	@Override
@@ -225,8 +226,13 @@ public class ManagerSystem extends TimedSystem implements AssetListener {
 					if (loadSystem(cls)) {
 
 					} else if (TypeManager.extendsType(cls, Component.class)) {
+						List<Class<? extends SystemBase>> systems = systemManager.getDepends(cls);
+						for (val system : systems) {
+							loadSystem(system);
+						}
 						for (val listener : listeners.entrySet()) {
-							// listener.getValue().onTypeChange(cls);
+							// TODO find a place to actually to this. Maybe in a later call to update?
+							// listener.getValue().onTypeChange((Class<? extends Component>) cls);
 						}
 					}
 				} catch (Throwable t) {

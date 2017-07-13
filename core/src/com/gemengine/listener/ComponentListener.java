@@ -69,8 +69,8 @@ public interface ComponentListener extends PriorityListener{
 	 * Called when the component type has changed(eg. the class that represented
 	 * the component has changed externally).
 	 * 
-	 * @param type
+	 * @param cls
 	 *            The type that changed.
 	 */
-	public <T extends Component> void onTypeChange(Class<T> type);
+	public <T extends Component> void onTypeChange(Class<T> cls);
 }

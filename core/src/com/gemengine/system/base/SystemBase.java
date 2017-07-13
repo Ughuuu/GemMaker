@@ -55,7 +55,7 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 		this.enable = enable;
 		this.priority = priority;
 		id = lastId++;
-		log.debug(MarkerManager.getMarker("gem"), "System created: id {} type {}", id, this.getClass());
+		log.debug(MarkerManager.getMarker("gem"), "System created: id {} type {} {}", id, getClass());
 	}
 
 	@Override
@@ -83,23 +83,22 @@ public abstract class SystemBase implements Comparable<SystemBase> {
 	}
 
 	/**
-	 * Called when the {@link Application} is paused, usually when it's not
-	 * active or visible on screen. An Application is also paused before it is
-	 * destroyed.
+	 * Called when the {@link Application} is paused, usually when it's not active
+	 * or visible on screen. An Application is also paused before it is destroyed.
 	 */
 	public void onPause() {
 	}
 
 	/**
-	 * Called when the {@link Application} is resumed from a paused state,
-	 * usually when it regains focus.
+	 * Called when the {@link Application} is resumed from a paused state, usually
+	 * when it regains focus.
 	 */
 	public void onResume() {
 	}
 
 	/**
-	 * Called when the {@link Application} is resized. This can happen at any
-	 * point during a non-paused state but will never happen before a call to
+	 * Called when the {@link Application} is resized. This can happen at any point
+	 * during a non-paused state but will never happen before a call to
 	 * {@link #onInit()}.
 	 * 
 	 * @param width

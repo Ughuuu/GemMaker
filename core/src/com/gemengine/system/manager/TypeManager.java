@@ -47,8 +47,8 @@ public abstract class TypeManager<T> {
 	private final Class<T> classType;
 
 	/**
-	 * Construct a new Type Manager with the given generic class. Used because
-	 * of type erasure.
+	 * Construct a new Type Manager with the given generic class. Used because of
+	 * type erasure.
 	 * 
 	 * @param type
 	 */
@@ -74,6 +74,10 @@ public abstract class TypeManager<T> {
 	public <U extends T> U getType(String type) {
 		return (U) types.get(type);
 	}
+	
+	public List<String> getAllSystems(){
+		return new ArrayList<String>(types.keySet());
+	}
 
 	/**
 	 * Inject a given type.
@@ -95,9 +99,8 @@ public abstract class TypeManager<T> {
 	}
 
 	/**
-	 * Event called on update. This instantiates the types that were added
-	 * between last update event. This does not instantiate the types that are
-	 * excluded.
+	 * Event called on update. This instantiates the types that were added between
+	 * last update event. This does not instantiate the types that are excluded.
 	 * 
 	 * @param delta
 	 */
@@ -121,8 +124,8 @@ public abstract class TypeManager<T> {
 	}
 
 	/**
-	 * Copy a given type. This occurs on onUpdate event. It is not instant. Use
-	 * this for add event also.
+	 * Copy a given type. This occurs on onUpdate event. It is not instant. Use this
+	 * for add event also.
 	 * 
 	 * @param typeClass
 	 */
@@ -130,17 +133,48 @@ public abstract class TypeManager<T> {
 		copyList.add(typeClass);
 	}
 
-	private void addAll(List<Class<? extends T>> types, Class<? extends T> type) {
+	/**
+	 * Get constructor dependencies of a class type.
+	 * 
+	 * @param type
+	 *            the class type to give dependencies for
+	 * @return A list of classes that this has defined in it's constructor
+	 */
+	public List<Class<? extends T>> getDepends(Class<?> type) {
+		List<Class<? extends T>> dependenciesAsClasses = new ArrayList<Class<? extends T>>();
+		InjectionPoint injectionPoint = null;
+		try {
+			injectionPoint = InjectionPoint.forConstructorOf(type);
+		} catch (Exception e) {
+			return dependenciesAsClasses;
+		}
+		List<Dependency<?>> dependencies = injectionPoint.getDependencies();
+		for (val dependency : dependencies) {
+			Class<?> dependencyClass = dependency.getKey().getTypeLiteral().getRawType();
+			if (extendsType(dependencyClass, classType)) {
+				dependenciesAsClasses.add((Class<? extends T>) dependencyClass);
+			}
+		}
+		return dependenciesAsClasses;
+	}
+
+	/**
+	 * Add all types from constructor of type to existing types list.
+	 * 
+	 * @param existingTypes
+	 * @param type
+	 */
+	public void addAll(List<Class<? extends T>> existingTypes, Class<? extends T> type) {
 		InjectionPoint injectionPoint = InjectionPoint.forConstructorOf(type);
 		List<Dependency<?>> dependencies = injectionPoint.getDependencies();
 		for (val dependency : dependencies) {
 			Class<?> dependencyClass = dependency.getKey().getTypeLiteral().getRawType();
 			if (extendsType(dependencyClass, classType)) {
-				if (types.contains(dependencyClass)) {
-					types.remove(dependencyClass);
+				if (existingTypes.contains(dependencyClass)) {
+					existingTypes.remove(dependencyClass);
 				}
-				types.add((Class<? extends T>) dependencyClass);
-				addAll(types, (Class<? extends T>) dependencyClass);
+				existingTypes.add((Class<? extends T>) dependencyClass);
+				addAll(existingTypes, (Class<? extends T>) dependencyClass);
 			}
 		}
 	}
