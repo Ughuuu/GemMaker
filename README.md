@@ -1,6 +1,6 @@
 # GemMaker 
 
-![](https://github.com/Ughuuu/GemMaker/blob/master/android/assets/gem.png)
+[![](https://github.com/Ughuuu/GemMaker/blob/master/android/assets/gem.png)](https://github.com/Ughuuu/GemMaker)
 
 [![](https://jitpack.io/v/Ughuuu/GemMaker.svg)](https://jitpack.io/#Ughuuu/GemMaker)
 
