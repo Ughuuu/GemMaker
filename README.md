@@ -1,6 +1,8 @@
 # GemMaker
 Game Engine with real time code recompiling and pulg-in architecture.
+
 Take it from Jitpack!
+
 [![](https://jitpack.io/v/Ughuuu/GemMaker.svg)](https://jitpack.io/#Ughuuu/GemMaker)
 
 **Features**
