@@ -1,89 +1,73 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { 
-	        url "https://oss.sonatype.org/content/repositories/snapshots/" 
-		    url "https://repo.eclipse.org/content/groups/releases/"
-		    url 'http://repo1.maven.org/maven2'
-		    url "http://localrepo:8081/artifactory/libs-release"
-	    }
-        mavenLocal()
         jcenter()
-    }
-    dependencies {
-        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.2.0'
-        classpath 'org.multi-os-engine:moe-gradle:1.1.0'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M4'
-        // TODO classpath 'me.tatarka:gradle-retrolambda:3.4.0'
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '1.0'
+    version = applicationVersion
+
     ext {
-        appName = 'example'
-        gdxVersion = '1.9.6'
-        roboVMVersion = '2.3.0'
-     	lombokVersion = '1.16.16'
-     	guiceVersion = '4.1.0'
-     	javaSync = 'f4e4cdd19ce'
-     	jackson = '2.9.0.pr2'
-     	log4jVersion = "2.8.2"
-     	junitVersion = "4.4"
+        appName = applicationName
+        gdxVersion = gdxVersion
+     	lombokVersion = lombokVersion
+     	guiceVersion = guiceVersion
+     	javaSync = javaSyncVersion
+     	jackson = jacksonVersion
+     	log4jVersion = log4jVersion
+     	junitVersion = junitVersion
     }
 
     repositories {
         mavenCentral()
-        maven { 
-	        url "https://oss.sonatype.org/content/repositories/snapshots/"
-	        url "https://oss.sonatype.org/content/repositories/releases/"
-	        url 'https://jitpack.io'
-	    }
     }
 }
 
-project(":core") {
+project(":gem-engine-common") {
     apply plugin: "java"
-    // TODO apply plugin: "me.tatarka.retrolambda"
 
     configurations {
         provided
     }
 
     sourceSets {
-        // run the annotation processor compile time.
+        main { compileClasspath += configurations.provided }
+    }
+}
+
+project(":gem-engine-core") {
+    apply plugin: "java"
+
+    configurations {
+        provided
+    }
+
+    sourceSets {
         main { compileClasspath += configurations.provided }
     }
 
     dependencies {
+        compile project(":common")
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.github.Ughuuu:JavaSync:$javaSync"
         compile group: 'com.google.inject', name: 'guice', version: guiceVersion
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson
-        compileOnly "org.projectlombok:lombok:$lombokVersion"
-        // log4j
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
   		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
-        compile fileTree(dir: '../libs', include: '*.jar')
+        //compile fileTree(dir: '../libs', include: '*.jar')
     }
 }
 
-project(":desktop") {
+project(":gem-engine-desktop") {
     apply plugin: "java"
-
 
     dependencies {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }

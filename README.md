@@ -10,7 +10,7 @@ Take it from Jitpack!
 
 
 **Features**
-- [x] Entity Component System Architecture
+- [x] Entity Component SystemBase Architecture
 - [x] Real Time Recompiling Code
 - [x] Support to Plug-in Components or Systems
 
